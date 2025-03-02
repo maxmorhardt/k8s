@@ -1,0 +1,30 @@
+global:
+  storageClass: postgres
+  postgresql:
+    auth:
+      username: maxmorhardt
+      database: maxstash
+      existingSecret: postgres-credentials
+      secretKeys:
+        adminPasswordKey: admin-password
+        userPasswordKey: user-password
+
+primary:
+  service:
+    type: NodePort
+    nodePorts:
+      postgresql: 30543
+
+  nodeSelector:
+    kubernetes.io/hostname: max-worker
+
+  persistence:
+    size: 1024Gi
+
+  resources:
+    requests:
+      cpu: 1
+      memory: 512Mi
+    limits:
+      cpu: 2
+      memory: 1024Mi

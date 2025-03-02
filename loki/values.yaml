@@ -1,0 +1,53 @@
+deploymentMode: SingleBinary
+
+loki:
+  auth_enabled: false
+
+  memcached:
+    chunk_cache:
+      enabled: false
+    results_cache:
+      enabled: false
+
+  commonConfig:
+    replication_factor: 1
+
+  storage:
+    type: 'filesystem'
+
+  schemaConfig:
+    configs:
+    - from: "2024-01-01"
+      store: tsdb
+      index:
+        prefix: loki_index_
+        period: 24h
+      object_store: filesystem
+      schema: v13
+      
+singleBinary:
+  replicas: 1
+read:
+  replicas: 0
+backend:
+  replicas: 0
+write:
+  replicas: 0
+
+gateway:
+  service:
+    port: 80
+    type: ClusterIP
+    clusterIP: 10.43.11.52
+
+test:
+  enabled: false
+
+lokiCanary:
+  enabled: false
+
+resultsCache:
+  enabled: false
+
+chunksCache:
+  enabled: false

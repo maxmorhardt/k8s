@@ -1,0 +1,64 @@
+pipeline {
+	agent {
+		kubernetes {
+			defaultContainer 'dind'
+			yaml '''
+kind: Pod
+spec:
+  containers:
+  - name: dind
+    image: docker:27-dind
+    imagePullPolicy: Always
+    securityContext:
+      privileged: true
+'''
+		}
+	}
+
+	parameters {
+		string(name: 'TAG', defaultValue: params.TAG ?: 'buildpack/1.0.0', description: 'Git tag version', trim: true)
+	}
+
+	environment { 
+		APP_NAME = 'jenkins-buildpack'
+		GITHUB_URL = 'https://github.com/maxmorhardt/k8s'
+	}
+
+	stages {
+
+		stage('Git Clone') {
+			steps {
+				script {
+					checkout scmGit(
+						branches: [[
+							name: "$TAG"
+						]],
+						userRemoteConfigs: [[
+							credentialsId: 'github',
+							url: "$GITHUB_URL"
+						]]
+					)
+
+					sh 'ls -lah'
+				}
+			}
+		}
+
+		stage('CI') {
+			steps {
+				script {
+					withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+						TAG_VERSION = "$TAG".split("/")[1]
+						echo "$TAG_VERSION"
+
+						sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+						
+						sh "docker buildx build --platform linux/arm64/v8 . --tag $DOCKER_USERNAME/$APP_NAME:$TAG_VERSION --tag $DOCKER_USERNAME/$APP_NAME:latest --file jenkins/jobs/buildpack/Dockerfile"
+						sh "docker push $DOCKER_USERNAME/$APP_NAME --all-tags"
+					}
+				}
+			}
+		}
+
+	}
+}

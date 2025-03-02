@@ -1,0 +1,132 @@
+controller:
+  componentName: "jenkins-controller"
+  image:
+    registry: "docker.io"
+    repository: "jenkins/jenkins"
+    tagLabel: jdk17
+    pullPolicy: "Always"
+
+  admin:
+    username: "<JENKINS_ADMIN_USERNAME>"
+    password: "<JENKINS_ADMIN_PASSWORD>"
+
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1024Mi"
+
+  usePodSecurityContext: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+  containerSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+
+  serviceType: ClusterIP
+  
+  servicePort: 8080
+  targetPort: 8080
+
+  nodeSelector:
+    kubernetes.io/hostname: max-worker-2
+
+  healthProbes: true
+  probes:
+    startupProbe:
+      failureThreshold: 12
+      httpGet:
+        path: '{{ default "" .Values.controller.jenkinsUriPrefix }}/login'
+        port: http
+      periodSeconds: 10
+      timeoutSeconds: 5
+    livenessProbe:
+      failureThreshold: 5
+      httpGet:
+        path: '{{ default "" .Values.controller.jenkinsUriPrefix }}/login'
+        port: http
+      periodSeconds: 10
+      timeoutSeconds: 5
+    readinessProbe:
+      failureThreshold: 3
+      httpGet:
+        path: '{{ default "" .Values.controller.jenkinsUriPrefix }}/login'
+        port: http
+      periodSeconds: 10
+      timeoutSeconds: 5
+  
+  installPlugins:
+    - kubernetes:4295.v7fa_01b_309c95
+    - workflow-aggregator:600.vb_57cdd26fdd7
+    - git:5.5.2
+    - docker-workflow:580.vc0c340686b_54
+    - configuration-as-code:1850.va_a_8c31d3158b_
+    - oic-auth:4.418.vccc7061f5b_6d
+    - role-strategy:743.v142ea_b_d5f1d3
+    - pipeline-stage-view:2.34
+    - ssh-agent:376.v8933585c69d3
+    - email-ext:1844.v3ea_a_b_842374a_
+  installLatestPlugins: true
+  installLatestSpecifiedPlugins: false
+  additionalPlugins: []
+
+  existingSecret:
+  additionalExistingSecrets: []
+  additionalSecrets: []
+  secretClaims: []
+
+  JCasC:
+    securityRealm: |-
+      oic:
+        serverConfiguration:
+          wellKnown:
+            wellKnownOpenIDConfigurationUrl: "https://auth.maxstash.io/realms/dev/.well-known/openid-configuration"
+            scopesOverride: "openid email profile"
+        clientId: "<JENKINS_CLIENT_ID>"
+        clientSecret: "<JENKINS_CLIENT_SECRET>"
+        disableSslVerification: false
+        logoutFromOpenidProvider: true
+        userNameField: "preferred_username"
+        emailFieldName: "email"
+        groupsFieldName: "groups"
+        escapeHatchEnabled: false
+        
+    authorizationStrategy: |
+      roleBased:
+        roles:
+          global:
+            - name: "admin"
+              description: "Jenkins administrators"
+              permissions:
+                - "Overall/Administer"
+              entries:
+                - group: "/jenkins"
+
+  ingress:
+    enabled: true
+    apiVersion: "networking.k8s.io/v1"
+    labels: {}
+    annotations: {}
+    ingressClassName: nginx
+    path: /
+    hostName: jenkins.maxstash.io
+    resourceRootUrl:
+    tls: 
+    - secretName: jenkins.maxstash.io-tls
+      hosts:
+        - jenkins.maxstash.io
+
+persistence:
+  enabled: true
+  storageClass: jenkins
+  accessMode: "ReadWriteOnce"
+  size: "32Gi"
+
+serviceAccount:
+  create: false
+  name: jenkins
