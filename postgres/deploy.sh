@@ -15,9 +15,9 @@ sed -i "s/<POSTGRES_USER_PASSWORD>/$POSTGRES_USER_PASSWORD_B64/g" secret.yaml
 
 cat secret.yaml
 
-kubectl apply --filename storage.yaml --namespace postgres
-kubectl apply --filename secret.yaml --namespace postgres
+kubectl apply --filename storage.yaml --namespace maxstash-global
+kubectl apply --filename secret.yaml --namespace maxstash-global
 
-helm install db oci://registry-1.docker.io/bitnamicharts/postgresql --version 15.5.38 --values values.yaml --namespace postgres
+helm install db oci://registry-1.docker.io/bitnamicharts/postgresql --version 16.4.14 --values values.yaml --namespace maxstash-global
 
 git restore secret.yaml

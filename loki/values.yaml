@@ -38,7 +38,6 @@ gateway:
   service:
     port: 80
     type: ClusterIP
-    clusterIP: 10.43.11.52
 
 test:
   enabled: false

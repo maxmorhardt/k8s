@@ -19,8 +19,6 @@ kubectl create secret tls rancher.maxstash.io-tls --cert=cert.pem --key=key.pem 
 rm cert.pem
 rm key.pem
 
-helm uninstall rancher --namespace cattle-system
-
 helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
 helm repo update
 
