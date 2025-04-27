@@ -61,16 +61,14 @@ controller:
       timeoutSeconds: 5
   
   installPlugins:
-    - kubernetes:4295.v7fa_01b_309c95
-    - workflow-aggregator:600.vb_57cdd26fdd7
-    - git:5.5.2
-    - docker-workflow:580.vc0c340686b_54
-    - configuration-as-code:1850.va_a_8c31d3158b_
-    - oic-auth:4.418.vccc7061f5b_6d
-    - role-strategy:743.v142ea_b_d5f1d3
-    - pipeline-stage-view:2.34
-    - ssh-agent:376.v8933585c69d3
-    - email-ext:1844.v3ea_a_b_842374a_
+    - kubernetes:4324.vfec199a_33512
+    - workflow-aggregator:608.v67378e9d3db_1
+    - git:5.7.0
+    - docker-workflow:611.v16e84da_6d3ff
+    - configuration-as-code:1958.vddc0d369b_e16
+    - oic-auth:4.494.v6b_f419104767
+    - role-strategy:756.v978cb_392eb_d3
+    - pipeline-stage-view:2.37
   installLatestPlugins: true
   installLatestSpecifiedPlugins: false
   additionalPlugins: []
@@ -94,7 +92,7 @@ controller:
         userNameField: "preferred_username"
         emailFieldName: "email"
         groupsFieldName: "groups"
-        escapeHatchEnabled: false
+        escapeHatchEnabled: true
         
     authorizationStrategy: |
       roleBased:

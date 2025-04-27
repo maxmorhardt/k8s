@@ -4,7 +4,7 @@ Once Rancher and Keycloak are setup, do the following
 ### In Keycloak:
 1. Create Client in Keycloak realm for Rancher
 	- Client Authentication must be true to obtain client secret
-	- Redirect urls should include https://<dns>/*
+	- Redirect urls and post logout urls should include https://<dns> and https://<dns>/*
 	- Standard flow and Direct Access Grants should be true
 	- Configure rancher-dedicated scope (https://ranchermanager.docs.rancher.com/how-to-guides/new-user-guides/authentication-permissions-and-global-configuration/authentication-config/configure-keycloak-oidc)
 
