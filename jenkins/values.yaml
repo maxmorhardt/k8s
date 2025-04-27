@@ -83,7 +83,7 @@ controller:
       oic:
         serverConfiguration:
           wellKnown:
-            wellKnownOpenIDConfigurationUrl: "https://auth.maxstash.io/realms/dev/.well-known/openid-configuration"
+            wellKnownOpenIDConfigurationUrl: "https://auth.maxstash.io/realms/maxstash-dev/.well-known/openid-configuration"
             scopesOverride: "openid email profile"
         clientId: "<JENKINS_CLIENT_ID>"
         clientSecret: "<JENKINS_CLIENT_SECRET>"
@@ -103,7 +103,7 @@ controller:
               permissions:
                 - "Overall/Administer"
               entries:
-                - group: "/jenkins"
+                - group: "/Jenkins_Admin"
 
   ingress:
     enabled: true
