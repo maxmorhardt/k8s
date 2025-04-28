@@ -3,7 +3,7 @@ controller:
   image:
     registry: "docker.io"
     repository: "jenkins/jenkins"
-    tagLabel: jdk17
+    tagLabel: jdk21
     pullPolicy: "Always"
 
   admin:
@@ -93,6 +93,9 @@ controller:
         emailFieldName: "email"
         groupsFieldName: "groups"
         escapeHatchEnabled: true
+        escapeHatchUsername: "<JENKINS_ADMIN_USERNAME>"
+        escapeHatchSecret: "<JENKINS_ADMIN_PASSWORD>"
+        escapeHatchGroup: "/Jenkins_Admin"
         
     authorizationStrategy: |
       roleBased:
