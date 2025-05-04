@@ -109,42 +109,6 @@ controller:
               entries:
                 - group: "/Jenkins_Admin"
 
-    clouds: |
-      - kubernetes:
-          containerCap: 10
-          containerCapStr: "10"
-          jenkinsTunnel: "jenkins-agent.maxstash-global.svc.cluster.local:50000"
-          jenkinsUrl: "http://jenkins.maxstash-global.svc.cluster.local:8080"
-          name: "kubernetes"
-          namespace: "maxstash-global"
-          podLabels:
-          - key: "jenkins/jenkins-jenkins-agent"
-            value: "true"
-          serverUrl: "https://kubernetes.default"
-          templates:
-          - containers:
-            - args: "^${computer.jnlpmac} ^${computer.name}"
-              envVars:
-              - envVar:
-                  key: "JENKINS_URL"
-                  value: "http://jenkins.maxstash-global.svc.cluster.local:8080/"
-              image: "jenkins/inbound-agent:3307.v632ed11b_3a_c7-2"
-              name: "jnlp"
-              resourceLimitCpu: "256m"
-              resourceLimitMemory: "256Mi"
-              resourceRequestCpu: "256m"
-              resourceRequestMemory: "256Mi"
-              workingDir: "/home/jenkins/agent"
-            label: "jenkins-jenkins-agent"
-            name: "default"
-            namespace: "maxstash-global"
-            nodeUsageMode: NORMAL
-            podRetention: "never"
-            serviceAccount: "jenkins"
-            slaveConnectTimeout: 100
-            slaveConnectTimeoutStr: "100"
-            yamlMergeStrategy: "override"
-
   ingress:
     enabled: true
     apiVersion: "networking.k8s.io/v1"
