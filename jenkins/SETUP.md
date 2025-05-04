@@ -15,11 +15,13 @@
 
 ## Pod Template
 1. In Manage Jenkins > Clouds > kubernetes > Pod Templates > default
-   - Update/add jnlp, dind, and buildpack container templates
-   - Add jenkins service account
+   - Update/add jnlp, dind, and buildpack container templates with appropriate config
+   - Update service account to 'jenkins'
+   - Update YAML merge strategy to 'merge'
 
 JCasC should look like:
 
+```yaml
 clouds:
   - kubernetes:
       containerCap: 10
@@ -54,9 +56,7 @@ clouds:
           runAsGroup: "1000"
           runAsUser: "1000"
           workingDir: "/home/jenkins/agent"
-        - args: "9999999"
-          command: "sleep"
-          image: "docker:28-dind"
+        - image: "docker:28-dind"
           livenessProbe:
             failureThreshold: 0
             initialDelaySeconds: 0
@@ -67,14 +67,12 @@ clouds:
           privileged: true
           resourceLimitCpu: "500m"
           resourceLimitMemory: "512Mi"
-          resourceRequestCpu: "500m"
-          resourceRequestMemory: "512Mi"
+          resourceRequestCpu: "200m"
+          resourceRequestMemory: "256Mi"
           runAsGroup: "0"
           runAsUser: "0"
           workingDir: "/home/jenkins/agent"
         - alwaysPullImage: true
-          args: "9999999"
-          command: "sleep"
           image: "maxmorhardt/jenkins-buildpack:latest"
           livenessProbe:
             failureThreshold: 0
@@ -86,8 +84,8 @@ clouds:
           privileged: true
           resourceLimitCpu: "500m"
           resourceLimitMemory: "512Mi"
-          resourceRequestCpu: "500m"
-          resourceRequestMemory: "512Mi"
+          resourceRequestCpu: "200m"
+          resourceRequestMemory: "256Mi"
           runAsGroup: "0"
           runAsUser: "0"
           workingDir: "/home/jenkins/agent"
@@ -95,9 +93,10 @@ clouds:
         label: "jenkins-jenkins-agent"
         name: "default"
         namespace: "maxstash-global"
-        nodeUsageMode: NORMAL
+        nodeUsageMode: "NORMAL"
         podRetention: "never"
         serviceAccount: "jenkins"
-        slaveConnectTimeout: 100
-        slaveConnectTimeoutStr: "100"
-        yamlMergeStrategy: "override"
+        slaveConnectTimeout: 180
+        slaveConnectTimeoutStr: "180"
+        yamlMergeStrategy: "merge"
+```
