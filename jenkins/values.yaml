@@ -110,8 +110,8 @@ controller:
                 - group: "/Jenkins_Admin"
 
     clouds: |
-    - kubernetes:
-      serviceAccount: "jenkins"
+      - kubernetes:
+        serviceAccount: "jenkins"
 
   ingress:
     enabled: true
