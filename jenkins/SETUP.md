@@ -14,10 +14,13 @@
 2. Create directory /data/jenkins with 1000:1000 owner/group 
 
 ## Pod Template
-1. In Manage Jenkins > Clouds > kubernetes > Pod Templates > default
-   - Update/add jnlp, dind, and buildpack container templates with appropriate config
+1. In Manage Jenkins > Clouds > kubernetes > Configure
+   - Add/update jnlp, dind, and buildpack container templates with appropriate config
    - Update service account to 'jenkins'
-   - Update YAML merge strategy to 'merge'
+   - Change YAML merge strategy to 'merge'
+
+2. In Manage Jenkins > Clouds > kubernetes > Pod Templates > default
+   - Lower concurrency limit to 5
 
 JCasC should look like:
 
