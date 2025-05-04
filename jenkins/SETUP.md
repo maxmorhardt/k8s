@@ -24,8 +24,8 @@ JCasC should look like:
 ```yaml
 clouds:
   - kubernetes:
-      containerCap: 10
-      containerCapStr: "10"
+      containerCap: 5
+      containerCapStr: "5"
       jenkinsTunnel: "jenkins-agent.maxstash-global.svc.cluster.local:50000"
       jenkinsUrl: "http://jenkins.maxstash-global.svc.cluster.local:8080"
       name: "kubernetes"
