@@ -61,7 +61,7 @@ controller:
       timeoutSeconds: 5
   
   installPlugins:
-    - kubernetes:4324.vfec199a_33512
+    - kubernetes:4295.v7fa_01b_309c95
     - workflow-aggregator:608.v67378e9d3db_1
     - git:5.7.0
     - docker-workflow:611.v16e84da_6d3ff
