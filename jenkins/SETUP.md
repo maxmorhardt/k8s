@@ -52,8 +52,8 @@ clouds:
             successThreshold: 0
             timeoutSeconds: 0
           name: "jnlp"
-          resourceLimitCpu: "200m"
-          resourceLimitMemory: "256Mi"
+          resourceLimitCpu: "500m"
+          resourceLimitMemory: "512Mi"
           resourceRequestCpu: "200m"
           resourceRequestMemory: "256Mi"
           runAsGroup: "1000"
