@@ -22,7 +22,7 @@
 2. In Manage Jenkins > Clouds > kubernetes > Pod Templates > default
    - Lower concurrency limit to 5
 
-JCasC should look like:
+JCasC should look like (both in config map and in controller):
 
 ```yaml
 clouds:
