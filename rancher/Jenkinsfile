@@ -1,0 +1,60 @@
+pipeline {
+	agent {
+		kubernetes {
+			inheritFrom 'default'
+			defaultContainer 'buildpack'
+		}
+	}
+
+	environment {
+        GITHUB_URL = 'https://github.com/maxmorhardt/k8s'
+        APP_NAME = "rancher"
+        NAMESPACE = "cattle-system"
+	}
+
+	stages {
+		stage('Git Clone') {
+			steps {
+				script {
+					withCredentials([file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG')]) {
+						checkout scmGit(
+							branches: [[
+								name: "$BRANCH_NAME"
+							]],
+							userRemoteConfigs: [[
+								credentialsId: 'github',
+								url: "$GITHUB_URL"
+							]]
+						)
+
+						sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG $WORKSPACE/.kube/config'
+						sh 'ls -lah'
+
+						echo "APP_NAME: $APP_NAME"
+						echo "NAMESPACE: $NAMESPACE"
+						echo "BRANCH: $BRANCH_NAME"
+					}
+				}
+			}
+		}
+
+		stage('CD') {
+			steps {
+				script {
+					sh """
+						helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+						helm repo update
+
+						helm upgrade $APP_NAME rancher-latest/rancher \
+							--install \
+							--atomic \
+							--debug \
+							--history-max=3 \
+							--namespace $NAMESPACE \
+							--values rancher/values.yaml
+					"""
+				}
+			}
+		}
+	}
+}
