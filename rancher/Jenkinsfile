@@ -51,7 +51,7 @@ pipeline {
 							--debug \
 							--history-max=3 \
 							--namespace $NAMESPACE \
-							--values rancher/values.yaml
+							--values rancher/values.yaml \
 							--timeout 15m0s
 					"""
 				}
