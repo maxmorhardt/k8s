@@ -57,7 +57,7 @@ pipeline {
 							--debug \
 							--history-max=3 \
 							--namespace $NAMESPACE \
-							--version $HELM_VERSION
+							--version $HELM_VERSION \
 							--values postgres/values.yaml 
 					"""
 				}
