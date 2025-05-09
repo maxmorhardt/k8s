@@ -51,7 +51,7 @@ pipeline {
 			steps {
 				script {
 					sh """
-						helm upgrade db $DOCKER_REGISTRY_FULL/bitnamicharts/postgresql \
+						helm upgrade $APP_NAME $DOCKER_REGISTRY_FULL/bitnamicharts/postgresql \
 							--install \
 							--atomic \
 							--debug \
