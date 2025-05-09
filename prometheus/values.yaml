@@ -2,7 +2,7 @@ configmapReload:
   prometheus:
     image:
       repository: quay.io/prometheus-operator/prometheus-config-reloader
-      tag: v0.77.2
+      tag: v0.82.1
       pullPolicy: Always
     containerPort: 8080
     containerPortName: metrics
@@ -42,7 +42,7 @@ server:
   name: server
   image:
     repository: quay.io/prometheus/prometheus
-    tag: ""
+    tag: "latest"
     pullPolicy: Always
 
   global:
@@ -379,14 +379,8 @@ serverFiles:
             action: replace
             target_label: node
 
-      # - job_name: 'topfilms-api'
-      #   metrics_path: '/actuator/prometheus'
-      #   scrape_interval: 30s
-      #   static_configs:
-      #     - targets: ['api.topfilms.io']
-
-      # - job_name: 'topfilms-ui'
-      #   metrics_path: '/nginx_status'
-      #   scrape_interval: 30s
-      #   static_configs:
-      #     - targets: ['topfilms.io']
+      - job_name: 'maxstash-keycloak'
+        metrics_path: '/metrics'
+        scrape_interval: 30s
+        static_configs:
+          - targets: ['auth.maxstash.io']

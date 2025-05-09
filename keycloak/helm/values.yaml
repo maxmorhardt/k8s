@@ -50,6 +50,7 @@ image:
     - "--spi-theme-static-max-age=-1"
     - "--spi-theme-cache-themes=false"
     - "--spi-theme-cache-templates=false"
+    - "--metrics-enabled=true"
   readinessProbe:
     scheme: HTTPS
     path: /realms/master
