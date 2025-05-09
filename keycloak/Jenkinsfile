@@ -23,7 +23,7 @@ pipeline {
 	}
 
 	stages {
-		stage('Git Clone') {
+		stage('Setup') {
 			steps {
 				script {
 					withCredentials([file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG')]) {

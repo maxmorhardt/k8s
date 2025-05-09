@@ -52,15 +52,6 @@ server:
 
   ingress:
     enabled: false
-    ingressClassName: nginx
-    hosts:
-      - prometheus.maxstash.io
-    path: /
-    pathType: Prefix
-    tls:
-      - secretName: prometheus.maxstash.io-tls
-        hosts:
-          - prometheus.maxstash.io
 
   persistentVolume:
     enabled: true
@@ -74,8 +65,6 @@ server:
   replicaCount: 1
   revisionHistoryLimit: 3
 
-  tcpSocketProbeEnabled: false
-  probeScheme: HTTP
   readinessProbeInitialDelay: 30
   readinessProbePeriodSeconds: 5
   readinessProbeTimeout: 4
@@ -86,11 +75,6 @@ server:
   livenessProbeTimeout: 10
   livenessProbeFailureThreshold: 3
   livenessProbeSuccessThreshold: 1
-  startupProbe:
-    enabled: false
-    periodSeconds: 5
-    failureThreshold: 30
-    timeoutSeconds: 10
 
   resources:
     limits:
@@ -111,7 +95,6 @@ server:
     servicePort: 80
     sessionAffinity: None
     type: ClusterIP
-    clusterIP: 10.43.11.51
 
   terminationGracePeriodSeconds: 300
   retention: "15d"
