@@ -97,9 +97,9 @@ grafana.ini:
     email_attribute_path: email
     login_attribute_path: username
     name_attribute_path: full_name
-    auth_url: https://auth.maxstash.io/realms/dev/protocol/openid-connect/auth
-    token_url: https://auth.maxstash.io/realms/dev/protocol/openid-connect/token
-    api_url: https://auth.maxstash.io/realms/dev/protocol/openid-connect/userinfo
+    auth_url: https://auth.maxstash.io/realms/maxstash-dev/protocol/openid-connect/auth
+    token_url: https://auth.maxstash.io/realms/maxstash-dev/protocol/openid-connect/token
+    api_url: https://auth.maxstash.io/realms/maxstash-dev/protocol/openid-connect/userinfo
     role_attribute_path: contains(groups[*], '/Grafana_Admin') && 'Admin' || 'Viewer'
 
 assertNoLeakedSecrets: false
