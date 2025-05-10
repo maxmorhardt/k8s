@@ -33,7 +33,7 @@ configmapReload:
     resources:
       limits:
         cpu: 100m
-        memory: 128i
+        memory: 128Mi
       requests:
         cpu: 100m
         memory: 128Mi
@@ -115,7 +115,14 @@ prometheus-node-exporter:
       memory: 32Mi
 
 kube-state-metrics:
-  enabled: false
+  enabled: true
+  resources: 
+    limits:
+      cpu: 100m
+      memory: 64Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
 
 prometheus-pushgateway:
   enabled: false
