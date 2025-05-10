@@ -32,8 +32,8 @@ configmapReload:
 
     resources:
       limits:
-        cpu: 200m
-        memory: 256Gi
+        cpu: 100m
+        memory: 128i
       requests:
         cpu: 100m
         memory: 128Mi
@@ -79,9 +79,9 @@ server:
   resources:
     limits:
       cpu: 500m
-      memory: 1Gi
+      memory: 512Mi
     requests:
-      cpu: 300m
+      cpu: 500m
       memory: 512Mi
 
   securityContext:
@@ -100,13 +100,27 @@ server:
   retention: "15d"
   retentionSize: ""
 
+prometheus-node-exporter:
+  enabled: true
+  rbac:
+    pspEnabled: false
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+  resources:
+    limits:
+     cpu: 100m
+     memory: 64Mi
+    requests:
+     cpu: 10m
+     memory: 32Mi
+
+kube-state-metrics:
+  enabled: false
+
 prometheus-pushgateway:
   enabled: false
 
 alertmanager:
-  enabled: false
-
-kube-state-metrics:
   enabled: false
 
 serverFiles:
