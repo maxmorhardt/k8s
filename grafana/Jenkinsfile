@@ -1,0 +1,70 @@
+pipeline {
+	agent {
+		kubernetes {
+			inheritFrom 'default'
+			defaultContainer 'buildpack'
+		}
+	}
+
+	environment {
+        GITHUB_URL = 'https://github.com/maxmorhardt/k8s'
+        APP_NAME = "grafana"
+        NAMESPACE = "maxstash-global"
+	}
+
+	stages {
+		stage('Setup') {
+			steps {
+				script {
+					withCredentials([
+						file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG'),
+						usernamePassword(credentialsId: 'grafana', usernameVariable: 'GRAFANA_CLIENT_ID', passwordVariable: 'GRAFANA_CLIENT_SECRET')
+					]) {
+						checkout scmGit(
+							branches: [[
+								name: "$BRANCH_NAME"
+							]],
+							userRemoteConfigs: [[
+								credentialsId: 'github',
+								url: "$GITHUB_URL"
+							]]
+						)
+
+						sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG $WORKSPACE/.kube/config'
+						sh 'ls -lah'
+
+						sh """
+							set +x
+							
+							sed -i "s/<GRAFANA_CLIENT_ID>/$GRAFANA_CLIENT_ID/g" grafana/values.yaml
+							sed -i "s/<GRAFANA_CLIENT_SECRET>/$GRAFANA_CLIENT_SECRET/g" grafana/values.yaml
+						"""
+
+						echo "APP_NAME: $APP_NAME"
+						echo "NAMESPACE: $NAMESPACE"
+						echo "BRANCH: $BRANCH_NAME"
+					}
+				}
+			}
+		}
+
+		stage('CD') {
+			steps {
+				script {
+					sh """
+						helm repo add grafana https://grafana.github.io/helm-charts 
+						helm repo update
+
+						helm upgrade $APP_NAME grafana/grafana \
+							--install \
+							--atomic \
+							--debug \
+							--history-max=3 \
+							--namespace $NAMESPACE \
+							--values grafana/values.yaml 
+					"""
+				}
+			}
+		}
+	}
+}

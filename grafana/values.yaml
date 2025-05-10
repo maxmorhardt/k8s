@@ -67,10 +67,8 @@ persistence:
     - ReadWriteOnce
   size: 8Gi
 
-adminUser: admin
-
 admin:
-  existingSecret: ""
+  existingSecret: grafana-credentials
   userKey: admin-user
   passwordKey: admin-password
 
@@ -92,7 +90,7 @@ grafana.ini:
   auth.generic_oauth:
     enabled: true
     name: Max Stash
-    allow_sign_up: true
+    allow_sign_up: false
     client_id: <GRAFANA_CLIENT_ID>
     client_secret: <GRAFANA_CLIENT_SECRET>
     scopes: openid email profile offline_access roles
@@ -102,6 +100,6 @@ grafana.ini:
     auth_url: https://auth.maxstash.io/realms/dev/protocol/openid-connect/auth
     token_url: https://auth.maxstash.io/realms/dev/protocol/openid-connect/token
     api_url: https://auth.maxstash.io/realms/dev/protocol/openid-connect/userinfo
-    role_attribute_path: contains(groups[*], '/grafana') && 'Admin' || 'Viewer'
+    role_attribute_path: contains(groups[*], '/Grafana_Admin') && 'Admin' || 'Viewer'
 
 assertNoLeakedSecrets: false
