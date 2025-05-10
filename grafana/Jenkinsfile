@@ -18,7 +18,7 @@ pipeline {
 				script {
 					withCredentials([
 						file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG'),
-						usernamePassword(credentialsId: 'grafana', usernameVariable: 'GRAFANA_CLIENT_ID', passwordVariable: 'GRAFANA_CLIENT_SECRET')
+						usernamePassword(credentialsId: 'grafana-client', usernameVariable: 'GRAFANA_CLIENT_ID', passwordVariable: 'GRAFANA_CLIENT_SECRET')
 					]) {
 						checkout scmGit(
 							branches: [[
@@ -35,7 +35,7 @@ pipeline {
 
 						sh """
 							set +x
-							
+
 							sed -i "s/<GRAFANA_CLIENT_ID>/$GRAFANA_CLIENT_ID/g" grafana/values.yaml
 							sed -i "s/<GRAFANA_CLIENT_SECRET>/$GRAFANA_CLIENT_SECRET/g" grafana/values.yaml
 						"""
