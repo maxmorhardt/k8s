@@ -108,11 +108,11 @@ prometheus-node-exporter:
     allowPrivilegeEscalation: false
   resources:
     limits:
-     cpu: 100m
-     memory: 64Mi
+      cpu: 100m
+      memory: 64Mi
     requests:
-     cpu: 10m
-     memory: 32Mi
+      cpu: 10m
+      memory: 32Mi
 
 kube-state-metrics:
   enabled: false
@@ -395,6 +395,7 @@ serverFiles:
 
       - job_name: 'maxstash-keycloak'
         metrics_path: '/metrics'
-        scrape_interval: 30s
+        scrape_interval: 5m
+        scrape_timeout: 30s
         static_configs:
-          - targets: ['auth.maxstash.io']
+          - targets: ['keycloak.maxstash-global.svc.cluster.local:9000']
