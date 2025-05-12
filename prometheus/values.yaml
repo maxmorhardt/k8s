@@ -47,20 +47,17 @@ server:
 
   global:
     scrape_interval: 1m
-    scrape_timeout: 10s
+    scrape_timeout: 15s
     evaluation_interval: 1m
+
+  persistentVolume:
+    existingClaim: prometheus
+
+  nodeSelector:
+    kubernetes.io/hostname: max-worker
 
   ingress:
     enabled: false
-
-  persistentVolume:
-    enabled: true
-    statefulSetNameOverride: ""
-    accessModes:
-      - ReadWriteOnce
-    existingClaim: ""
-    mountPath: /data
-    size: 8Gi
 
   replicaCount: 1
   revisionHistoryLimit: 3
@@ -70,6 +67,7 @@ server:
   readinessProbeTimeout: 4
   readinessProbeFailureThreshold: 3
   readinessProbeSuccessThreshold: 1
+
   livenessProbeInitialDelay: 30
   livenessProbePeriodSeconds: 15
   livenessProbeTimeout: 10
@@ -140,9 +138,6 @@ serverFiles:
       - job_name: 'kubernetes-service-endpoints'
         honor_labels: true
 
-        scrape_interval: 1m
-        scrape_timeout: 15s
-
         kubernetes_sd_configs:
           - role: endpoints
 
@@ -183,7 +178,5 @@ serverFiles:
 
       - job_name: 'keycloak'
         metrics_path: '/metrics'
-        scrape_interval: 1m
-        scrape_timeout: 15s
         static_configs:
-          - targets: ['http://keycloak.maxstash-global.svc.cluster.local:9000']
+          - targets: ['https://keycloak.maxstash-global.svc.cluster.local:9000']
