@@ -79,9 +79,9 @@ server:
   resources:
     limits:
       cpu: 500m
-      memory: 512Mi
+      memory: 1Gi
     requests:
-      cpu: 500m
+      cpu: 250m
       memory: 512Mi
 
   securityContext:
@@ -115,14 +115,7 @@ prometheus-node-exporter:
       memory: 32Mi
 
 kube-state-metrics:
-  enabled: true
-  resources: 
-    limits:
-      cpu: 100m
-      memory: 64Mi
-    requests:
-      cpu: 10m
-      memory: 32Mi
+  enabled: false
 
 prometheus-pushgateway:
   enabled: false

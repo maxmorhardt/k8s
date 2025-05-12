@@ -61,12 +61,11 @@ resources:
    memory: 256Mi
 
 persistence:
-  enabled: true
-  type: pvc
-  accessModes:
-    - ReadWriteOnce
-  size: 8Gi
+  existingClaim: grafana
 
+nodeSelector:
+    kubernetes.io/hostname: max-worker
+    
 admin:
   existingSecret: grafana-credentials
   userKey: admin-user

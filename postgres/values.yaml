@@ -19,7 +19,7 @@ primary:
     kubernetes.io/hostname: max-worker
 
   persistence:
-    size: 1024Gi
+    size: 256Gi
 
   resources:
     requests:
