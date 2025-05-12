@@ -186,4 +186,4 @@ serverFiles:
         scrape_interval: 1m
         scrape_timeout: 15s
         static_configs:
-          - targets: ['keycloak.maxstash-global.svc.cluster.local']
+          - targets: ['keycloak.maxstash-global.svc.cluster.local:9000']
