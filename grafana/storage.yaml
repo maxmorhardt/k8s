@@ -5,7 +5,7 @@ metadata:
   labels:
     type: local
 spec:
-  storageClassName: grafana
+  storageClassName: ""
   capacity:
     storage: 8Gi
   accessModes:
