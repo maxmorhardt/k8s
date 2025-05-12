@@ -181,9 +181,9 @@ serverFiles:
             action: replace
             target_label: node
 
-      - job_name: 'maxstash-keycloak'
+      - job_name: 'keycloak'
         metrics_path: '/metrics'
         scrape_interval: 1m
         scrape_timeout: 15s
         static_configs:
-          - targets: ['keycloak.maxstash-global.svc.cluster.local:9000']
+          - targets: ['http://keycloak.maxstash-global.svc.cluster.local:9000']
