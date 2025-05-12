@@ -140,8 +140,8 @@ serverFiles:
       - job_name: 'kubernetes-service-endpoints'
         honor_labels: true
 
-        scrape_interval: 5m
-        scrape_timeout: 30s
+        scrape_interval: 1m
+        scrape_timeout: 15s
 
         kubernetes_sd_configs:
           - role: endpoints
@@ -183,7 +183,7 @@ serverFiles:
 
       - job_name: 'maxstash-keycloak'
         metrics_path: '/metrics'
-        scrape_interval: 5m
-        scrape_timeout: 30s
+        scrape_interval: 1m
+        scrape_timeout: 15s
         static_configs:
           - targets: ['keycloak.maxstash-global.svc.cluster.local']
