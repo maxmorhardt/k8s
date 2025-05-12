@@ -83,10 +83,10 @@ server:
       memory: 512Mi
 
   securityContext:
-    runAsUser: 65534
-    runAsNonRoot: true
-    runAsGroup: 65534
-    fsGroup: 65534
+    runAsNonRoot: false
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
 
   service:
     enabled: true
