@@ -58,7 +58,6 @@ pipeline {
 						helm upgrade $APP_NAME grafana/grafana \
 							--install \
 							--atomic \
-							--debug \
 							--history-max=3 \
 							--namespace $NAMESPACE \
 							--values grafana/values.yaml 
