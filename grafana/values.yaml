@@ -61,10 +61,11 @@ resources:
    memory: 256Mi
 
 persistence:
+  enabled: true
   existingClaim: grafana
 
 nodeSelector:
-    kubernetes.io/hostname: max-worker
+  kubernetes.io/hostname: max-worker
     
 admin:
   existingSecret: grafana-credentials
