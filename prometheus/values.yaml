@@ -178,5 +178,6 @@ serverFiles:
 
       - job_name: 'keycloak'
         metrics_path: '/metrics'
+        scheme: https
         static_configs:
           - targets: ['keycloak.maxstash-global.svc.cluster.local:9000']
