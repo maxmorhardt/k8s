@@ -11,7 +11,7 @@
 
 ## Storage
 1. SSH into node that will host Jenkins
-2. Create directory /data/jenkins with 1000:1000 owner/group 
+2. Create directory /data/jenkins with 1000:1000 owner/group - chown -R 1000:1000 /data
 
 ## Pod Template
 1. In Manage Jenkins > Clouds > kubernetes > Configure

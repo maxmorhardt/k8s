@@ -18,7 +18,7 @@ Once Rancher and Keycloak are setup, do the following
 
 ### In Rancher:
 1. Under Users & Authentication, select Keycloak OIDC Auth Provider and fill in required fields
-	- As of 3/8/25, Rancher's auto generated keycloak url is wrong. Remove /auth from the beginning of the path
+	- As of 3/8/25, Rancher's auto generated keycloak url is wrong. Remove /auth from the beginning of the path (Fixed now)
 
 2. Once setup, select restrict to users and groups and select Rancher Admin group
 
