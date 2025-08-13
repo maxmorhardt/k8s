@@ -18,6 +18,7 @@
    - Add/update jnlp, dind, and buildpack container templates with appropriate config
    - Update service account to 'jenkins'
    - Change YAML merge strategy to 'merge'
+   - Change this all in jcasc config map as well
 
 2. In Manage Jenkins > Clouds > kubernetes > Pod Templates > default
    - Lower concurrency limit to 5
@@ -27,7 +28,6 @@ JCasC should look like (both in config map and in controller):
 ```yaml
 clouds:
   - kubernetes:
-      containerCap: 5
       containerCapStr: "5"
       jenkinsTunnel: "jenkins-agent.maxstash-global.svc.cluster.local:50000"
       jenkinsUrl: "http://jenkins.maxstash-global.svc.cluster.local:8080"
@@ -44,7 +44,7 @@ clouds:
           - envVar:
               key: "JENKINS_URL"
               value: "http://jenkins.maxstash-global.svc.cluster.local:8080/"
-          image: "jenkins/inbound-agent:3307.v632ed11b_3a_c7-2"
+          image: "jenkins/inbound-agent:3327.v868139a_d00e0-5"
           livenessProbe:
             failureThreshold: 0
             initialDelaySeconds: 0
