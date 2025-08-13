@@ -52,6 +52,7 @@ clouds:
             successThreshold: 0
             timeoutSeconds: 0
           name: "jnlp"
+		  alwaysPullImage: true
           resourceLimitCpu: "500m"
           resourceLimitMemory: "512Mi"
           resourceRequestCpu: "200m"
@@ -67,6 +68,7 @@ clouds:
             successThreshold: 0
             timeoutSeconds: 0
           name: "dind"
+		  alwaysPullImage: true
           privileged: true
           resourceLimitCpu: "500m"
           resourceLimitMemory: "512Mi"
@@ -75,8 +77,7 @@ clouds:
           runAsGroup: "0"
           runAsUser: "0"
           workingDir: "/home/jenkins/agent"
-        - alwaysPullImage: true
-          image: "maxmorhardt/jenkins-buildpack:latest"
+        - image: "maxmorhardt/jenkins-buildpack:latest"
           livenessProbe:
             failureThreshold: 0
             initialDelaySeconds: 0
@@ -84,6 +85,7 @@ clouds:
             successThreshold: 0
             timeoutSeconds: 0
           name: "buildpack"
+		  alwaysPullImage: true
           privileged: true
           resourceLimitCpu: "500m"
           resourceLimitMemory: "512Mi"
