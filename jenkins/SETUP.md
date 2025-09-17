@@ -60,7 +60,7 @@ clouds:
           runAsGroup: "1000"
           runAsUser: "1000"
           workingDir: "/home/jenkins/agent"
-        - image: "docker:28-dind"
+        - image: "docker:dind"
           livenessProbe:
             failureThreshold: 0
             initialDelaySeconds: 0
