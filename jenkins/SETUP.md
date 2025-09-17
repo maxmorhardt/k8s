@@ -26,82 +26,77 @@
 JCasC should look like (both in config map and in controller):
 
 ```yaml
-clouds:
-  - kubernetes:
-      containerCapStr: "5"
-      jenkinsTunnel: "jenkins-agent.maxstash-global.svc.cluster.local:50000"
-      jenkinsUrl: "http://jenkins.maxstash-global.svc.cluster.local:8080"
-      name: "kubernetes"
-      namespace: "maxstash-global"
-      podLabels:
-      - key: "jenkins/jenkins-jenkins-agent"
-        value: "true"
-      serverUrl: "https://kubernetes.default"
-      templates:
-      - containers:
-        - args: "^${computer.jnlpmac} ^${computer.name}"
-          envVars:
-          - envVar:
-              key: "JENKINS_URL"
-              value: "http://jenkins.maxstash-global.svc.cluster.local:8080/"
-          image: "jenkins/inbound-agent:3327.v868139a_d00e0-5"
-          livenessProbe:
-            failureThreshold: 0
-            initialDelaySeconds: 0
-            periodSeconds: 0
-            successThreshold: 0
-            timeoutSeconds: 0
-          name: "jnlp"
-		  alwaysPullImage: true
-          resourceLimitCpu: "500m"
-          resourceLimitMemory: "512Mi"
-          resourceRequestCpu: "200m"
-          resourceRequestMemory: "256Mi"
-          runAsGroup: "1000"
-          runAsUser: "1000"
-          workingDir: "/home/jenkins/agent"
-        - image: "docker:dind"
-          livenessProbe:
-            failureThreshold: 0
-            initialDelaySeconds: 0
-            periodSeconds: 0
-            successThreshold: 0
-            timeoutSeconds: 0
-          name: "dind"
-		  alwaysPullImage: true
-          privileged: true
-          resourceLimitCpu: "500m"
-          resourceLimitMemory: "512Mi"
-          resourceRequestCpu: "200m"
-          resourceRequestMemory: "256Mi"
-          runAsGroup: "0"
-          runAsUser: "0"
-          workingDir: "/home/jenkins/agent"
-        - image: "maxmorhardt/jenkins-buildpack:latest"
-          livenessProbe:
-            failureThreshold: 0
-            initialDelaySeconds: 0
-            periodSeconds: 0
-            successThreshold: 0
-            timeoutSeconds: 0
-          name: "buildpack"
-		  alwaysPullImage: true
-          privileged: true
-          resourceLimitCpu: "500m"
-          resourceLimitMemory: "512Mi"
-          resourceRequestCpu: "200m"
-          resourceRequestMemory: "256Mi"
-          runAsGroup: "0"
-          runAsUser: "0"
-          workingDir: "/home/jenkins/agent"
-        id: "022135f78097870740d147ab5422584a59f31718160dcb9f0dd9c29da98174d2"
-        label: "jenkins-jenkins-agent"
-        name: "default"
-        namespace: "maxstash-global"
-        nodeUsageMode: "NORMAL"
-        podRetention: "never"
-        serviceAccount: "jenkins"
-        slaveConnectTimeout: 180
-        slaveConnectTimeoutStr: "180"
-        yamlMergeStrategy: "merge"
+      clouds:
+      - kubernetes:
+          containerCap: 5
+          containerCapStr: "5"
+          jenkinsTunnel: "jenkins-agent.maxstash-global.svc.cluster.local:50000"
+          jenkinsUrl: "http://jenkins.maxstash-global.svc.cluster.local:8080"
+          name: "kubernetes"
+          namespace: "maxstash-global"
+          podLabels:
+          - key: "jenkins/jenkins-jenkins-agent"
+            value: "true"
+          serverUrl: "https://kubernetes.default"
+          templates:
+          - containers:
+            - args: "^${computer.jnlpmac} ^${computer.name}"
+              envVars:
+              - envVar:
+                  key: "JENKINS_URL"
+                  value: "http://jenkins.maxstash-global.svc.cluster.local:8080/"
+              image: "jenkins/inbound-agent:3327.v868139a_d00e0-7"
+              name: "jnlp"
+              alwaysPullImage: true
+              resourceLimitCpu: "500m"
+              resourceLimitMemory: "512Mi"
+              resourceRequestCpu: "200m"
+              resourceRequestMemory: "256Mi"
+              runAsGroup: "1000"
+              runAsUser: "1000"
+              workingDir: "/home/jenkins/agent"
+            - image: "docker:dind"
+              livenessProbe:
+                failureThreshold: 0
+                initialDelaySeconds: 0
+                periodSeconds: 0
+                successThreshold: 0
+                timeoutSeconds: 0
+              name: "dind"
+              alwaysPullImage: true
+              privileged: true
+              resourceLimitCpu: "500m"
+              resourceLimitMemory: "512Mi"
+              resourceRequestCpu: "200m"
+              resourceRequestMemory: "256Mi"
+              runAsGroup: "0"
+              runAsUser: "0"
+              workingDir: "/home/jenkins/agent"
+            - image: "maxmorhardt/jenkins-buildpack:latest"
+              livenessProbe:
+                failureThreshold: 0
+                initialDelaySeconds: 0
+                periodSeconds: 0
+                successThreshold: 0
+                timeoutSeconds: 0
+              name: "buildpack"
+              alwaysPullImage: true
+              privileged: true
+              resourceLimitCpu: "500m"
+              resourceLimitMemory: "512Mi"
+              resourceRequestCpu: "200m"
+              resourceRequestMemory: "256Mi"
+              runAsGroup: "0"
+              runAsUser: "0"
+              workingDir: "/home/jenkins/agent"
+            id: "d05f1a832f8657e0e01902696b5ad35b806d9d41ec6657c6d16c768c8d712d47"
+            label: "jenkins-jenkins-agent"
+            name: "default"
+            namespace: "maxstash-global"
+            nodeUsageMode: NORMAL
+            podRetention: "never"
+            serviceAccount: "jenkins"
+            slaveConnectTimeout: 180
+            slaveConnectTimeoutStr: "180"
+            yamlMergeStrategy: "merge"
 ```
