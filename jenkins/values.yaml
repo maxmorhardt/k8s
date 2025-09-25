@@ -65,11 +65,11 @@ controller:
     - workflow-aggregator:608.v67378e9d3db_1
     - git:5.7.0
     - docker-workflow:621.va_73f881d9232
-    - configuration-as-code:1985.vdda_32d0c4ea_b_
+    - configuration-as-code:1995.v540b_50a_eb_0c1
     - oic-auth:4.609.v9de140f63d01
     - role-strategy:799.v5b_e7b_ecc231e
     - pipeline-stage-view:2.38
-    - github-branch-source:1862.v1a_fc22a_d3788
+    - github-branch-source:1864.v411feec5e78e
   installLatestPlugins: true
   installLatestSpecifiedPlugins: false
   additionalPlugins: []

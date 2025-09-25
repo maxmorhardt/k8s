@@ -194,7 +194,7 @@ serverFiles:
           - targets: ['keycloak.maxstash-global.svc.cluster.local:9000']
 
       - job_name: ages
-        metrics_path: /stub_status
+        metrics_path: /metrics
         scheme: http
         static_configs:
-          - targets: ["ages.maxstash-apps.svc.cluster.local"]
+          - targets: ["ages.maxstash-apps.svc.cluster.local:8080"]
