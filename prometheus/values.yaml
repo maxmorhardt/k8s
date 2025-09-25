@@ -136,7 +136,7 @@ serverFiles:
           - targets:
             - localhost:9090
 
-      - job_name: 'kubernetes-service-endpoints'
+      - job_name: kubernetes-service-endpoints
         honor_labels: true
         kubernetes_sd_configs:
           - role: endpoints
@@ -185,16 +185,16 @@ serverFiles:
         - target_label: cluster
           replacement: local
 
-      - job_name: 'keycloak'
-        metrics_path: '/metrics'
+      - job_name: keycloak
+        metrics_path: /metrics
         scheme: https
         tls_config:
           insecure_skip_verify: true 
         static_configs:
           - targets: ['keycloak.maxstash-global.svc.cluster.local:9000']
 
-      - job_name: "nginx"
-        metrics_path: /metrics
+      - job_name: ages
+        metrics_path: /stub_status
         scheme: http
         static_configs:
           - targets: ["ages.maxstash-apps.svc.cluster.local"]
