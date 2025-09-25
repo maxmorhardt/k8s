@@ -192,3 +192,8 @@ serverFiles:
           insecure_skip_verify: true 
         static_configs:
           - targets: ['keycloak.maxstash-global.svc.cluster.local:9000']
+
+      - job_name: 'postgres'
+        scheme: http
+        static_configs:
+          - targets: [db-postgresql-0.maxstash-global.svc.cluster.local:9187]
