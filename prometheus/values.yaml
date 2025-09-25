@@ -194,7 +194,9 @@ serverFiles:
           - targets: ['keycloak.maxstash-global.svc.cluster.local:9000']
 
       - job_name: ages
-        metrics_path: /metrics
-        scheme: http
+        metrics_path: /stub_status
+        scheme: https
+        tls_config:
+          insecure_skip_verify: true 
         static_configs:
-          - targets: ["ages.maxstash-apps.svc.cluster.local:8080"]
+          - targets: ["demo.nginx.com/stub_status"]
