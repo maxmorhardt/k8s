@@ -18,6 +18,6 @@ cat secret.yaml
 kubectl apply --filename storage.yaml --namespace maxstash-global
 kubectl apply --filename secret.yaml --namespace maxstash-global
 
-helm install db oci://registry-1.docker.io/bitnamicharts/postgresql --version 16.7.21 --values values.yaml --namespace maxstash-global
+helm install db oci://registry-1.docker.io/bitnamicharts/postgresql --version 16.7.27 --values values.yaml --namespace maxstash-global
 
 git restore secret.yaml
