@@ -192,11 +192,3 @@ serverFiles:
           insecure_skip_verify: true 
         static_configs:
           - targets: ['keycloak.maxstash-global.svc.cluster.local:9000']
-
-      - job_name: ages
-        metrics_path: /stub_status
-        scheme: https
-        tls_config:
-          insecure_skip_verify: true 
-        static_configs:
-          - targets: ["demo.nginx.com/stub_status"]
