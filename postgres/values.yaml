@@ -14,6 +14,8 @@ primary:
     type: NodePort
     nodePorts:
       postgresql: 5432
+    extraPorts:
+      - 9187
 
   nodeSelector:
     kubernetes.io/hostname: max-worker
