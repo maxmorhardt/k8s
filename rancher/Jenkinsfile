@@ -7,9 +7,9 @@ pipeline {
 	}
 
 	environment {
-        GITHUB_URL = 'https://github.com/maxmorhardt/k8s'
-        APP_NAME = "rancher"
-        NAMESPACE = "cattle-system"
+		GITHUB_URL = 'https://github.com/maxmorhardt/k8s'
+		APP_NAME = "rancher"
+		NAMESPACE = "cattle-system"
 	}
 
 	stages {

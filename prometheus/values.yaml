@@ -2,7 +2,7 @@ configmapReload:
   prometheus:
     image:
       repository: quay.io/prometheus-operator/prometheus-config-reloader
-      tag: v0.84.1
+      tag: v0.85.0
       pullPolicy: Always
     containerPort: 8080
     containerPortName: metrics
@@ -76,11 +76,11 @@ server:
 
   resources:
     limits:
-      cpu: 500m
-      memory: 1Gi
+      cpu: 200m
+      memory: 128Mi
     requests:
-      cpu: 250m
-      memory: 512Mi
+      cpu: 100m
+      memory: 64Mi
 
   securityContext:
     runAsNonRoot: true
@@ -106,14 +106,14 @@ prometheus-node-exporter:
     allowPrivilegeEscalation: false
   resources:
     limits:
-      cpu: 100m
+      cpu: 20m
       memory: 64Mi
     requests:
       cpu: 10m
       memory: 32Mi
 
 kube-state-metrics:
-  enabled: false
+  enabled: true
 
 prometheus-pushgateway:
   enabled: false
@@ -137,10 +137,8 @@ serverFiles:
 
       - job_name: 'kubernetes-service-endpoints'
         honor_labels: true
-
         kubernetes_sd_configs:
           - role: endpoints
-
         relabel_configs:
           - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
             action: keep
@@ -175,6 +173,16 @@ serverFiles:
           - source_labels: [__meta_kubernetes_pod_node_name]
             action: replace
             target_label: node
+
+      - job_name: k8s-kube-state-metrics-local
+        honor_timestamps: true
+        metrics_path: /metrics
+        scheme: http
+        static_configs:
+          - targets: ['IP:PORT']
+        metric_relabel_configs:
+        - target_label: cluster
+          replacement: YourDefinedK8sClusterName(自定义的k8s集群名字)
 
       - job_name: 'keycloak'
         metrics_path: '/metrics'

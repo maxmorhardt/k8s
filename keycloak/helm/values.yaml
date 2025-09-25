@@ -1,6 +1,6 @@
 image:
   repository: quay.io/keycloak/keycloak
-  tag: 26.3.2
+  tag: 26.3.5
   pullPolicy: Always
   replicas: 1
   revisionHistoryLimit: 2
@@ -51,7 +51,6 @@ image:
     - "--spi-theme-cache-themes=false"
     - "--spi-theme-cache-templates=false"
     - "--metrics-enabled=true"
-    - "--http-metrics-histograms-enabled=true"
   readinessProbe:
     scheme: HTTPS
     path: /realms/master

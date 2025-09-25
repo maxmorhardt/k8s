@@ -13,13 +13,13 @@ pipeline {
 
 
 	environment {
-        GITHUB_URL = 'https://github.com/maxmorhardt/k8s'
+		GITHUB_URL = 'https://github.com/maxmorhardt/k8s'
 
 		DOCKER_REGISTRY = 'registry-1.docker.io'
 		DOCKER_REGISTRY_FULL = "oci://${env.DOCKER_REGISTRY}"
 
-        APP_NAME = "keycloak"
-        NAMESPACE = "maxstash-global"
+		APP_NAME = "keycloak"
+		NAMESPACE = "maxstash-global"
 	}
 
 	stages {
@@ -54,7 +54,7 @@ pipeline {
 			steps {
 				script {
 					withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-					    sh 'echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin'
+						sh 'echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin'
 
 						sh """
 							cd keycloak/helm
@@ -73,13 +73,13 @@ pipeline {
 					withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 						sh """
 							helm upgrade $APP_NAME $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME/$APP_NAME \
-							    --version $HELM_VERSION \
-							    --install \
-							    --atomic \
-							    --debug \
-							    --history-max=3 \
-							    --namespace $NAMESPACE \
-							    --set image.tag=$DOCKER_VERSION
+								--version $HELM_VERSION \
+								--install \
+								--atomic \
+								--debug \
+								--history-max=3 \
+								--namespace $NAMESPACE \
+								--set image.tag=$DOCKER_VERSION
 						"""
 					}
 				}
