@@ -196,4 +196,4 @@ serverFiles:
       - job_name: 'postgres'
         scheme: http
         static_configs:
-          - targets: [db-postgresql-0.maxstash-global.svc.cluster.local:9187]
+          - targets: [db-postgresql-metrics.maxstash-global.svc.cluster.local:9187]
