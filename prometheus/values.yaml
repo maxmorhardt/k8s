@@ -179,10 +179,10 @@ serverFiles:
         metrics_path: /metrics
         scheme: http
         static_configs:
-          - targets: ['IP:PORT']
+          - targets: ['http://prometheus-kube-state-metrics.maxstash-global.svc.cluster.local:8080']
         metric_relabel_configs:
         - target_label: cluster
-          replacement: YourDefinedK8sClusterName(自定义的k8s集群名字)
+          replacement: local
 
       - job_name: 'keycloak'
         metrics_path: '/metrics'
