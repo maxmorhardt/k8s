@@ -46,9 +46,9 @@ server:
     pullPolicy: Always
 
   global:
-    scrape_interval: 1m
-    scrape_timeout: 15s
-    evaluation_interval: 1m
+    scrape_interval: 90s
+    scrape_timeout: 30s
+    evaluation_interval: 90s
 
   persistentVolume:
     existingClaim: prometheus
@@ -106,7 +106,7 @@ prometheus-node-exporter:
     allowPrivilegeEscalation: false
   resources:
     limits:
-      cpu: 20m
+      cpu: 50m
       memory: 64Mi
     requests:
       cpu: 10m
