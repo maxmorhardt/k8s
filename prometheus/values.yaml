@@ -93,6 +93,7 @@ server:
     servicePort: 80
     sessionAffinity: None
     type: ClusterIP
+    clusterIP: 10.43.148.167
 
   terminationGracePeriodSeconds: 300
   retention: "15d"
@@ -191,3 +192,9 @@ serverFiles:
           insecure_skip_verify: true 
         static_configs:
           - targets: ['keycloak.maxstash-global.svc.cluster.local:9000']
+
+      - job_name: "nginx"
+        metrics_path: /metrics
+        scheme: http
+        static_configs:
+          - targets: ["ages.maxstash-apps.svc.cluster.local"]
