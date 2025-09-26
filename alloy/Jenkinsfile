@@ -49,7 +49,7 @@ pipeline {
 						helm repo add grafana https://grafana.github.io/helm-charts 
 						helm repo update
 
-						helm upgrade $APP_NAME grafana/$APP_NAME 
+						helm upgrade $APP_NAME grafana/$APP_NAME \
 							--install \
 							--atomic \
 							--debug \
