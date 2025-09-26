@@ -107,3 +107,27 @@ alloy:
 
         forward_to = [loki.write.default.receiver]
       }
+
+      loki.source.kubernetes_events "cluster_events" {
+        job_name   = "integrations/kubernetes/eventhandler"
+        log_format = "logfmt"
+        forward_to = [
+          loki.process.cluster_events.receiver,
+        ]
+      }
+
+      loki.process "cluster_events" {
+        forward_to = [loki.write.default.receiver]
+
+        stage.static_labels {
+          values = {
+            cluster = "local",
+          }
+        }
+
+        stage.labels {
+          values = {
+            kubernetes_cluster_events = "job",
+          }
+        }
+      }
