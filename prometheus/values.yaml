@@ -230,3 +230,9 @@ serverFiles:
         scheme: http
         static_configs:
           - targets: [ages.maxstash-apps.svc.cluster.local:9113]
+
+      - job_name: squares
+        metrics_path: /metrics
+        scheme: http
+        static_configs:
+          - targets: [squares.maxstash-apps.svc.cluster.local:9113]
