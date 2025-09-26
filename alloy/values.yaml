@@ -6,44 +6,39 @@ alloy:
   configMap:
     create: true
     content: |
-      // Node log discovery
       local.file_match "node_logs" {
         path_targets = [{
-          __path__  = "/var/log/syslog"
-          job       = "node/syslog"
-          node_name = sys.env("HOSTNAME")
-          cluster   = "local"
+          __path__   = "/var/log/syslog",
+          job        = "node/syslog",
+          node_name  = sys.env("HOSTNAME"),
+          cluster    = "<CLUSTER_NAME>",
         }]
       }
 
-      // Pod log discovery (example for container logs)
       local.file_match "pod_logs" {
         path_targets = [{
-          __path__  = "/var/log/pods/**/*.log"
-          job       = "k8s/pods"
-          node_name = sys.env("HOSTNAME")
-          cluster   = "local"
+          __path__   = "/var/log/pods/**/*.log",
+          job        = "k8s/pods",
+          node_name  = sys.env("HOSTNAME"),
+          cluster    = "<CLUSTER_NAME>",
         }]
       }
 
-      // Forward node logs to Loki
       loki.source.file "node_logs" {
-        targets    = local.file_match.node_logs.targets
-        forward_to = [loki.write.main.receiver]
+        targets    = local.file_match.node_logs.targets,
+        forward_to = [loki.write.main.receiver],
       }
 
-      // Forward pod logs to Loki
       loki.source.file "pod_logs" {
-        targets    = local.file_match.pod_logs.targets
-        forward_to = [loki.write.main.receiver]
+        targets    = local.file_match.pod_logs.targets,
+        forward_to = [loki.write.main.receiver],
       }
 
-      // Loki write component
       loki.write.main {
-        receiver = "default"
+        receiver = "default",
       }
 
       loki.receiver.default {
-        type = "loki"
-        url  = "http://loki.maxstash-global.svc.cluster.local:3100/loki/api/v1/push"
+        type = "loki",
+        url  = "http://loki.maxstash-global.svc.cluster.local:3100/loki/api/v1/push",
       }
