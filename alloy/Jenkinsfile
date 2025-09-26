@@ -12,7 +12,7 @@ pipeline {
 		DOCKER_REGISTRY = 'registry-1.docker.io'
 		DOCKER_REGISTRY_FULL = "oci://${env.DOCKER_REGISTRY}"
 
-		APP_NAME = "loki"
+		APP_NAME = "alloy"
 		NAMESPACE = "maxstash-global"
 	}
 

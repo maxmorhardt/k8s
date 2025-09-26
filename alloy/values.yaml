@@ -1,0 +1,43 @@
+replicaCount: 1
+
+serviceAccount:
+  create: true
+  name: alloy
+
+resources:
+  requests:
+    cpu: "50m"
+    memory: "64Mi"
+  limits:
+    cpu: "100m"
+    memory: "128Mi"
+
+config:
+  clients:
+    - url: http://loki.maxstash-global.svc.cluster.local:3100/loki/api/v1/push
+
+  scrape_configs:
+    - job_name: kubernetes-pods
+      kubernetes_sd_configs:
+        - role: pod
+      relabel_configs:
+        - source_labels: [__meta_kubernetes_namespace]
+          regex: kube-system|kube-public|kube-node-lease
+          action: drop
+        - source_labels: [__meta_kubernetes_pod_label_app]
+          target_label: app
+
+    - job_name: kubernetes-nodes
+      kubernetes_sd_configs:
+        - role: node
+      relabel_configs:
+        - source_labels: [__address__]
+          target_label: __param_target
+        - target_label: __address__
+          replacement: localhost:9100
+
+telemetry:
+  enabled: false
+
+server:
+  enabled: false
