@@ -1,0 +1,64 @@
+pipeline {
+	agent {
+		kubernetes {
+			inheritFrom 'default'
+			defaultContainer 'buildpack'
+		}
+	}
+
+	environment {
+		GITHUB_URL = 'https://github.com/maxmorhardt/k8s'
+
+		DOCKER_REGISTRY = 'registry-1.docker.io'
+		DOCKER_REGISTRY_FULL = "oci://${env.DOCKER_REGISTRY}"
+
+		APP_NAME = "loki"
+		NAMESPACE = "maxstash-global"
+	}
+
+	stages {
+		stage('Setup') {
+			steps {
+				script {
+					withCredentials([file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG')]) {
+						checkout scmGit(
+							branches: [[
+								name: "$BRANCH_NAME"
+							]],
+							userRemoteConfigs: [[
+								credentialsId: 'github',
+								url: "$GITHUB_URL"
+							]]
+						)
+
+						sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG $WORKSPACE/.kube/config'
+						sh 'ls -lah'
+
+						echo "APP_NAME: $APP_NAME"
+						echo "NAMESPACE: $NAMESPACE"
+						echo "BRANCH: $BRANCH_NAME"
+					}
+				}
+			}
+		}
+
+		stage('CD') {
+			steps {
+				script {
+					sh """
+						helm repo add grafana https://grafana.github.io/helm-charts 
+						helm repo update
+
+						helm upgrade $APP_NAME grafana/loki 
+							--install \
+							--atomic \
+							--debug \
+							--history-max=3 \
+							--namespace $NAMESPACE \
+							--values postgres/values.yaml 
+					"""
+				}
+			}
+		}
+	}
+}
