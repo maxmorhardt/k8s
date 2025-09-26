@@ -27,17 +27,19 @@ loki:
 
 singleBinary:
   replicas: 1
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "64Mi"
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
 read:
   replicas: 0
 backend:
   replicas: 0
 write:
   replicas: 0
-
-gateway:
-  service:
-    port: 80
-    type: ClusterIP
 
 test:
   enabled: false

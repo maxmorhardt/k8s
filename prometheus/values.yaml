@@ -125,6 +125,13 @@ prometheus-node-exporter:
 
 kube-state-metrics:
   enabled: true
+  global:
+    resources:
+      cpu: 50m
+      memory: 64Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
 
 prometheus-pushgateway:
   enabled: false
