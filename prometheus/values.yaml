@@ -199,6 +199,7 @@ serverFiles:
           - targets: [db-postgresql-metrics.maxstash-global.svc.cluster.local:9187]
       
       - job_name: ages
+        metrics_path: /metrics
         scheme: http
         static_configs:
           - targets: [ages.maxstash-apps.svc.cluster.local:9113]
