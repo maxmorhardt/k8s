@@ -1,43 +1,49 @@
-replicaCount: 1
-
 serviceAccount:
   create: true
   name: alloy
 
-resources:
-  requests:
-    cpu: "50m"
-    memory: "64Mi"
-  limits:
-    cpu: "100m"
-    memory: "128Mi"
+alloy:
+  configMap:
+    create: true
+    content: |
+      // Node log discovery
+      local.file_match "node_logs" {
+        path_targets = [{
+          __path__  = "/var/log/syslog"
+          job       = "node/syslog"
+          node_name = sys.env("HOSTNAME")
+          cluster   = "local"
+        }]
+      }
 
-config:
-  clients:
-    - url: http://loki.maxstash-global.svc.cluster.local:3100/loki/api/v1/push
+      // Pod log discovery (example for container logs)
+      local.file_match "pod_logs" {
+        path_targets = [{
+          __path__  = "/var/log/pods/**/*.log"
+          job       = "k8s/pods"
+          node_name = sys.env("HOSTNAME")
+          cluster   = "local"
+        }]
+      }
 
-  scrape_configs:
-    - job_name: kubernetes-pods
-      kubernetes_sd_configs:
-        - role: pod
-      relabel_configs:
-        - source_labels: [__meta_kubernetes_namespace]
-          regex: kube-system|kube-public|kube-node-lease
-          action: drop
-        - source_labels: [__meta_kubernetes_pod_label_app]
-          target_label: app
+      // Forward node logs to Loki
+      loki.source.file "node_logs" {
+        targets    = local.file_match.node_logs.targets
+        forward_to = [loki.write.main.receiver]
+      }
 
-    - job_name: kubernetes-nodes
-      kubernetes_sd_configs:
-        - role: node
-      relabel_configs:
-        - source_labels: [__address__]
-          target_label: __param_target
-        - target_label: __address__
-          replacement: localhost:9100
+      // Forward pod logs to Loki
+      loki.source.file "pod_logs" {
+        targets    = local.file_match.pod_logs.targets
+        forward_to = [loki.write.main.receiver]
+      }
 
-telemetry:
-  enabled: false
+      // Loki write component
+      loki.write.main {
+        receiver = "default"
+      }
 
-server:
-  enabled: false
+      loki.receiver.default {
+        type = "loki"
+        url  = "http://loki.maxstash-global.svc.cluster.local:3100/loki/api/v1/push"
+      }
