@@ -193,7 +193,12 @@ serverFiles:
         static_configs:
           - targets: ['keycloak.maxstash-global.svc.cluster.local:9000']
 
-      - job_name: 'postgres'
+      - job_name: postgres
         scheme: http
         static_configs:
           - targets: [db-postgresql-metrics.maxstash-global.svc.cluster.local:9187]
+      
+      - job_name: ages
+        scheme: http
+        static_configs:
+          - targets: [ages.maxstash-apps.svc.cluster.local:9113]
