@@ -48,10 +48,6 @@ JCasC should look like (both in config map and in controller):
               image: "jenkins/inbound-agent:3327.v868139a_d00e0-7"
               name: "jnlp"
               alwaysPullImage: true
-              resourceLimitCpu: "1"
-              resourceLimitMemory: "1Gi"
-              resourceRequestCpu: "200m"
-              resourceRequestMemory: "256Mi"
               runAsGroup: "1000"
               runAsUser: "1000"
               workingDir: "/home/jenkins/agent"
@@ -65,10 +61,8 @@ JCasC should look like (both in config map and in controller):
               name: "dind"
               alwaysPullImage: true
               privileged: true
-              resourceLimitCpu: "1"
-              resourceLimitMemory: "1Gi"
-              resourceRequestCpu: "200m"
-              resourceRequestMemory: "256Mi"
+              resourceLimitCpu: "250m"
+              resourceLimitMemory: "256Mi"
               runAsGroup: "0"
               runAsUser: "0"
               workingDir: "/home/jenkins/agent"
@@ -82,10 +76,8 @@ JCasC should look like (both in config map and in controller):
               name: "buildpack"
               alwaysPullImage: true
               privileged: true
-              resourceLimitCpu: "500m"
-              resourceLimitMemory: "512Mi"
-              resourceRequestCpu: "200m"
-              resourceRequestMemory: "256Mi"
+              resourceLimitCpu: "1"
+              resourceLimitMemory: "1Gi"
               runAsGroup: "0"
               runAsUser: "0"
               workingDir: "/home/jenkins/agent"
