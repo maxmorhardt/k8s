@@ -83,7 +83,7 @@ JCasC should look like (both in config map and in controller):
                 runAsGroup: "0"
                 runAsUser: "0"
                 resourceLimitCpu: "1"
-                resourceLimitMemory: "1Gi"
+                resourceLimitMemory: "2Gi"
                 resourceRequestCpu: "100m"
                 resourceRequestMemory: "128Mi"
                 privileged: "true"
