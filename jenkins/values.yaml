@@ -69,7 +69,7 @@ controller:
     - oic-auth:4.609.v9de140f63d01
     - role-strategy:799.v5b_e7b_ecc231e
     - pipeline-stage-view:2.38
-    - github-branch-source:1864.v411feec5e78e
+    - github-branch-source:1869.vdb_846d75405b_
     - prometheus:819.v50953a_c560dd
   installLatestPlugins: true
   installLatestSpecifiedPlugins: false
