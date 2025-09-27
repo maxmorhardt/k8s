@@ -207,12 +207,14 @@ serverFiles:
         tls_config:
           insecure_skip_verify: true 
         static_configs:
-          - targets: ['keycloak.maxstash-global.svc.cluster.local:9000']
+          - targets: 
+            - 'keycloak.maxstash-global.svc.cluster.local:9000'
 
       - job_name: postgres
         scheme: http
         static_configs:
-          - targets: [db-postgresql-metrics.maxstash-global.svc.cluster.local:9187]
+          - targets: 
+            - db-postgresql-metrics.maxstash-global.svc.cluster.local:9187
         
       - job_name: jenkins
         metrics_path: /prometheus
@@ -223,16 +225,26 @@ serverFiles:
           username_file: /etc/prometheus/secrets/jenkins-api-credentials/username
           password_file: /etc/prometheus/secrets/jenkins-api-credentials/password
         static_configs:
-          - targets: ['jenkins.maxstash.io']
+          - targets: 
+            - jenkins.maxstash.io
 
       - job_name: ages
         metrics_path: /metrics
         scheme: http
         static_configs:
-          - targets: [ages.maxstash-apps.svc.cluster.local:9113]
+          - targets: 
+            - ages.maxstash-apps.svc.cluster.local:9113
 
       - job_name: squares
         metrics_path: /metrics
         scheme: http
         static_configs:
-          - targets: [squares.maxstash-apps.svc.cluster.local:9113]
+          - targets: 
+            - squares.maxstash-apps.svc.cluster.local:9113
+
+      - job_name: squares-api
+        metrics_path: /metrics
+        scheme: http
+        static_configs:
+        - targets:
+          - squares-api.maxstash-apps.svc.cluster.local:2112
