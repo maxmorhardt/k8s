@@ -78,6 +78,7 @@ pipeline {
 								--atomic \
 								--debug \
 								--history-max=3 \
+								--timeout 15m0s \
 								--namespace $NAMESPACE \
 								--set image.tag=$DOCKER_VERSION
 						"""

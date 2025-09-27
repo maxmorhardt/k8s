@@ -51,7 +51,7 @@ rm key.pem
 
 kubectl apply --filename secret.yaml --namespace maxstash-global
 
-helm upgrade keycloak keycloak-1.0.0.tgz --install --atomic --debug --history-max=3 --namespace maxstash-global --timeout 10m0s
+helm upgrade keycloak keycloak-1.0.0.tgz --install --atomic --debug --history-max=3 --namespace maxstash-global --timeout 15m0s
 
 rm keycloak-1.0.0.tgz
 
