@@ -48,8 +48,8 @@ JCasC should look like (both in config map and in controller):
               image: "jenkins/inbound-agent:3327.v868139a_d00e0-7"
               name: "jnlp"
               alwaysPullImage: true
-              resourceLimitCpu: "500m"
-              resourceLimitMemory: "512Mi"
+              resourceLimitCpu: "1"
+              resourceLimitMemory: "1Gi"
               resourceRequestCpu: "200m"
               resourceRequestMemory: "256Mi"
               runAsGroup: "1000"
@@ -65,8 +65,8 @@ JCasC should look like (both in config map and in controller):
               name: "dind"
               alwaysPullImage: true
               privileged: true
-              resourceLimitCpu: "500m"
-              resourceLimitMemory: "512Mi"
+              resourceLimitCpu: "1"
+              resourceLimitMemory: "1Gi"
               resourceRequestCpu: "200m"
               resourceRequestMemory: "256Mi"
               runAsGroup: "0"
