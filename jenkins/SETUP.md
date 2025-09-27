@@ -63,6 +63,8 @@ JCasC should look like (both in config map and in controller):
               privileged: true
               resourceLimitCpu: "250m"
               resourceLimitMemory: "256Mi"
+							resourceRequestCpu: "100m"
+              resourceRequestMemory: "128Mi"
               runAsGroup: "0"
               runAsUser: "0"
               workingDir: "/home/jenkins/agent"
@@ -78,6 +80,8 @@ JCasC should look like (both in config map and in controller):
               privileged: true
               resourceLimitCpu: "1"
               resourceLimitMemory: "1Gi"
+              resourceRequestCpu: "100m"
+              resourceRequestMemory: "128Mi"
               runAsGroup: "0"
               runAsUser: "0"
               workingDir: "/home/jenkins/agent"
