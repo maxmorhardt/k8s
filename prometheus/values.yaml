@@ -103,7 +103,6 @@ server:
     servicePort: 80
     sessionAffinity: None
     type: ClusterIP
-    clusterIP: 10.43.148.167
 
   terminationGracePeriodSeconds: 300
   retention: "15d"
