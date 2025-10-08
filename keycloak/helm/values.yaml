@@ -1,6 +1,6 @@
 image:
   repository: quay.io/keycloak/keycloak
-  tag: 26.3.5
+  tag: 26.4.0
   pullPolicy: Always
   replicas: 1
   revisionHistoryLimit: 2
@@ -8,7 +8,7 @@ image:
     - mountPath: /var/keycloak
       name: keycloak-cert
       readOnly: true
-    - mountPath: /opt/keycloak/themes/maxstash-theme
+    - mountPath: /opt/keycloak/themes/maxstash-keycloakify
       name: theme
   env:
     - name: KC_PROXY
@@ -64,9 +64,9 @@ initContainers:
       - /bin/sh
       - -c
     args:
-      - cp -r /maxstash-theme/* /opt/keycloak/themes/maxstash-theme
+      - cp -r /maxstash-keycloakify/* /opt/keycloak/themes/maxstash-keycloakify
     volumeMounts:
-      - mountPath: /opt/keycloak/themes/maxstash-theme
+      - mountPath: /opt/keycloak/themes/maxstash-keycloakify
         name: theme
 
 volumes:
