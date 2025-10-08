@@ -58,7 +58,7 @@ image:
 
 initContainers: 
   - name: keycloak-theme
-    image: maxmorhardt/maxstash-keycloak-theme:latest
+    image: maxmorhardt/maxstash-keycloakify:latest
     imagePullPolicy: Always
     command:
       - /bin/sh
