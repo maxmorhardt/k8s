@@ -42,7 +42,7 @@ server:
   name: server
   image:
     repository: quay.io/prometheus/prometheus
-    tag: "latest"
+    tag: 'latest'
     pullPolicy: Always
 
   global:
@@ -105,8 +105,8 @@ server:
     type: ClusterIP
 
   terminationGracePeriodSeconds: 300
-  retention: "15d"
-  retentionSize: ""
+  retention: '15d'
+  retentionSize: ''
 
 prometheus-node-exporter:
   enabled: true
@@ -149,28 +149,36 @@ serverFiles:
       - job_name: prometheus
         static_configs:
           - targets:
-            - localhost:9090
+              - localhost:9090
 
       - job_name: kubernetes-service-endpoints
         honor_labels: true
         kubernetes_sd_configs:
           - role: endpoints
         relabel_configs:
-          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+          - source_labels:
+              [__meta_kubernetes_service_annotation_prometheus_io_scrape]
             action: keep
             regex: true
-          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape_slow]
+          - source_labels:
+              [__meta_kubernetes_service_annotation_prometheus_io_scrape_slow]
             action: drop
             regex: true
-          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+          - source_labels:
+              [__meta_kubernetes_service_annotation_prometheus_io_scheme]
             action: replace
             target_label: __scheme__
             regex: (https?)
-          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+          - source_labels:
+              [__meta_kubernetes_service_annotation_prometheus_io_path]
             action: replace
             target_label: __metrics_path__
             regex: (.+)
-          - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+          - source_labels:
+              [
+                __address__,
+                __meta_kubernetes_service_annotation_prometheus_io_port
+              ]
             action: replace
             target_label: __address__
             regex: (.+?)(?::\d+)?;(\d+)
@@ -195,55 +203,66 @@ serverFiles:
         metrics_path: /metrics
         scheme: http
         static_configs:
-          - targets: ['prometheus-kube-state-metrics.maxstash-global.svc.cluster.local:8080']
+          - targets:
+              [
+                'prometheus-kube-state-metrics.maxstash-global.svc.cluster.local:8080'
+              ]
         metric_relabel_configs:
-        - target_label: cluster
-          replacement: local
+          - target_label: cluster
+            replacement: local
 
       - job_name: keycloak
         metrics_path: /metrics
         scheme: https
         tls_config:
-          insecure_skip_verify: true 
+          insecure_skip_verify: true
         static_configs:
-          - targets: 
-            - 'keycloak.maxstash-global.svc.cluster.local:9000'
+          - targets:
+              - 'keycloak.maxstash-global.svc.cluster.local:9000'
 
       - job_name: postgres
         scheme: http
         static_configs:
-          - targets: 
-            - db-postgresql-metrics.maxstash-global.svc.cluster.local:9187
-        
+          - targets:
+              - db-postgresql-metrics.maxstash-global.svc.cluster.local:9187
+
       - job_name: jenkins
         metrics_path: /prometheus
         scheme: https
         tls_config:
-          insecure_skip_verify: true 
+          insecure_skip_verify: true
         basic_auth:
           username_file: /etc/prometheus/secrets/jenkins-api-credentials/username
           password_file: /etc/prometheus/secrets/jenkins-api-credentials/password
         static_configs:
-          - targets: 
-            - jenkins.maxstash.io
+          - targets:
+              - jenkins.maxstash.io
 
       - job_name: ages
         metrics_path: /metrics
         scheme: http
         static_configs:
-          - targets: 
-            - ages.maxstash-apps.svc.cluster.local:9113
+          - targets:
+              - ages.maxstash-apps.svc.cluster.local:9113
 
       - job_name: squares
         metrics_path: /metrics
         scheme: http
         static_configs:
-          - targets: 
-            - squares.maxstash-apps.svc.cluster.local:9113
+          - targets:
+              - squares.maxstash-apps.svc.cluster.local:9113
 
       - job_name: squares-api
         metrics_path: /metrics
         scheme: http
         static_configs:
-        - targets:
-          - squares-api.maxstash-apps.svc.cluster.local:2112
+          - targets:
+              - squares-api.maxstash-apps.svc.cluster.local:2112
+
+      - job_name: redis
+        metrics_path: /metrics
+        scheme: http
+        scrape_interval: 30s
+        static_configs:
+          - targets:
+              - redis-master.maxstash-global.svc.cluster.local:9121
