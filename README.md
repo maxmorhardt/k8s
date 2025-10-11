@@ -82,7 +82,7 @@ The stack follows a microservices architecture where each service is independent
 2. **Deploy core services**:
    ```bash
    # Deploy storage layer
-   cd postgres/ && ./deploy.sh
+   cd postgres/ && ./deploy-with-secrets.sh
    cd redis/ && ./deploy.sh
    
    # Deploy authentication
@@ -90,14 +90,13 @@ The stack follows a microservices architecture where each service is independent
    
    # Deploy monitoring
    cd prometheus/ && ./deploy.sh
-   cd grafana/ && ./deploy.sh
+   cd grafana/ && ./deploy-with-secrets.sh
    ```
 
 3. **Access services**:
    ```bash
    # Port forward to access locally
    kubectl port-forward svc/redis-master 6379:6379
-   kubectl port-forward svc/grafana 3000:80
    ```
 
 ## Development
