@@ -264,4 +264,4 @@ serverFiles:
         scheme: http
         static_configs:
           - targets:
-              - redis-master.maxstash-global.svc.cluster.local:9121
+              - redis-metrics.maxstash-global.svc.cluster.local:9121
