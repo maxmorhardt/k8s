@@ -262,7 +262,6 @@ serverFiles:
       - job_name: redis
         metrics_path: /metrics
         scheme: http
-        scrape_interval: 30s
         static_configs:
           - targets:
               - redis-master.maxstash-global.svc.cluster.local:9121
