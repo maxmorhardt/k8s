@@ -1,0 +1,47 @@
+image:
+  pullPolicy: Always
+
+architecture: standalone
+
+auth:
+  enabled: false
+
+master:
+  count: 1
+  revisionHistoryLimit: 2
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+  nodeSelector:
+    kubernetes.io/hostname: max-worker-2
+  persistence:
+    enabled: true
+    path: /data
+    storageClass: redis
+    accessModes:
+      - ReadWriteOnce
+    size: 8Gi
+    existingClaim: redis
+  persistentVolumeClaimRetentionPolicy:
+    enabled: true
+    whenScaled: Retain
+    whenDeleted: Retain
+  pdb:
+    create: true
+    minAvailable: 1
+
+metrics:
+  enabled: true
+  image:
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
