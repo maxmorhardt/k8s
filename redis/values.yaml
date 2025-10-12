@@ -11,13 +11,13 @@ master:
   revisionHistoryLimit: 2
   resources:
     requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
       cpu: 100m
       memory: 128Mi
+    limits:
+      cpu: 2
+      memory: 2Gi
   nodeSelector:
-    kubernetes.io/hostname: max-worker-2
+    kubernetes.io/hostname: max-worker-3
   persistence:
     enabled: true
     path: /data
@@ -43,5 +43,5 @@ metrics:
       cpu: 10m
       memory: 32Mi
     limits:
-      cpu: 50m
-      memory: 64Mi
+      cpu: 100m
+      memory: 128Mi
