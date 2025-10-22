@@ -87,7 +87,7 @@ server:
   resources:
     limits:
       cpu: 200m
-      memory: 512Mi
+      memory: 768Mi
     requests:
       cpu: 100m
       memory: 64Mi
