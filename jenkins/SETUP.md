@@ -100,3 +100,6 @@ JCasC should look like (both in config map and in controller):
               yamlMergeStrategy: merge
               inheritYamlMergeStrategy: false
 ```
+
+## Prometheus
+- Namespace should be jenkins or will get invalid metric name error

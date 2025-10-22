@@ -61,15 +61,15 @@ controller:
       timeoutSeconds: 5
   
   installPlugins:
-    - kubernetes:4371.vb_33b_086d54a_1
+    - kubernetes:4384.v1b_6367f393d9
     - workflow-aggregator:608.v67378e9d3db_1
-    - git:5.7.0
-    - docker-workflow:621.va_73f881d9232
-    - configuration-as-code:1995.v540b_50a_eb_0c1
+    - git:5.8.0
+    - docker-workflow:634.vedc7242b_eda_7
+    - configuration-as-code:2006.v001a_2ca_6b_574
     - oic-auth:4.609.v9de140f63d01
-    - role-strategy:799.v5b_e7b_ecc231e
+    - role-strategy:840.v206ff7f7312e
     - pipeline-stage-view:2.38
-    - github-branch-source:1869.vdb_846d75405b_
+    - github-branch-source:1906.v21c5c13d25c6
     - prometheus:819.v50953a_c560dd
   installLatestPlugins: true
   installLatestSpecifiedPlugins: false
