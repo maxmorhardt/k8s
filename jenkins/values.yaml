@@ -3,9 +3,21 @@ controller:
   image:
     registry: "docker.io"
     repository: "jenkins/jenkins"
-    tagLabel: jdk21
+    tag: latest-jdk21
     pullPolicy: "Always"
 
+  sidecars:
+    configAutoReload:
+      image:
+        tag: latest
+      imagePullPolicy: Always
+      resources:
+        limits:
+          cpu: 100m
+          memory: 100Mi
+        requests:
+          cpu: 50m
+          memory: 50Mi
   admin:
     username: "<JENKINS_ADMIN_USERNAME>"
     password: "<JENKINS_ADMIN_PASSWORD>"

@@ -59,7 +59,7 @@ JCasC should look like (both in config map and in controller):
                   - envVar:
                       key: "JENKINS_URL"
                       value: "http://jenkins.maxstash-global.svc.cluster.local:8080/"
-                image: "jenkins/inbound-agent:3341.v0766d82b_dec0-1"
+                image: "jenkins/inbound-agent:latest-jdk21"
                 runAsGroup: "1000"
                 runAsUser: "1000"
                 privileged: "false"
