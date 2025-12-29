@@ -1,0 +1,150 @@
+image:
+  registry: docker.io
+  repository: bitnami/keycloak
+  tag: 26.3.3-debian-12-r0
+  pullPolicy: Always
+
+auth:
+  adminUser: admin
+  existingSecret: keycloak-credentials
+  passwordSecretKey: admin-password
+
+tls:
+  enabled: true
+  usePemCerts: true
+  existingSecret: keycloak-credentials
+  certFilename: cert.pem
+  certKeyFilename: key.pem
+
+production: true
+proxyHeaders: xforwarded
+
+cache:
+  enabled: true
+  stack: jdbc-ping
+
+containerPorts:
+  http: 8080
+  https: 8443
+  management: 9000
+
+extraEnvVars:
+  - name: KC_HOSTNAME
+    value: 'auth.maxstash.io'
+  - name: KC_HOSTNAME_STRICT
+    value: 'true'
+  - name: KC_DB_URL_HOST
+    valueFrom:
+      secretKeyRef:
+        name: keycloak-credentials
+        key: db-host
+
+extraVolumes:
+  - name: theme
+    emptyDir: {}
+
+extraVolumeMounts:
+  - name: theme
+    mountPath: /opt/bitnami/keycloak/themes/maxstash-keycloakify
+
+initContainers:
+  - name: keycloak-theme
+    image: maxmorhardt/maxstash-keycloakify:1.0.0
+    imagePullPolicy: Always
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+          - ALL
+      seccompProfile:
+        type: RuntimeDefault
+    command:
+      - /bin/sh
+      - -c
+      - cp -r /maxstash-keycloakify/* /opt/bitnami/keycloak/themes/maxstash-keycloakify
+    volumeMounts:
+      - name: theme
+        mountPath: /opt/bitnami/keycloak/themes/maxstash-keycloakify
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 1001
+  runAsUser: 1001
+  runAsNonRoot: true
+
+containerSecurityContext:
+  enabled: true
+  runAsUser: 1001
+  runAsGroup: 1001
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 768Mi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+service:
+  type: ClusterIP
+  ports:
+    http: 80
+    https: 443
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  hostname: auth.maxstash.io
+  servicePort: https
+  tls: true
+  extraTls:
+    - hosts:
+        - auth.maxstash.io
+      secretName: maxstash.io-tls
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/ssl-passthrough: 'true'
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+
+postgresql:
+  enabled: false
+
+externalDatabase:
+  host: ''
+  port: 5432
+  user: keycloak
+  database: keycloak
+  existingSecret: keycloak-credentials
+  existingSecretUserKey: db-username
+  existingSecretPasswordKey: db-password
+
+metrics:
+  enabled: true
+
+pdb:
+  create: true
+  minAvailable: 1
+
+networkPolicy:
+  enabled: true
+  allowExternal: true
+
+autoscaling:
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 4
+    targetCPU: 90
+    targetMemory: 90

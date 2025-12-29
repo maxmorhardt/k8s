@@ -12,10 +12,8 @@ pipeline {
 	}
 
 	parameters {
-		string(name: 'DOCKER_VERSION', defaultValue: params.DOCKER_VERSION ?: '0.0.1', description: 'Docker image version', trim: true)
-		string(name: 'HELM_VERSION', defaultValue: params.HELM_VERSION ?: '0.0.1', description: 'Helm version', trim: true)
+		string(name: 'HELM_VERSION', defaultValue: params.HELM_VERSION ?: '23.2.1', description: 'Bitnami Keycloak chart version', trim: true)
 	}
-
 
 	environment {
 		GITHUB_URL = 'https://github.com/maxmorhardt/k8s'
@@ -44,47 +42,28 @@ pipeline {
 					echo "APP_NAME: $APP_NAME"
 					echo "NAMESPACE: $NAMESPACE"
 					echo "BRANCH: $BRANCH_NAME"
-					echo "DOCKER_VERSION: $DOCKER_VERSION"
 					echo "HELM_VERSION: $HELM_VERSION"
-				}
-			}
-		}
-
-		stage('Helm CI') {
-			steps {
-				dir('keycloak/helm') {
-					script {
-						withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-							sh 'echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin'
-
-							sh """
-								helm package . --app-version=$DOCKER_VERSION --version=$HELM_VERSION
-								helm push $APP_NAME-${HELM_VERSION}.tgz $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME
-							"""
-						}
-					}
 				}
 			}
 		}
 
 		stage('CD') {
 			steps {
-				script {
-					withCredentials([
-						file(credentialsId: 'kube-config', variable: 'KUBECONFIG'),
-						usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')
-					]) {
-						sh """
-							helm upgrade $APP_NAME $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME/$APP_NAME \
+				dir('keycloak') {
+					script {
+						withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG')]) {
+							sh """
+								helm upgrade $APP_NAME $DOCKER_REGISTRY_FULL/bitnamicharts/keycloak \
 								--version $HELM_VERSION \
-								--install \
-								--atomic \
-								--debug \
-								--history-max=3 \
-								--timeout 15m0s \
-								--namespace $NAMESPACE \
-								--set image.tag=$DOCKER_VERSION
-						"""
+									--install \
+									--atomic \
+									--debug \
+									--history-max=3 \
+									--timeout 15m0s \
+									--namespace $NAMESPACE \
+									--values values.yaml
+							"""
+						}
 					}
 				}
 			}
