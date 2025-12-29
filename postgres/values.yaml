@@ -1,7 +1,5 @@
 image:
-  registry: docker.io
-  repository: library/postgres
-  tag: 16.7-alpine
+  tag: latest
   pullPolicy: Always
 
 global:

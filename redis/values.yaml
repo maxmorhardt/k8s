@@ -1,7 +1,5 @@
 image:
-  registry: docker.io
-  repository: library/redis
-  tag: 7.4-alpine
+  tag: latest
   pullPolicy: Always
 
 architecture: standalone

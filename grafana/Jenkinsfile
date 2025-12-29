@@ -47,12 +47,12 @@ pipeline {
 								helm repo add grafana https://grafana.github.io/helm-charts 
 								helm repo update
 
-								helm upgrade \$APP_NAME grafana/grafana \
+								helm upgrade $APP_NAME grafana/grafana \
 									--install \
 									--atomic \
 									--debug \
 									--history-max=3 \
-									--namespace \$NAMESPACE \
+									--namespace $NAMESPACE \
 									--values values.yaml 
 							"""
 						}
