@@ -1,3 +1,11 @@
+def getBackupFilename() {
+	def formattedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
+	def fileName = "postgres-backup-${formattedDate}.sql"
+
+	echo "Created backup file name: ${fileName}"
+	return fileName
+}
+
 pipeline {
 	agent {
 		kubernetes {
@@ -24,7 +32,6 @@ pipeline {
 
 		APP_NAME = "db"
 		NAMESPACE = "maxstash-global"
-		BACKUP_FILE = "postgres_backup_\${BUILD_NUMBER}_\${new Date().format('yyyyMMdd_HHmmss')}.sql"
 		
 		KUBECONFIG = credentials('kube-config')
 		POSTGRES = credentials('postgres')
@@ -38,14 +45,11 @@ pipeline {
 						error('Migration not confirmed. Check CONFIRM_MIGRATION parameter to proceed.')
 					}
 
-					echo "⚠️  PostgreSQL Major Version Migration"
-					echo "This will:"
-					echo "  1. Backup current database"
-					echo "  2. Delete deployment and PVC"
-					echo "  3. Redeploy with new version"
-					echo "  4. Restore data"
-					echo ""
-					echo "⏱️  Expected downtime: 5-15 minutes"
+					echo "PostgreSQL Major Version Migration"
+					echo "1. Backup current database"
+					echo "2. Delete deployment and PVC"
+					echo "3. Redeploy with new version"
+					echo "4. Restore data"
 				}
 			}
 		}
@@ -75,8 +79,10 @@ pipeline {
 			steps {
 				dir('postgres') {
 					script {
+						env.BACKUP_FILE = getBackupFilename()
+
 						sh """
-							kubectl exec -it ${APP_NAME}-postgresql-0 -- bash -c \'PGPASSWORD=${POSTGRES_PSW} pg_dumpall -U ${POSTGRES_USR} > /tmp/backup.sql\'
+							kubectl exec -it ${APP_NAME}-postgresql-0 -- bash -c \'PGPASSWORD=${POSTGRES_PSW} pg_dumpall -U ${POSTGRES_USR} > ${BACKUP_FILE}\'
 						"""
 
 						archiveArtifacts artifacts: "$BACKUP_FILE", fingerprint: true
