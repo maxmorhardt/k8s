@@ -13,6 +13,7 @@ pipeline {
 
 	parameters {
 		string(name: 'HELM_VERSION', defaultValue: params.HELM_VERSION ?: '0.0.1', description: 'Helm version', trim: true)
+		booleanParam(name: 'CONFIRM_MIGRATION', defaultValue: false, description: 'Confirm PostgreSQL major version migration (will cause downtime)')
 	}
 
 	environment {
@@ -26,9 +27,31 @@ pipeline {
 		BACKUP_FILE = "postgres_backup_\${BUILD_NUMBER}_\${new Date().format('yyyyMMdd_HHmmss')}.sql"
 		
 		KUBECONFIG = credentials('kube-config')
+		POSTGRES = credentials('postgres')
+		POSTGRES_USERNAME = POSTGRES_USR
+		POSTGRES_PASSWORD = POSTGRES_PSW
 	}
 
 	stages {
+		stage('Confirm Migration') {
+			steps {
+				script {
+					if (!params.CONFIRM_MIGRATION) {
+						error('Migration not confirmed. Check CONFIRM_MIGRATION parameter to proceed.')
+					}
+
+					echo "⚠️  PostgreSQL Major Version Migration"
+					echo "This will:"
+					echo "  1. Backup current database"
+					echo "  2. Delete deployment and PVC"
+					echo "  3. Redeploy with new version"
+					echo "  4. Restore data"
+					echo ""
+					echo "⏱️  Expected downtime: 5-15 minutes"
+				}
+			}
+		}
+
 		stage('Setup') {
 			steps {
 				script {
@@ -54,17 +77,12 @@ pipeline {
 			steps {
 				dir('postgres') {
 					script {
-						withCredentials([
-							file(credentialsId: 'kube-config', variable: 'KUBECONFIG'),
-							usernamePassword(credentialsId: 'postgres', usernameVariable: 'POSTGRES_USERNAME', passwordVariable: 'POSTGRES_PASSWORD')
-						]) {
-							sh """
-								kubectl exec -n $NAMESPACE ${APP_NAME}-postgresql-0 -- \
-									bash -c 'PGPASSWORD=$POSTGRES_PASSWORD pg_dumpall -U $POSTGRES_USERNAME' > $BACKUP_FILE
-							"""
+						sh """
+							kubectl exec -n $NAMESPACE ${APP_NAME}-postgresql-0 -- \
+								bash -c 'PGPASSWORD=$POSTGRES_PASSWORD pg_dumpall -U $POSTGRES_USERNAME' > $BACKUP_FILE
+						"""
 
-							archiveArtifacts artifacts: "$BACKUP_FILE", fingerprint: true
-						}
+						archiveArtifacts artifacts: "$BACKUP_FILE", fingerprint: true
 					}
 				}
 			}
@@ -74,11 +92,9 @@ pipeline {
 			steps {
 				dir('postgres') {
 					script {
-						withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG')]) {
-							sh """
-								helm uninstall $APP_NAME -n $NAMESPACE || true
-							"""
-
+						sh """
+							helm uninstall $APP_NAME -n $NAMESPACE || true
+						"""
 					}
 				}
 			}
@@ -88,11 +104,9 @@ pipeline {
 			steps {
 				dir('postgres') {
 					script {
-						withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG')]) {
-							sh """
-								kubectl delete pvc data-${APP_NAME}-postgresql-0 -n $NAMESPACE
-							"""
-
+						sh """
+							kubectl delete pvc data-${APP_NAME}-postgresql-0 -n $NAMESPACE
+						"""
 					}
 				}
 			}
@@ -102,18 +116,16 @@ pipeline {
 			steps {
 				dir('postgres') {
 					script {
-						withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG')]) {
-							sh """
-								helm upgrade $APP_NAME $DOCKER_REGISTRY_FULL/bitnamicharts/postgresql \
-									--install \
-									--atomic \
-									--debug \
-									--history-max=3 \
-									--namespace $NAMESPACE \
-									--version $HELM_VERSION \
-									--values values.yaml
-							"""
-
+						sh """
+							helm upgrade $APP_NAME $DOCKER_REGISTRY_FULL/bitnamicharts/postgresql \
+								--install \
+								--atomic \
+								--debug \
+								--history-max=3 \
+								--namespace $NAMESPACE \
+								--version $HELM_VERSION \
+								--values values.yaml
+						"""
 					}
 				}
 			}
@@ -123,12 +135,10 @@ pipeline {
 			steps {
 				dir('postgres') {
 					script {
-						withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG')]) {
-							sh """
-								kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=postgresql \
-									-n $NAMESPACE --timeout=300s
-							"""
-
+						sh """
+							kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=postgresql \
+								-n $NAMESPACE --timeout=300s
+						"""
 					}
 				}
 			}
@@ -138,16 +148,11 @@ pipeline {
 			steps {
 				dir('postgres') {
 					script {
-						withCredentials([
-							file(credentialsId: 'kube-config', variable: 'KUBECONFIG'),
-							usernamePassword(credentialsId: 'postgres', usernameVariable: 'POSTGRES_USERNAME', passwordVariable: 'POSTGRES_PASSWORD')
-						]) {
-							sh """
-								kubectl cp $BACKUP_FILE ${NAMESPACE}/${APP_NAME}-postgresql-0:/tmp/restore.sql
-								kubectl exec -n $NAMESPACE ${APP_NAME}-postgresql-0 -- \
-									bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USERNAME -d postgres -f /tmp/restore.sql'
-							"""
-						}
+						sh """
+							kubectl cp $BACKUP_FILE ${NAMESPACE}/${APP_NAME}-postgresql-0:/tmp/restore.sql
+							kubectl exec -n $NAMESPACE ${APP_NAME}-postgresql-0 -- \
+								bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USERNAME -d postgres -f /tmp/restore.sql'
+						"""
 					}
 				}
 			}
@@ -157,15 +162,10 @@ pipeline {
 			steps {
 				dir('postgres') {
 					script {
-						withCredentials([
-							file(credentialsId: 'kube-config', variable: 'KUBECONFIG'),
-							usernamePassword(credentialsId: 'postgres', usernameVariable: 'POSTGRES_USERNAME', passwordVariable: 'POSTGRES_PASSWORD')
-						]) {
-							sh """
-								kubectl exec -n $NAMESPACE ${APP_NAME}-postgresql-0 -- \
-									bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USERNAME -d maxstash -c "\\\\dt"'
-							"""
-						}
+						sh """
+							kubectl exec -n $NAMESPACE ${APP_NAME}-postgresql-0 -- \
+								bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USERNAME -d maxstash -c "\\\\dt"'
+						"""
 					}
 				}
 			}
