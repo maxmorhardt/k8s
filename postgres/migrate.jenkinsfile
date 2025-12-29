@@ -77,7 +77,7 @@ pipeline {
 					script {
 						sh """
 							kubectl exec -n $NAMESPACE ${APP_NAME}-postgresql-0 -- \
-								bash -c 'PGPASSWORD=$POSTGRES_PSW pg_dumpall -U $POSTGRES_USR' > $BACKUP_FILE
+								bash -c 'PGPASSWORD=${POSTGRES_PSW} pg_dumpall -U ${POSTGRES_USR}' > $BACKUP_FILE
 						"""
 
 						archiveArtifacts artifacts: "$BACKUP_FILE", fingerprint: true
