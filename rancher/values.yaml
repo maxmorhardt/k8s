@@ -4,6 +4,6 @@ ingress:
   ingressClassName: nginx
   tls:
     source: secret
-    secretName: rancher.maxstash.io-tls
+    secretName: maxstash.io-tls
 
 replicas: 1

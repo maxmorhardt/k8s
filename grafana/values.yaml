@@ -28,9 +28,19 @@ containerSecurityContext:
   allowPrivilegeEscalation: false
   capabilities:
     drop:
-    - ALL
+      - ALL
   seccompProfile:
     type: RuntimeDefault
+
+envValueFrom:
+  GRAFANA_CLIENT_ID:
+    secretKeyRef:
+      name: grafana-credentials
+      key: client-id
+  GRAFANA_CLIENT_SECRET:
+    secretKeyRef:
+      name: grafana-credentials
+      key: client-secret
 
 service:
   enabled: true
@@ -47,18 +57,18 @@ ingress:
   pathType: Prefix
   hosts:
     - grafana.maxstash.io
-  tls: 
-   - secretName: grafana.maxstash.io-tls
-     hosts:
-       - grafana.maxstash.io
+  tls:
+    - secretName: maxstash.io-tls
+      hosts:
+        - grafana.maxstash.io
 
 resources:
- limits:
-   cpu: 500m
-   memory: 512Mi
- requests:
-   cpu: 200m
-   memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
 
 persistence:
   enabled: true
@@ -94,8 +104,8 @@ grafana.ini:
     enabled: true
     name: Max Stash
     allow_sign_up: true
-    client_id: <GRAFANA_CLIENT_ID>
-    client_secret: <GRAFANA_CLIENT_SECRET>
+    client_id: ${GRAFANA_CLIENT_ID}
+    client_secret: ${GRAFANA_CLIENT_SECRET}
     scopes: openid email profile offline_access roles
     email_attribute_path: email
     login_attribute_path: username
@@ -104,5 +114,3 @@ grafana.ini:
     token_url: https://auth.maxstash.io/realms/maxstash-dev/protocol/openid-connect/token
     api_url: https://auth.maxstash.io/realms/maxstash-dev/protocol/openid-connect/userinfo
     role_attribute_path: contains(groups[*], '/Grafana_Admin') && 'Admin' || 'Viewer'
-
-assertNoLeakedSecrets: false

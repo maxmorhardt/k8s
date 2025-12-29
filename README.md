@@ -76,47 +76,74 @@ The stack follows a microservices architecture where each service is independent
 1. **Set up K3s cluster**:
    ```bash
    cd k3s/
-   ./SETUP.md
+   # Follow instructions in SETUP.md
    ```
 
-2. **Deploy core services**:
+2. **Create namespaces**:
+   ```bash
+   ./namespaces.sh
+   ```
+
+3. **Deploy core services**:
    ```bash
    # Deploy storage layer
-   cd postgres/ && ./deploy-with-secrets.sh
+   cd postgres/ && ./deploy.sh
    cd redis/ && ./deploy.sh
    
    # Deploy authentication
-   cd keycloak/ && ./deploy-with-secrets.sh
+   cd keycloak/ && ./deploy.sh
    
-   # Deploy monitoring
+   # Deploy CI/CD
+   cd jenkins/ && ./deploy.sh
+   
+   # Deploy monitoring & logging
    cd prometheus/ && ./deploy.sh
-   cd grafana/ && ./deploy-with-secrets.sh
+   cd loki/ && ./deploy.sh
+   cd grafana/ && ./deploy.sh
+   cd alloy/ && ./deploy.sh
+   
+   # Deploy management
+   cd rancher/ && ./deploy.sh
    ```
 
-3. **Access services**:
-   ```bash
-   # Port forward to access locally
-   kubectl port-forward svc/redis-master 6379:6379
-   ```
+4. **Access services via ingress**:
+   - Rancher: https://rancher.maxstash.io
+   - Keycloak: https://auth.maxstash.io
+   - Jenkins: https://jenkins.maxstash.io
+   - Grafana: https://grafana.maxstash.io
 
 ## Development
 
 Each service directory contains:
-- **SETUP.md** - Service-specific setup instructions
+- **SETUP.md** - Service-specific setup instructions and required secrets
 - **values.yaml** - Helm chart configuration
-- **deploy.sh** - Standard deployment script
-- **deploy-with-secrets.sh** - Production deployment with secrets
+- **deploy.sh** - Deployment script using helm upgrade
+- **Jenkinsfile** - CI/CD pipeline for automated deployment
 - **storage.yaml** - Persistent volume configurations (where applicable)
 
-### Environment-Specific Configuration
-Scripts named `*-with-secrets.sh` allow for environment-specific configurations without exposing secrets to version control. Copy and customize these for your deployment environment.
+### Secret Management
+All secrets are managed via Kubernetes secrets and mounted as environment variables. See each service's SETUP.md for required secret keys and example YAML format.
+
+### Node Maintenance
+Weekly automated node rehydration runs on Sunday mornings (staggered 2-5 AM) via cron:
+- Drains node
+- Updates system packages
+- Cleans up container images, logs, and temp files
+- Logs to `/var/log/rehydrate/` (collected by Alloy)
 
 ## Resource Dependencies
 
 Services have the following dependency chain:
-- **Jenkins** → requires Keycloak (OIDC)
+- **Jenkins** → requires Keycloak (OIDC), has cluster-admin permissions for CI/CD
 - **Keycloak** → requires PostgreSQL (database)
-- **Grafana** → requires Prometheus (data source)
-- **Alloy** → requires Prometheus + Loki (targets)
+- **Grafana** → requires Prometheus (data source), Keycloak (OIDC)
+- **Alloy** → requires Loki (log target)
+- **Rancher** → requires Keycloak (OIDC)
 
 Deploy dependencies first to avoid service startup issues.
+
+## Node Assignments
+- **main**: Control plane, Alloy
+- **max-worker**: PostgreSQL, Prometheus, Grafana
+- **max-worker-2**: Jenkins, Keycloak
+- **max-worker-3**: Redis, Loki

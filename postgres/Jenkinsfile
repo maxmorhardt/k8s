@@ -6,6 +6,11 @@ pipeline {
 		}
 	}
 
+	options {
+		timeout(time: 15, unit: 'MINUTES')
+		buildDiscarder(logRotator(numToKeepStr: '5'))
+	}
+
 	parameters {
 		string(name: 'HELM_VERSION', defaultValue: params.HELM_VERSION ?: '0.0.1', description: 'Helm version', trim: true)
 	}
@@ -24,44 +29,49 @@ pipeline {
 		stage('Setup') {
 			steps {
 				script {
-					withCredentials([file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG')]) {
-						checkout scmGit(
-							branches: [[
-								name: "$BRANCH_NAME"
-							]],
-							userRemoteConfigs: [[
-								credentialsId: 'github',
-								url: "$GITHUB_URL"
-							]]
-						)
+					checkout scmGit(
+						branches: [[
+							name: "$BRANCH_NAME"
+						]],
+						userRemoteConfigs: [[
+							credentialsId: 'github',
+							url: "$GITHUB_URL"
+						]]
+					)
 
-						sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG $WORKSPACE/.kube/config'
-						sh 'ls -lah'
-
-						echo "APP_NAME: $APP_NAME"
-						echo "NAMESPACE: $NAMESPACE"
-						echo "BRANCH: $BRANCH_NAME"
-						echo "HELM_VERSION: $HELM_VERSION"
-					}
+					echo "APP_NAME: $APP_NAME"
+					echo "NAMESPACE: $NAMESPACE"
+					echo "BRANCH: $BRANCH_NAME"
+					echo "HELM_VERSION: $HELM_VERSION"
 				}
 			}
 		}
 
 		stage('CD') {
 			steps {
-				script {
-					sh """
-						helm upgrade $APP_NAME $DOCKER_REGISTRY_FULL/bitnamicharts/postgresql \
-							--install \
-							--atomic \
-							--debug \
-							--history-max=3 \
-							--namespace $NAMESPACE \
-							--version $HELM_VERSION \
-							--values postgres/values.yaml 
-					"""
+				dir('postgres') {
+					script {
+						withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG')]) {
+							sh """
+								helm upgrade $APP_NAME $DOCKER_REGISTRY_FULL/bitnamicharts/postgresql \
+									--install \
+									--atomic \
+									--debug \
+									--history-max=3 \
+									--namespace $NAMESPACE \
+									--version $HELM_VERSION \
+									--values values.yaml 
+							"""
+						}
+					}
 				}
 			}
+		}
+	}
+
+	post {
+		always {
+			cleanWs()
 		}
 	}
 }

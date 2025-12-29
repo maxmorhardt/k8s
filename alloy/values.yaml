@@ -5,11 +5,24 @@ serviceAccount:
 alloy:
   resources:
     requests:
-      cpu: "50m"
-      memory: "64Mi"
+      cpu: '50m'
+      memory: '64Mi'
     limits:
-      cpu: "100m"
-      memory: "128Mi"
+      cpu: '100m'
+      memory: '128Mi'
+
+  mounts:
+    varlog: true
+
+  extraVolumes:
+    - name: varlog
+      hostPath:
+        path: /var/log
+
+  extraVolumeMounts:
+    - name: varlog
+      mountPath: /var/log
+      readOnly: true
 
   configMap:
     create: true
@@ -29,8 +42,22 @@ alloy:
         }]
       }
 
+      local.file_match "rehydrate_logs" {
+        path_targets = [{
+            __path__  = "/var/log/rehydrate/*.log",
+            job       = "node/rehydrate",
+            node_name = sys.env("HOSTNAME"),
+            cluster   = "local",
+        }]
+      }
+
       loki.source.file "node_logs" {
         targets    = local.file_match.node_logs.targets
+        forward_to = [loki.write.default.receiver]
+      }
+
+      loki.source.file "rehydrate_logs" {
+        targets    = local.file_match.rehydrate_logs.targets
         forward_to = [loki.write.default.receiver]
       }
 

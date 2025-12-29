@@ -39,24 +39,24 @@ image:
           name: keycloak-credentials
           key: db-host
   args:
-    - "start"
-    - "--db=postgres"
-    - "--db-username=$(DB_USERNAME)"
-    - "--db-password=$(DB_PASSWORD)"
-    - "--db-url=$(DB_HOST)"
-    - "--https-certificate-file=/var/keycloak/cert.pem"
-    - "--https-certificate-key-file=/var/keycloak/key.pem"
-    - "--hostname=auth.maxstash.io"
-    - "--spi-theme-static-max-age=-1"
-    - "--spi-theme-cache-themes=false"
-    - "--spi-theme-cache-templates=false"
-    - "--metrics-enabled=true"
+    - 'start'
+    - '--db=postgres'
+    - '--db-username=$(DB_USERNAME)'
+    - '--db-password=$(DB_PASSWORD)'
+    - '--db-url=$(DB_HOST)'
+    - '--https-certificate-file=/var/keycloak/cert.pem'
+    - '--https-certificate-key-file=/var/keycloak/key.pem'
+    - '--hostname=auth.maxstash.io'
+    - '--spi-theme-static-max-age=-1'
+    - '--spi-theme-cache-themes=false'
+    - '--spi-theme-cache-templates=false'
+    - '--metrics-enabled=true'
   readinessProbe:
     scheme: HTTPS
     path: /realms/master
     port: 8443
 
-initContainers: 
+initContainers:
   - name: keycloak-theme
     image: maxmorhardt/maxstash-keycloakify:latest
     imagePullPolicy: Always
@@ -78,7 +78,7 @@ volumes:
 
 nodeSelector:
   kubernetes.io/hostname: max-worker-2
-    
+
 service:
   type: ClusterIP
   port: 8443
@@ -91,17 +91,17 @@ ingress:
   className: nginx
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-passthrough: 'true'
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
   hosts:
     - host: auth.maxstash.io
       paths:
         - path: /
           pathType: Prefix
-  tls: 
-   - secretName: auth.maxstash.io-tls
-     hosts:
-       - auth.maxstash.io
+  tls:
+    - secretName: maxstash.io-tls
+      hosts:
+        - auth.maxstash.io
 
 resources:
   limits:

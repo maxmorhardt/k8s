@@ -152,7 +152,7 @@ controller:
     hostName: jenkins.maxstash.io
     resourceRootUrl:
     tls:
-      - secretName: jenkins.maxstash.io-tls
+      - secretName: maxstash.io-tls
         hosts:
           - jenkins.maxstash.io
 

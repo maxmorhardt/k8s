@@ -17,23 +17,38 @@ loki:
 
   schemaConfig:
     configs:
-    - from: "2024-01-01"
-      store: tsdb
-      index:
-        prefix: loki_index_
-        period: 24h
-      object_store: filesystem
-      schema: v13
+      - from: '2024-01-01'
+        store: tsdb
+        index:
+          prefix: loki_index_
+          period: 24h
+        object_store: filesystem
+        schema: v13
+
+  limits_config:
+    retention_period: 30d
+    max_query_lookback: 30d
+
+  rulerConfig:
+    enable_api: false
+    storage:
+      type: local
 
 singleBinary:
   replicas: 1
+  persistence:
+    enabled: true
+    storageClass: loki
+    size: 10Gi
+  nodeSelector:
+    kubernetes.io/hostname: max-worker-3
   resources:
     requests:
-      cpu: "50m"
-      memory: "64Mi"
+      cpu: '100m'
+      memory: '256Mi'
     limits:
-      cpu: "200m"
-      memory: "256Mi"
+      cpu: '500m'
+      memory: '512Mi'
 read:
   replicas: 0
 backend:

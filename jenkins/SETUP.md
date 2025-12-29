@@ -1,3 +1,21 @@
+## Secrets Required
+
+Create the `jenkins` secret manually before deployment:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: jenkins
+  namespace: maxstash-global
+type: Opaque
+data:
+  jenkins-admin-user: <base64-encoded-admin-username>
+  jenkins-admin-password: <base64-encoded-admin-password>
+  jenkins-client-id: <base64-encoded-keycloak-client-id>
+  jenkins-client-secret: <base64-encoded-keycloak-client-secret>
+```
+
 ## OIDC
 
 ### In Keycloak:

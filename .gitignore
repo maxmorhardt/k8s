@@ -1,7 +1,6 @@
 # k8s
 charts
 *.tgz
-*-with-secrets*
 
 # python
 .venv
