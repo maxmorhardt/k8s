@@ -12,14 +12,14 @@ pipeline {
 	}
 
 	parameters {
-		string(name: 'HELM_VERSION', defaultValue: params.HELM_VERSION ?: '23.2.1', description: 'Bitnami Keycloak chart version', trim: true)
+		string(name: 'HELM_VERSION', defaultValue: params.HELM_VERSION ?: '7.1.5', description: 'codecentric keycloakx chart version', trim: true)
 	}
 
 	environment {
 		GITHUB_URL = 'https://github.com/maxmorhardt/k8s'
 
-		DOCKER_REGISTRY = 'docker.io'
-		DOCKER_REGISTRY_FULL = "oci://${env.DOCKER_REGISTRY}"
+		CHART_REPO = 'codecentric'
+		CHART_NAME = 'keycloakx'
 
 		APP_NAME = "keycloak"
 		NAMESPACE = "maxstash-global"
@@ -53,8 +53,11 @@ pipeline {
 					script {
 						withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG')]) {
 							sh """
-								helm upgrade $APP_NAME $DOCKER_REGISTRY_FULL/bitnamicharts/keycloak \
-								--version $HELM_VERSION \
+								helm repo add $CHART_REPO https://codecentric.github.io/helm-charts
+								helm repo update $CHART_REPO
+								
+								helm upgrade $APP_NAME $CHART_REPO/$CHART_NAME \
+									--version $HELM_VERSION \
 									--install \
 									--atomic \
 									--debug \

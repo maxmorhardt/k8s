@@ -1,5 +1,8 @@
-helm upgrade keycloak oci://registry-1.docker.io/bitnamicharts/keycloak \
-  --version 23.2.1 \
+helm repo add codecentric https://codecentric.github.io/helm-charts
+helm repo update codecentric
+
+helm upgrade keycloak codecentric/keycloakx \
+  --version 7.1.5 \
   --install \
   --atomic \
   --debug \

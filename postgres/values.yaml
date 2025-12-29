@@ -1,3 +1,9 @@
+image:
+  registry: docker.io
+  repository: library/postgres
+  tag: 16.7-alpine
+  pullPolicy: Always
+
 global:
   storageClass: postgres
   postgresql:
@@ -28,6 +34,6 @@ primary:
     limits:
       cpu: 2
       memory: 2Gi
-  
+
 metrics:
   enabled: true

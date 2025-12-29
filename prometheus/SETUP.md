@@ -28,6 +28,6 @@ data:
   - Example: `http://prometheus-server.maxstash-global.svc.cluster.local`
 - To access locally:
   ```bash
-  kubectl port-forward -n maxstash-global svc/prometheus-server 9090:9090
+  kubectl port-forward -n maxstash-global svc/prometheus-server 9090:80
   # Then visit http://localhost:9090
   ```
