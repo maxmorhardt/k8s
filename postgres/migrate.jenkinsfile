@@ -75,10 +75,9 @@ pipeline {
 			steps {
 				dir('postgres') {
 					script {
-						sh '''
-							kubectl exec -n ''' + env.NAMESPACE + ' ' + env.APP_NAME + '''-postgresql-0 -- \
-								bash -c 'PGPASSWORD="''' + env.POSTGRES_PSW + '''" pg_dumpall -U ''' + env.POSTGRES_USR + '''" > ''' + env.BACKUP_FILE + '''
-						'''
+						sh """
+							kubectl exec -it <pod-name> -- bash -c \'PGPASSWORD=${POSTGRES_PSW} pg_dumpall -U ${POSTGRES_USR} > /tmp/backup.sql\'
+						"""
 
 						archiveArtifacts artifacts: "$BACKUP_FILE", fingerprint: true
 					}
@@ -91,7 +90,8 @@ pipeline {
 				dir('postgres') {
 					script {
 						sh """
-							helm uninstall $APP_NAME -n $NAMESPACE || true
+							exit 1
+							helm uninstall $APP_NAME -n $NAMESPACE
 						"""
 					}
 				}
