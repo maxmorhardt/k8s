@@ -75,10 +75,10 @@ pipeline {
 			steps {
 				dir('postgres') {
 					script {
-						sh """
-							kubectl exec -n $NAMESPACE ${APP_NAME}-postgresql-0 -- \
-								bash -c 'PGPASSWORD=${POSTGRES_PSW} pg_dumpall -U ${POSTGRES_USR}' > $BACKUP_FILE
-						"""
+						sh '''
+							kubectl exec -n ''' + env.NAMESPACE + ' ' + env.APP_NAME + '''-postgresql-0 -- \
+								bash -c 'PGPASSWORD="''' + env.POSTGRES_PSW + '''" pg_dumpall -U ''' + env.POSTGRES_USR + '''" > ''' + env.BACKUP_FILE + '''
+						'''
 
 						archiveArtifacts artifacts: "$BACKUP_FILE", fingerprint: true
 					}
@@ -146,11 +146,11 @@ pipeline {
 			steps {
 				dir('postgres') {
 					script {
-						sh """
-							kubectl cp $BACKUP_FILE ${NAMESPACE}/${APP_NAME}-postgresql-0:/tmp/restore.sql
-							kubectl exec -n $NAMESPACE ${APP_NAME}-postgresql-0 -- \
-								bash -c 'PGPASSWORD=$POSTGRES_PSW psql -U $POSTGRES_USR -d postgres -f /tmp/restore.sql'
-						"""
+						sh '''
+							kubectl cp ''' + env.BACKUP_FILE + ' ' + env.NAMESPACE + '/' + env.APP_NAME + '''-postgresql-0:/tmp/restore.sql
+							kubectl exec -n ''' + env.NAMESPACE + ' ' + env.APP_NAME + '''-postgresql-0 -- \
+								bash -c 'PGPASSWORD="''' + env.POSTGRES_PSW + '''" psql -U ''' + env.POSTGRES_USR + ''' -d postgres -f /tmp/restore.sql'
+						'''
 					}
 				}
 			}
@@ -160,10 +160,10 @@ pipeline {
 			steps {
 				dir('postgres') {
 					script {
-						sh """
-							kubectl exec -n $NAMESPACE ${APP_NAME}-postgresql-0 -- \
-								bash -c 'PGPASSWORD=$POSTGRES_PSW psql -U $POSTGRES_USR -d maxstash -c "\\\\dt"'
-						"""
+						sh '''
+							kubectl exec -n ''' + env.NAMESPACE + ' ' + env.APP_NAME + '''-postgresql-0 -- \
+								bash -c 'PGPASSWORD="''' + env.POSTGRES_PSW + '''" psql -U ''' + env.POSTGRES_USR + ''' -d maxstash -c "\\dt"'
+						'''
 					}
 				}
 			}
