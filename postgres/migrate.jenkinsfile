@@ -55,7 +55,7 @@ pipeline {
 						withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG')]) {
 							sh """
 								kubectl exec -n $NAMESPACE ${APP_NAME}-postgresql-0 -- \
-									bash -c 'PGPASSWORD=\$POSTGRES_PASSWORD pg_dumpall -U maxmorhardt' > $BACKUP_FILE
+									bash -c 'PGPASSWORD=${POSTGRES_PASSWORD} pg_dumpall -U maxmorhardt' > $BACKUP_FILE
 							"""
 
 							archiveArtifacts artifacts: "$BACKUP_FILE", fingerprint: true
