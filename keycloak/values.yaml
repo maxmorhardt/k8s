@@ -79,7 +79,7 @@ resources:
     memory: 768Mi
   requests:
     cpu: 500m
-    memory: 512Mi
+    memory: 768Mi
 
 database:
   vendor: postgres
@@ -152,13 +152,13 @@ autoscaling:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 90
+          averageUtilization: 100
     - type: Resource
       resource:
         name: memory
         target:
           type: Utilization
-          averageUtilization: 90
+          averageUtilization: 100
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 600
