@@ -1,6 +1,6 @@
 kubectl apply --filename storage.yaml --namespace maxstash-global
 
-helm upgrade db oci://.docker.io/bitnamicharts/postgresql \
+helm upgrade db oci://docker.io/bitnamicharts/postgresql \
 	--install \
 	--atomic \
 	--debug \

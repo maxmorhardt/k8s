@@ -2,7 +2,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 def getBackupFilename() {
-	def formattedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
+	def formattedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 	def fileName = "postgres-backup-${formattedDate}.sql"
 
 	echo "Created backup file name: ${fileName}"
@@ -50,10 +50,6 @@ pipeline {
 					}
 
 					echo "PostgreSQL Major Version Migration"
-					echo "1. Backup current database"
-					echo "2. Delete deployment and PVC"
-					echo "3. Redeploy with new version"
-					echo "4. Restore data"
 				}
 			}
 		}
@@ -96,6 +92,18 @@ pipeline {
 			}
 		}
 
+		stage('Delete Data Directory') {
+			steps {
+				dir('postgres') {
+					script {
+						sh """
+							kubectl exec ${POD_NAME} -n ${NAMESPACE} -- rm -rf /bitnami/postgresql/data/*
+						"""
+					}
+				}
+			}
+		}
+
 		stage('Uninstall Current Deployment') {
 			steps {
 				dir('postgres') {
@@ -106,11 +114,14 @@ pipeline {
 			}
 		}
 
-		stage('Delete PVC') {
+		stage('Delete PV and PVC') {
 			steps {
 				dir('postgres') {
 					script {
-						sh "kubectl delete pvc data-${POD_NAME} -n $NAMESPACE"
+						sh """
+							kubectl delete pvc data-${POD_NAME} -n $NAMESPACE
+							kubectl delete pv postgres
+						"""
 					}
 				}
 			}
@@ -121,6 +132,8 @@ pipeline {
 				dir('postgres') {
 					script {
 						sh """
+							kubectl apply -f storage.yaml
+
 							helm upgrade $APP_NAME $DOCKER_REGISTRY_FULL/bitnamicharts/postgresql \
 								--install \
 								--atomic \
@@ -140,8 +153,7 @@ pipeline {
 				dir('postgres') {
 					script {
 						sh """
-							kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=postgresql \
-								-n $NAMESPACE --timeout=300s
+							kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=postgresql -n $NAMESPACE --timeout=300s
 						"""
 					}
 				}
@@ -154,7 +166,7 @@ pipeline {
 					script {
 						sh """
 							kubectl cp ${BACKUP_FILE} ${NAMESPACE}/${POD_NAME}:/tmp/restore.sql
-							kubectl exec ${POD_NAME} -n ${NAMESPACE} -- bash -c 'PGPASSWORD=${POSTGRES_PSW} pg_dumpall -d postgres -f /tmp/restore.sql'
+							kubectl exec ${POD_NAME} -n ${NAMESPACE} -- bash -c 'PGPASSWORD=${POSTGRES_PSW} psql -U ${POSTGRES_USR} -d postgres -f /tmp/restore.sql'
 						"""
 					}
 				}
@@ -165,11 +177,6 @@ pipeline {
 			steps {
 				dir('postgres') {
 					script {
-						sh """
-							kubectl cp ${BACKUP_FILE} ${NAMESPACE}/${POD_NAME}:/tmp/restore.sql
-							kubectl exec ${POD_NAME} -n ${NAMESPACE} -- bash -c 'PGPASSWORD=${POSTGRES_PSW} pg_dumpall -d postgres -f /tmp/restore.sql'
-						"""
-
 						sh """
 							kubectl exec -n ${NAMESPACE} ${POD_NAME} -- bash -c 'PGPASSWORD="${POSTGRES_PSW}" psql -U ${POSTGRES_USR} -d maxstash -c "\\dt"'
 						"""
