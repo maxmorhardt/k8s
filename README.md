@@ -145,5 +145,5 @@ Deploy dependencies first to avoid service startup issues.
 ## Node Assignments
 - **main**: Control plane, Alloy
 - **max-worker**: PostgreSQL, Prometheus, Grafana
-- **max-worker-2**: Jenkins, Keycloak
+- **max-worker-2**: Jenkins
 - **max-worker-3**: Redis, Loki
