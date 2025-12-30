@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cleanup-postgres-data
+spec:
+  ttlSecondsAfterFinished: 30
+  template:
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: max-worker
+      containers:
+        - name: cleanup
+          image: busybox
+          command:
+            - 'sh'
+            - '-c'
+            - 'ls -lah /data && rm -rf /data/* && ls -lah /data'
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /data
+      volumes:
+        - name: postgres-data
+          hostPath:
+            path: /bitnami/postgresql
+      restartPolicy: Never

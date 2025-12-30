@@ -92,19 +92,7 @@ pipeline {
 			}
 		}
 
-		stage('Delete Data Directory') {
-			steps {
-				dir('postgres') {
-					script {
-						sh """
-							kubectl exec ${POD_NAME} -n ${NAMESPACE} -- rm -rf /bitnami/postgresql/data/*
-						"""
-					}
-				}
-			}
-		}
-
-		stage('Uninstall Current Deployment') {
+		stage('Uninstall Legacy Postgres') {
 			steps {
 				dir('postgres') {
 					script {
@@ -114,20 +102,24 @@ pipeline {
 			}
 		}
 
-		stage('Delete PV and PVC') {
+		stage('Delete Legacy Data') {
 			steps {
 				dir('postgres') {
 					script {
 						sh """
 							kubectl delete pvc data-${POD_NAME} -n $NAMESPACE
 							kubectl delete pv postgres
+
+							kubectl apply -f cleanup.yaml -n $NAMESPACE
+							kubectl wait --for=condition=complete job/cleanup-postgres-data -n $NAMESPACE --timeout=300s
+							kubectl delete job cleanup-postgres-data -n $NAMESPACE
 						"""
 					}
 				}
 			}
 		}
 
-		stage('Deploy New Version') {
+		stage('Deploy New Postgres') {
 			steps {
 				dir('postgres') {
 					script {
