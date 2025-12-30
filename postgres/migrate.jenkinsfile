@@ -140,18 +140,6 @@ pipeline {
 			}
 		}
 
-		stage('Wait for Pod Ready') {
-			steps {
-				dir('postgres') {
-					script {
-						sh """
-							kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=postgresql -n $NAMESPACE --timeout=300s
-						"""
-					}
-				}
-			}
-		}
-
 		stage('Restore Database') {
 			steps {
 				dir('postgres') {
@@ -159,18 +147,6 @@ pipeline {
 						sh """
 							kubectl cp ${BACKUP_FILE} ${NAMESPACE}/${POD_NAME}:/tmp/restore.sql
 							kubectl exec ${POD_NAME} -n ${NAMESPACE} -- bash -c 'PGPASSWORD=${POSTGRES_PSW} psql -U ${POSTGRES_USR} -d postgres -f /tmp/restore.sql'
-						"""
-					}
-				}
-			}
-		}
-
-		stage('Verify') {
-			steps {
-				dir('postgres') {
-					script {
-						sh """
-							kubectl exec -n ${NAMESPACE} ${POD_NAME} -- bash -c 'PGPASSWORD="${POSTGRES_PSW}" psql -U ${POSTGRES_USR} -d maxstash -c "\\dt"'
 						"""
 					}
 				}
