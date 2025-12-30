@@ -7,7 +7,7 @@ global:
   postgresql:
     auth:
       username: maxmorhardt
-      database: maxstash
+      database: keycloak
       existingSecret: postgres-credentials
       secretKeys:
         adminPasswordKey: admin-password

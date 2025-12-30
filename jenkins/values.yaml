@@ -1,4 +1,5 @@
 controller:
+  javaOpts: "-Duser.timezone=America/New_York"
   componentName: 'jenkins-controller'
   image:
     registry: 'docker.io'
