@@ -35,6 +35,7 @@ pipeline {
 
 		APP_NAME = "db"
 		NAMESPACE = "maxstash-global"
+		POD_NAME = "${APP_NAME}-postgresql-0"
 		
 		KUBECONFIG = credentials('kube-config')
 		POSTGRES = credentials('postgres')
@@ -85,7 +86,8 @@ pipeline {
 						env.BACKUP_FILE = getBackupFilename()
 
 						sh """
-							kubectl exec -it ${APP_NAME}-postgresql-0 -- bash -c \'PGPASSWORD=${POSTGRES_PSW} pg_dumpall -U ${POSTGRES_USR} > ${BACKUP_FILE}\'
+							kubectl exec ${POD_NAME} -n ${NAMESPACE} -- bash -c 'PGPASSWORD=${POSTGRES_PSW} pg_dumpall -U ${POSTGRES_USR} > /tmp/backup.sql'
+							kubectl cp ${NAMESPACE}/${POD_NAME}:/tmp/backup.sql ${BACKUP_FILE}
 						"""
 
 						archiveArtifacts artifacts: "$BACKUP_FILE", fingerprint: true
