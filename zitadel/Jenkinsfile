@@ -13,8 +13,8 @@ pipeline {
 
 	environment {
 		GITHUB_URL = 'https://github.com/maxmorhardt/k8s'
-		APP_NAME = "rancher"
-		NAMESPACE = "cattle-system"
+		APP_NAME = "zitadel"
+		NAMESPACE = "zitadel"
 	}
 
 	stages {
@@ -40,21 +40,21 @@ pipeline {
 
 		stage('CD') {
 			steps {
-				dir('rancher') {
+				dir('zitadel') {
 					script {
 						withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG')]) {
 							sh """
-								helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+								helm repo add zitadel https://charts.zitadel.com
 								helm repo update
 
-								helm upgrade $APP_NAME rancher-latest/rancher \
+								helm upgrade $APP_NAME zitadel/zitadel \
 									--install \
 									--atomic \
 									--debug \
 									--history-max=3 \
 									--namespace $NAMESPACE \
-									--values values.yaml \
-									--timeout 15m0s
+									--timeout 15m0s \
+									--values values.yaml
 							"""
 						}
 					}

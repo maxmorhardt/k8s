@@ -1,0 +1,108 @@
+zitadel:
+  configmapConfig:
+    ExternalSecure: true
+    ExternalDomain: login.maxstash.io
+    Database:
+      Postgres:
+        Host: db-postgresql.db.svc.cluster.local
+        Port: 5432
+
+  masterkeySecretName: zitadel-masterkey
+
+  revisionHistoryLimit: 3
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 4
+    targetCPU: 80
+    targetMemory: 80
+
+  selfSignedCert:
+    enabled: false
+
+  debug:
+    enabled: false
+
+login:
+  enabled: true
+
+  pdb:
+    enabled: true
+    minAvailable: 1
+
+  image:
+    repository: ghcr.io/zitadel/zitadel-login
+    pullPolicy: Always
+    tag: ""
+
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 0
+    periodSeconds: 5
+    failureThreshold: 3
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 0
+    periodSeconds: 5
+    failureThreshold: 3
+  startupProbe:
+    enabled: false
+    periodSeconds: 1
+    failureThreshold: 30
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 3
+    targetCPU: 75
+    targetMemory: 75
+
+  service:
+    type: ClusterIP
+    port: 3000
+    protocol: http
+    scheme: HTTP
+
+  ingress:
+    enabled: true
+    controller: generic
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    hosts:
+      - host: login.maxstash.io
+        paths:
+          - path: /ui/v2/login
+            pathType: Prefix
+    tls:
+      - secretName: maxstash.io-tls
+        hosts:
+          - login.maxstash.io
+
+  serviceAccount:
+    create: true
+
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    readOnlyRootFilesystem: true
+    privileged: false
+
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+  env: []
