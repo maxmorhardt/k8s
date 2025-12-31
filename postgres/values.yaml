@@ -15,8 +15,8 @@ global:
 
 primary:
   service:
-    type: NodePort
-    nodePorts:
+    type: ClusterIP
+    ports:
       postgresql: 5432
 
   nodeSelector:
