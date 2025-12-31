@@ -333,13 +333,13 @@ serverFiles:
           insecure_skip_verify: true
         static_configs:
           - targets:
-              - 'keycloak-http.maxstash-global.svc.cluster.local:9000'
+              - 'keycloak-http.keycloak.svc.cluster.local:9000'
 
       - job_name: postgres
         scheme: http
         static_configs:
           - targets:
-              - db-postgresql-metrics.maxstash-global.svc.cluster.local:9187
+              - db-postgresql-metrics.db.svc.cluster.local:9187
 
       - job_name: jenkins
         metrics_path: /prometheus
@@ -379,4 +379,4 @@ serverFiles:
         scheme: http
         static_configs:
           - targets:
-              - redis-metrics.maxstash-global.svc.cluster.local:9121
+              - redis-metrics.db.svc.cluster.local:9121

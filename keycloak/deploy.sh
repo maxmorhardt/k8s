@@ -7,6 +7,6 @@ helm upgrade keycloak codecentric/keycloakx \
   --atomic \
   --debug \
   --history-max=3 \
-  --namespace maxstash-global \
+  --namespace keycloak \
   --timeout 15m0s \
   --values values.yaml

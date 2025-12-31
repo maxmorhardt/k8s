@@ -22,7 +22,7 @@ pipeline {
 		CHART_NAME = 'keycloakx'
 
 		APP_NAME = "keycloak"
-		NAMESPACE = "maxstash-global"
+		NAMESPACE = "keycloak"
 	}
 
 	stages {

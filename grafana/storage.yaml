@@ -17,7 +17,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: grafana
-  namespace: maxstash-global
+  namespace: monitoring
 spec:
   accessModes:
     - ReadWriteOnce

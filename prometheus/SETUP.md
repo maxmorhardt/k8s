@@ -15,7 +15,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: jenkins-api-credentials
-  namespace: maxstash-global
+  namespace: monitoring
 type: Opaque
 data:
   username: <base64-encoded-jenkins-username>
@@ -25,9 +25,9 @@ data:
 ## Notes
 - Apply storage.yaml before running ./deploy.sh
 - Ingress is not enabled -- visualize with Grafana and use kube DNS
-  - Example: `http://prometheus-server.maxstash-global.svc.cluster.local`
+  - Example: `http://prometheus-server.monitoring.svc.cluster.local`
 - To access locally:
   ```bash
-  kubectl port-forward -n maxstash-global svc/prometheus-server 9090:80
+  kubectl port-forward -n monitoring svc/prometheus-server 9090:80
   # Then visit http://localhost:9090
   ```

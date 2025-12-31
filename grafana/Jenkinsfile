@@ -14,7 +14,7 @@ pipeline {
 	environment {
 		GITHUB_URL = 'https://github.com/maxmorhardt/k8s'
 		APP_NAME = "grafana"
-		NAMESPACE = "maxstash-global"
+		NAMESPACE = "monitoring"
 	}
 
 	stages {

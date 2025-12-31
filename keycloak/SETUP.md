@@ -7,7 +7,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: keycloak-credentials
-  namespace: maxstash-global
+  namespace: keycloak
 type: Opaque
 data:
   db-password: <base64-encoded-db-password>
@@ -15,9 +15,9 @@ data:
 
 ```bash
 # Generate TLS certificate for Keycloak
-openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/O=<ORG>/CN=auth.maxstash.io"
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/O=maxstash/CN=auth.maxstash.io"
 
-kubectl create secret tls keycloak-tls --cert=cert.pem --key=key.pem -n maxstash-global
+kubectl create secret tls keycloak-tls --cert=cert.pem --key=key.pem -n keycloak
 ```
 
 ## Notes

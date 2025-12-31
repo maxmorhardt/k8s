@@ -7,7 +7,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: jenkins
-  namespace: maxstash-global
+  namespace: jenkins
 type: Opaque
 data:
   jenkins-admin-user: <base64-encoded-admin-username>
@@ -50,15 +50,15 @@ JCasC should look like (both in config map and in controller):
           defaultsProviderTemplate: ""
           connectTimeout: "5"
           readTimeout: "15"
-          jenkinsUrl: "http://jenkins.maxstash-global.svc.cluster.local:8080"
-          jenkinsTunnel: "jenkins-agent.maxstash-global.svc.cluster.local:50000"
+          jenkinsUrl: "http://jenkins.jenkins.svc.cluster.local:8080"
+          jenkinsTunnel: "jenkins-agent.jenkins.svc.cluster.local:50000"
           skipTlsVerify: false
           usageRestricted: false
           maxRequestsPerHostStr: "32"
           retentionTimeout: "5"
           waitForPodSec: "600"
           name: "kubernetes"
-          namespace: "maxstash-global"
+          namespace: "jenkins"
           restrictedPssSecurityContext: false
           serverUrl: "https://kubernetes.default"
           credentialsId: ""
@@ -67,7 +67,7 @@ JCasC should look like (both in config map and in controller):
             value: "true"
           templates:
             - name: "default"
-              namespace: "maxstash-global"
+              namespace: "jenkins"
               id: 2ca4c2a8a38f9f875a44b668fa5f23f249d3d06db5c18e16387b0c85d7e8bafa
               containers:
               - name: "jnlp"
@@ -76,7 +76,7 @@ JCasC should look like (both in config map and in controller):
                 envVars:
                   - envVar:
                       key: "JENKINS_URL"
-                      value: "http://jenkins.maxstash-global.svc.cluster.local:8080/"
+                      value: "http://jenkins.jenkins.svc.cluster.local:8080/"
                 image: "jenkins/inbound-agent:latest-jdk21"
                 runAsGroup: "1000"
                 runAsUser: "1000"

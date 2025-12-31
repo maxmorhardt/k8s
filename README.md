@@ -50,17 +50,17 @@ The stack follows a microservices architecture where each service is independent
 
 ## Services
 
-| Service | Purpose | Port | Dependencies |
-|---------|---------|------|--------------|
-| **Rancher** | Kubernetes cluster management | 80/443 | None |
-| **Keycloak** | OIDC authentication provider | 8080 | PostgreSQL |
-| **Jenkins** | CI/CD automation server | 8080 | Keycloak |
-| **PostgreSQL** | Primary database | 5432 | None |
-| **Redis** | Caching & pub/sub messaging | 6379 | None |
-| **Prometheus** | Metrics collection | 9090 | None |
-| **Grafana** | Metrics visualization | 3000 | Prometheus |
-| **Loki** | Log aggregation | 3100 | None |
-| **Alloy** | Telemetry data collection | 12345 | Prometheus, Loki |
+| Service | Purpose | Port | Namespace | Dependencies |
+|---------|---------|------|-----------|--------------|
+| **Rancher** | Kubernetes cluster management | 80/443 | cattle-system | None |
+| **Keycloak** | OIDC authentication provider | 8080 | keycloak | PostgreSQL |
+| **Jenkins** | CI/CD automation server | 8080 | jenkins | Keycloak |
+| **PostgreSQL** | Primary database | 5432 | db | None |
+| **Redis** | Caching & pub/sub messaging | 6379 | db | None |
+| **Prometheus** | Metrics collection | 9090 | monitoring | None |
+| **Grafana** | Metrics visualization | 3000 | monitoring | Prometheus |
+| **Loki** | Log aggregation | 3100 | monitoring | None |
+| **Alloy** | Telemetry data collection | 12345 | monitoring | Prometheus, Loki |
 
 ## Deployment Order
 
@@ -70,47 +70,6 @@ The stack follows a microservices architecture where each service is independent
 4. **CI/CD**: Jenkins (requires Keycloak)
 5. **Monitoring**: Prometheus, Grafana, Loki, Alloy
 6. **Management**: Rancher
-
-## Quick Start
-
-1. **Set up K3s cluster**:
-   ```bash
-   cd k3s/
-   # Follow instructions in SETUP.md
-   ```
-
-2. **Create namespaces**:
-   ```bash
-   ./namespaces.sh
-   ```
-
-3. **Deploy core services**:
-   ```bash
-   # Deploy storage layer
-   cd postgres/ && ./deploy.sh
-   cd redis/ && ./deploy.sh
-   
-   # Deploy authentication
-   cd keycloak/ && ./deploy.sh
-   
-   # Deploy CI/CD
-   cd jenkins/ && ./deploy.sh
-   
-   # Deploy monitoring & logging
-   cd prometheus/ && ./deploy.sh
-   cd loki/ && ./deploy.sh
-   cd grafana/ && ./deploy.sh
-   cd alloy/ && ./deploy.sh
-   
-   # Deploy management
-   cd rancher/ && ./deploy.sh
-   ```
-
-4. **Access services via ingress**:
-   - Rancher: https://rancher.maxstash.io
-   - Keycloak: https://auth.maxstash.io
-   - Jenkins: https://jenkins.maxstash.io
-   - Grafana: https://grafana.maxstash.io
 
 ## Development
 

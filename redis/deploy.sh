@@ -3,6 +3,6 @@ helm upgrade redis oci://docker.io/bitnamicharts/redis \
 	--atomic \
 	--debug \
 	--history-max=3 \
-	--namespace maxstash-global \
+	--namespace db \
 	--version 23.1.1 \
 	--values values.yaml

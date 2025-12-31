@@ -18,7 +18,7 @@ pipeline {
 		DOCKER_REGISTRY_FULL = "oci://${env.DOCKER_REGISTRY}"
 
 		APP_NAME = "loki"
-		NAMESPACE = "maxstash-global"
+		NAMESPACE = "monitoring"
 	}
 
 	stages {

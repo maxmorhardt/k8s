@@ -83,7 +83,7 @@ resources:
 
 database:
   vendor: postgres
-  hostname: db-postgresql.maxstash-global.svc.cluster.local
+  hostname: db-postgresql.db.svc.cluster.local
   port: 5432
   database: keycloak
   username: keycloak

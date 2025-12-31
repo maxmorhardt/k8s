@@ -8,6 +8,6 @@
 
 ## Notes
 - Apply storage.yaml before running ./deploy.sh
-- Loki push endpoint: `http://loki.maxstash-global.svc.cluster.local:3100/loki/api/v1/push`
+- Loki push endpoint: `http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push`
 - Logs are retained for 30 days by default
 - Query logs via Grafana data source

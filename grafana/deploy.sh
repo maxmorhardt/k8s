@@ -7,4 +7,4 @@ helm upgrade grafana grafana/grafana \
 	--atomic \
 	--debug \
 	--history-max=3 \
-	--namespace maxstash-global
+	--namespace monitoring

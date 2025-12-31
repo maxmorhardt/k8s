@@ -7,7 +7,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-credentials
-  namespace: maxstash-global
+  namespace: db
 type: Opaque
 data:
   admin-password: <base64-encoded-admin-password>

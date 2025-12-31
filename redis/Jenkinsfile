@@ -22,7 +22,7 @@ pipeline {
 		DOCKER_REGISTRY_FULL = "oci://${env.DOCKER_REGISTRY}"
 
 		APP_NAME = "redis"
-		NAMESPACE = "maxstash-global"
+		NAMESPACE = "db"
 	}
 
 	stages {

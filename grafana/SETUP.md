@@ -7,7 +7,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: grafana-credentials
-  namespace: maxstash-global
+  namespace: monitoring
 type: Opaque
 data:
   admin-user: <base64-encoded-admin-username>
