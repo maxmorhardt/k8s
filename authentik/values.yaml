@@ -53,7 +53,7 @@ server:
   autoscaling:
     enabled: true
     minReplicas: 2
-    maxReplicas: 3
+    maxReplicas: 4
     targetCPUUtilizationPercentage: 85
     targetMemoryUtilizationPercentage: 85
 
