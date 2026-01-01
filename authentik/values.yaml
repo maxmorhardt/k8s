@@ -17,13 +17,32 @@ global:
   affinity:
     podAntiAffinity: soft
 
+  volumes:
+    - name: assets
+      emptyDir: {}
+
+  volumeMounts:
+    - name: assets
+      mountPath: /var/lib/authentik/static
+
 authentik:
   enabled: false
   log_level: info
 
 server:
   enabled: true
-
+  initContainers:
+    - name: clone-assets
+      image: alpine/git:latest
+      command:
+        - sh
+        - -c
+        - |
+          git clone https://github.com/maxmorhardt/assets /tmp/assets
+          cp -r /tmp/assets/* /assets/
+      volumeMounts:
+        - name: assets
+          mountPath: /assets
   autoscaling:
     enabled: true
     minReplicas: 2
@@ -124,6 +143,20 @@ server:
 
 worker:
   enabled: true
+
+  initContainers:
+    - name: clone-assets
+      image: alpine/git:latest
+      command:
+        - sh
+        - -c
+        - |
+          git clone https://github.com/maxmorhardt/assets /tmp/assets
+          cp -r /tmp/assets/* /assets/
+      volumeMounts:
+        - name: assets
+          mountPath: /assets
+
   autoscaling:
     enabled: true
     minReplicas: 2
