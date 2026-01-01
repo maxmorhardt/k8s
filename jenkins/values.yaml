@@ -117,7 +117,7 @@ controller:
       oic:
         serverConfiguration:
           wellKnown:
-            wellKnownOpenIDConfigurationUrl: "https://auth.maxstash.io/realms/maxstash-dev/.well-known/openid-configuration"
+            wellKnownOpenIDConfigurationUrl: "https://login.maxstash.io/application/o/jenkins/.well-known/openid-configuration"
             scopesOverride: "openid email profile"
         clientId: "${JENKINS_CLIENT_ID}"
         clientSecret: "${JENKINS_CLIENT_SECRET}"
@@ -130,7 +130,7 @@ controller:
         - escapeHatch:
             secret: "${JENKINS_ADMIN_PASSWORD}"
             username: "${JENKINS_ADMIN_USERNAME}"
-            group: "/Jenkins_Admin"
+            group: "jenkins-admin"
 
     authorizationStrategy: |
       roleBased:
@@ -141,7 +141,7 @@ controller:
               permissions:
                 - "Overall/Administer"
               entries:
-                - group: "/Jenkins_Admin"
+                - group: "jenkins-admin"
 
   ingress:
     enabled: true

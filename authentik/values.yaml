@@ -73,6 +73,15 @@ server:
       memory: 1Gi
 
   affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                  - max-master
+
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - weight: 100
@@ -186,13 +195,22 @@ worker:
 
   resources:
     requests:
-      cpu: 250m
+      cpu: 300m
       memory: 512Mi
     limits:
-      cpu: 250m
+      cpu: 300m
       memory: 512Mi
 
   affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                  - max-master
+
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - weight: 100
