@@ -2,7 +2,7 @@
 
 ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)
 ![Rancher](https://img.shields.io/badge/Rancher-0075A8?style=for-the-badge&logo=rancher)
-![Logto](https://img.shields.io/badge/Logto-6C5CE7?style=for-the-badge&logo=logto&logoColor=white)
+![Authentik](https://img.shields.io/badge/Authentik-FD4B2D?style=for-the-badge&logo=authentik&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Jenkins](https://img.shields.io/badge/jenkins-D24939?style=for-the-badge&logo=jenkins&logoColor=black)
 ![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
@@ -16,7 +16,7 @@ A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with productio
 
 ## Features
 - **Container Orchestration** with Kubernetes (K3s) and Rancher management
-- **Authentication & Authorization** via Logto OIDC provider
+- **Authentication & Authorization** via Authentik OIDC/SAML provider
 - **Data Persistence** with PostgreSQL database and Redis caching/pub-sub
 - **CI/CD Pipeline** using Jenkins with OIDC integration
 - **Monitoring & Observability** with Prometheus metrics and Grafana dashboards
@@ -24,7 +24,7 @@ A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with productio
 - **Production Ready** with persistent storage, resource limits, and security configurations
 
 ## Architecture
-The stack follows a microservices architecture where each service is independently deployable with Helm charts. Services communicate through Kubernetes networking, with Logto providing centralized authentication for Jenkins and other applications requiring OIDC.
+The stack follows a microservices architecture where each service is independently deployable with Helm charts. Services communicate through Kubernetes networking, with Authentik providing centralized authentication for Jenkins and other applications requiring OIDC/SAML.
 
 ```
 ┌─────────────┐    ┌──────────────┐    ┌─────────────┐
@@ -35,7 +35,7 @@ The stack follows a microservices architecture where each service is independent
          ┌────────────────┼────────────────┐
          │                │                │
     ┌────▼─────┐    ┌─────▼──────┐    ┌───▼────┐
-    │  Logto   │    │Prometheus/ │    │ Loki/  │
+    │Authentik │    │Prometheus/ │    │ Loki/  │
     │  (Auth)  │    │ Grafana    │    │ Alloy  │
     └──────────┘    │(Monitoring)│    │(Logs)  │
                     └────────────┘    └────────┘
@@ -53,8 +53,8 @@ The stack follows a microservices architecture where each service is independent
 | Service | Purpose | Port | Namespace | Dependencies |
 |---------|---------|------|-----------|--------------|
 | **Rancher** | Kubernetes cluster management | 80/443 | cattle-system | None |
-| **Logto** | OIDC authentication provider | 3001 | logto | PostgreSQL |
-| **Jenkins** | CI/CD automation server | 8080 | jenkins | Logto |
+| **Authentik** | OIDC/SAML authentication provider | 9000/9443 | authentik | PostgreSQL |
+| **Jenkins** | CI/CD automation server | 8080 | jenkins | Authentik |
 | **PostgreSQL** | Primary database | 5432 | db | None |
 | **Redis** | Caching & pub/sub messaging | 6379 | db | None |
 | **Prometheus** | Metrics collection | 9090 | monitoring | None |
@@ -66,8 +66,8 @@ The stack follows a microservices architecture where each service is independent
 
 1. **Core Infrastructure**: K3s cluster setup
 2. **Storage**: PostgreSQL, Redis
-3. **Authentication**: Logto (requires PostgreSQL)
-4. **CI/CD**: Jenkins (requires Logto)
+3. **Authentication**: Authentik (requires PostgreSQL)
+4. **CI/CD**: Jenkins (requires Authentik)
 5. **Monitoring**: Prometheus, Grafana, Loki, Alloy
 6. **Management**: Rancher
 
@@ -93,16 +93,16 @@ Weekly automated node rehydration runs on Sunday mornings (staggered 2-5 AM) via
 ## Resource Dependencies
 
 Services have the following dependency chain:
-- **Jenkins** → requires Keycloak (OIDC), has cluster-admin permissions for CI/CD
-- **Keycloak** → requires PostgreSQL (database)
-- **Grafana** → requires Prometheus (data source), Keycloak (OIDC)
+- **Jenkins** → requires Authentik (OIDC), has cluster-admin permissions for CI/CD
+- **Authentik** → requires PostgreSQL (database)
+- **Grafana** → requires Prometheus (data source), Authentik (OIDC)
 - **Alloy** → requires Loki (log target)
-- **Rancher** → requires Keycloak (OIDC)
+- **Rancher** → requires Authentik (OIDC)
 
 Deploy dependencies first to avoid service startup issues.
 
 ## Node Assignments
-- **main**: Control plane, Alloy
+- **main**: Control plane
 - **max-worker**: PostgreSQL, Prometheus, Grafana
 - **max-worker-2**: Jenkins
 - **max-worker-3**: Redis, Loki

@@ -14,61 +14,12 @@ global:
     runAsGroup: 1000
     fsGroup: 1000
 
-  tolerations: []
-
   affinity:
     podAntiAffinity: soft
-    nodeAffinity:
-      type: hard
-      matchExpressions:
-        []
-
-  env:
-    []
-    # - name: AUTHENTIK_VAR_NAME
-    #   value: VALUE
-    # - name: AUTHENTIK_VAR_OTHER
-    #   valueFrom:
-    #     secretKeyRef:
-    #       name: secret-name
-    #       key: secret-key
-    # - name: AUTHENTIK_VAR_ANOTHER
-    #   valueFrom:
-    #     configMapKeyRef:
-    #       name: config-map-name
-    #       key: config-map-key
-
-  # -- envFrom to pass to all deployed Deployments. Does not apply to GeoIP
-  # @default -- `[]` (See [values.yaml])
-  envFrom:
-    []
-    # - configMapRef:
-    #     name: config-map-name
-    # - secretRef:
-    #     name: secret-name
-
-  # -- Additional volumeMounts to all deployed Deployments. Does not apply to GeoIP
-  # @default -- `[]` (See [values.yaml])
-  volumeMounts:
-    []
-    # - name: custom
-    #   mountPath: /custom
-
-  # -- Additional volumes to all deployed Deployments.
-  # @default -- `[]` (See [values.yaml])
-  volumes:
-    []
-    # - name: custom
-    #   emptyDir: {}
 
 authentik:
-  enabled: true
+  enabled: false
   log_level: info
-  secret_key: 'CHANGE-ME-GENERATE-RANDOM-KEY'
-  postgresql:
-    host: 'db-postgresql.db.svc.cluster.local'
-    name: 'authentik'
-    port: 5432
 
 server:
   enabled: true
@@ -95,20 +46,23 @@ server:
       cpu: 1
       memory: 1Gi
 
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - server
+            topologyKey: kubernetes.io/hostname
+
   containerPorts:
     http: 9000
     https: 9443
     metrics: 9300
-
-  containerSecurityContext:
-    runAsNonRoot: true
-    readOnlyRootFilesystem: true
-    allowPrivilegeEscalation: false
-    seccomProfile:
-      type: RuntimeDefault
-    capabilities:
-      drop:
-        - ALL
 
   livenessProbe:
     failureThreshold: 3
@@ -140,11 +94,6 @@ server:
       path: '{{ .Values.authentik.web.path }}-/health/live/'
       port: http
 
-  terminationGracePeriodSeconds: 30
-
-  tolerations: []
-  affinity: {}
-
   service:
     servicePortHttp: 80
     servicePortHttps: 443
@@ -154,10 +103,6 @@ server:
   metrics:
     enabled: false
     service:
-      type: ClusterIP
-      clusterIP: ''
-      annotations: {}
-      labels: {}
       servicePort: 9300
       portName: metrics
     serviceMonitor:
@@ -183,21 +128,8 @@ worker:
     enabled: true
     minReplicas: 2
     maxReplicas: 3
-    targetCPUUtilizationPercentage: 90
-    targetMemoryUtilizationPercentage: 90
-    behavior:
-      scaleDown:
-        stabilizationWindowSeconds: 300
-        policies:
-          - type: Pods
-            value: 1
-            periodSeconds: 180
-      scaleUp:
-        stabilizationWindowSeconds: 300
-        policies:
-          - type: Pods
-            value: 2
-            periodSeconds: 60
+    targetCPUUtilizationPercentage: 85
+    targetMemoryUtilizationPercentage: 85
 
   pdb:
     enabled: true
@@ -214,6 +146,19 @@ worker:
       cpu: 500m
       memory: 512Mi
 
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - worker
+            topologyKey: kubernetes.io/hostname
+
   containerPorts:
     http: 9000
     metrics: 9300
@@ -222,16 +167,6 @@ worker:
     runAsUser: 1000
     runAsGroup: 1000
     fsGroup: 1000
-
-  containerSecurityContext:
-    runAsNonRoot: true
-    readOnlyRootFilesystem: true
-    allowPrivilegeEscalation: false
-    seccomProfile:
-      type: RuntimeDefault
-    capabilities:
-      drop:
-        - ALL
 
   livenessProbe:
     failureThreshold: 3
@@ -265,8 +200,6 @@ worker:
       command:
         - ak
         - healthcheck
-
-  affinity: {}
 
   metrics:
     enabled: false

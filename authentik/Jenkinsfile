@@ -1,0 +1,65 @@
+pipeline {
+  agent {
+    kubernetes {
+      inheritFrom 'default'
+      defaultContainer 'buildpack'
+    }
+  }
+
+  options {
+    timeout(time: 20, unit: 'MINUTES')
+    buildDiscarder(logRotator(numToKeepStr: '5'))
+  }
+
+  environment {
+    GITHUB_URL = 'https://github.com/maxmorhardt/k8s'
+    APP_NAME = "authentik"
+    NAMESPACE = "authentik"
+  }
+
+  stages {
+    stage('Setup') {
+      steps {
+        script {
+          checkout scmGit(
+            branches: [[
+              name: "$BRANCH_NAME"
+            ]],
+            userRemoteConfigs: [[
+              credentialsId: 'github',
+              url: "$GITHUB_URL"
+            ]]
+          )
+
+          echo "APP_NAME: $APP_NAME"
+          echo "NAMESPACE: $NAMESPACE"
+          echo "BRANCH: $BRANCH_NAME"
+        }
+      }
+    }
+
+    stage('CD') {
+      steps {
+        dir('authentik') {
+          script {
+            withCredentials([file(credentialsId: 'kube-config', variable: 'KUBECONFIG')]) {
+              sh """
+                helm repo add authentik https://charts.goauthentik.io
+                helm repo update
+
+                helm upgrade $APP_NAME authentik/authentik \
+                  --install \
+                  --atomic \
+                  --debug \
+                  --history-max=3 \
+                  --namespace $NAMESPACE \
+                  --timeout 15m \
+                  --values values.yaml 
+              """
+            }
+          }
+        }
+      }
+    }
+  }
+}
