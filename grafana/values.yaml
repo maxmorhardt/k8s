@@ -64,11 +64,11 @@ ingress:
 
 resources:
   limits:
-    cpu: 500m
-    memory: 512Mi
+    cpu: 250m
+    memory: 500Mi
   requests:
-    cpu: 200m
-    memory: 256Mi
+    cpu: 250m
+    memory: 500Mi
 
 persistence:
   enabled: true

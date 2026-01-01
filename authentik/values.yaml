@@ -31,6 +31,13 @@ authentik:
 
 server:
   enabled: true
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
   initContainers:
     - name: clone-assets
       image: alpine/git:latest
@@ -59,10 +66,10 @@ server:
 
   resources:
     requests:
-      cpu: 1
+      cpu: 500m
       memory: 1Gi
     limits:
-      cpu: 1
+      cpu: 500m
       memory: 1Gi
 
   affinity:
@@ -144,6 +151,12 @@ server:
 worker:
   enabled: true
 
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
   initContainers:
     - name: clone-assets
       image: alpine/git:latest
@@ -173,10 +186,10 @@ worker:
 
   resources:
     requests:
-      cpu: 500m
+      cpu: 250m
       memory: 512Mi
     limits:
-      cpu: 500m
+      cpu: 250m
       memory: 512Mi
 
   affinity:

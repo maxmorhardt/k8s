@@ -44,11 +44,11 @@ singleBinary:
     kubernetes.io/hostname: max-worker-3
   resources:
     requests:
-      cpu: '100m'
-      memory: '256Mi'
+      cpu: 250m
+      memory: 512Mi
     limits:
-      cpu: '500m'
-      memory: '512Mi'
+      cpu: 250m
+      memory: 512Mi
 read:
   replicas: 0
 backend:
