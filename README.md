@@ -4,7 +4,7 @@
 ![Rancher](https://img.shields.io/badge/Rancher-0075A8?style=for-the-badge&logo=rancher)
 ![Authentik](https://img.shields.io/badge/Authentik-FD4B2D?style=for-the-badge&logo=authentik&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
-![Jenkins](https://img.shields.io/badge/jenkins-D24939?style=for-the-badge&logo=jenkins&logoColor=black)
+![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
 ![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
 ![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)
 ![Grafana](https://img.shields.io/badge/grafana-%23F46800.svg?style=for-the-badge&logo=grafana&logoColor=white)
@@ -18,19 +18,19 @@ A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with productio
 - **Container Orchestration** with Kubernetes (K3s) and Rancher management
 - **Authentication & Authorization** via Authentik OIDC/SAML provider
 - **Data Persistence** with PostgreSQL database and Redis caching/pub-sub
-- **CI/CD Pipeline** using Jenkins with OIDC integration
+- **CI/CD Pipeline** using GitHub Actions (private repo for secrets)
 - **Monitoring & Observability** with Prometheus metrics and Grafana dashboards
 - **Centralized Logging** via Loki and Alloy data collection
 - **Production Ready** with persistent storage, resource limits, and security configurations
 
 ## Architecture
-The stack follows a microservices architecture where each service is independently deployable with Helm charts. Services communicate through Kubernetes networking, with Authentik providing centralized authentication for Jenkins and other applications requiring OIDC/SAML.
+The stack follows a microservices architecture where each service is independently deployable with Helm charts. Services communicate through Kubernetes networking, with Authentik providing centralized authentication for applications requiring OIDC/SAML. CI/CD is handled via GitHub Actions from a private repository.
 
 ```
-┌─────────────┐    ┌──────────────┐    ┌─────────────┐
-│   Rancher   │───▶│  Kubernetes  │◀───│   Jenkins   │
-│ (Management)│    │    (K3s)     │    │   (CI/CD)   │
-└─────────────┘    └──────┬───────┘    └─────────────┘
+┌─────────────┐    ┌──────────────┐    ┌──────────────┐
+│   Rancher   │───▶│  Kubernetes  │◀───│GitHub Actions│
+│ (Management)│    │    (K3s)     │    │   (CI/CD)    │
+└─────────────┘    └──────┬───────┘    └──────────────┘
                           │
          ┌────────────────┼────────────────┐
          │                │                │
@@ -54,7 +54,6 @@ The stack follows a microservices architecture where each service is independent
 |---------|---------|------|-----------|--------------|
 | **Rancher** | Kubernetes cluster management | 80/443 | cattle-system | None |
 | **Authentik** | OIDC/SAML authentication provider | 9000/9443 | authentik | PostgreSQL |
-| **Jenkins** | CI/CD automation server | 8080 | jenkins | Authentik |
 | **PostgreSQL** | Primary database | 5432 | db | None |
 | **Redis** | Caching & pub/sub messaging | 6379 | db | None |
 | **Prometheus** | Metrics collection | 9090 | monitoring | None |
@@ -67,8 +66,7 @@ The stack follows a microservices architecture where each service is independent
 1. **Core Infrastructure**: K3s cluster setup
 2. **Storage**: PostgreSQL, Redis
 3. **Authentication**: Authentik (requires PostgreSQL)
-4. **CI/CD**: Jenkins (requires Authentik)
-5. **Monitoring**: Prometheus, Grafana, Loki, Alloy
+4. **Monitoring**: Prometheus, Grafana, Loki, Alloy
 6. **Management**: Rancher
 
 ## Development
@@ -77,8 +75,10 @@ Each service directory contains:
 - **SETUP.md** - Service-specific setup instructions and required secrets
 - **values.yaml** - Helm chart configuration
 - **deploy.sh** - Deployment script using helm upgrade
-- **Jenkinsfile** - CI/CD pipeline for automated deployment
 - **storage.yaml** - Persistent volume configurations (where applicable)
+
+### CI/CD
+CI/CD pipelines are managed via GitHub Actions in a private repository for secure secret handling. Workflows deploy services to the cluster using kubectl/helm.
 
 ### Secret Management
 All secrets are managed via Kubernetes secrets and mounted as environment variables. See each service's SETUP.md for required secret keys and example YAML format.
@@ -93,7 +93,6 @@ Weekly automated node rehydration runs on Sunday mornings (staggered 2-5 AM) via
 ## Resource Dependencies
 
 Services have the following dependency chain:
-- **Jenkins** → requires Authentik (OIDC), has cluster-admin permissions for CI/CD
 - **Authentik** → requires PostgreSQL (database)
 - **Grafana** → requires Prometheus (data source), Authentik (OIDC)
 - **Alloy** → requires Loki (log target)
@@ -104,5 +103,5 @@ Deploy dependencies first to avoid service startup issues.
 ## Node Assignments
 - **main**: Control plane
 - **max-worker**: PostgreSQL, Prometheus, Grafana
-- **max-worker-2**: Jenkins
+- **max-worker-2**: Available
 - **max-worker-3**: Redis, Loki

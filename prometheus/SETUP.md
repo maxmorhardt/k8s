@@ -6,22 +6,6 @@
    sudo chown -R 1000:1000 /data/prometheus
    ```
 
-## Secrets Required
-
-Create the `jenkins-api-credentials` secret manually before deployment:
-
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: jenkins-api-credentials
-  namespace: monitoring
-type: Opaque
-data:
-  username: <base64-encoded-jenkins-username>
-  password: <base64-encoded-jenkins-api-token>
-```
-
 ## Notes
 - Apply storage.yaml before running ./deploy.sh
 - Ingress is not enabled -- visualize with Grafana and use kube DNS
