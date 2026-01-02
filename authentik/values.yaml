@@ -66,10 +66,10 @@ server:
   resources:
     requests:
       cpu: 1
-      memory: 1Gi
+      memory: 2Gi
     limits:
       cpu: 1
-      memory: 1Gi
+      memory: 2Gi
 
   affinity:
     nodeAffinity:
@@ -169,8 +169,8 @@ worker:
     enabled: true
     minReplicas: 2
     maxReplicas: 3
-    targetCPUUtilizationPercentage: 85
-    targetMemoryUtilizationPercentage: 85
+    targetCPUUtilizationPercentage: 90
+    targetMemoryUtilizationPercentage: 90
 
   pdb:
     enabled: true

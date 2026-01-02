@@ -102,7 +102,7 @@ grafana.ini:
     root_url: https://grafana.maxstash.io
   auth.generic_oauth:
     enabled: true
-    name: Max Stash
+    name: maxstash
     allow_sign_up: true
     client_id: ${GRAFANA_CLIENT_ID}
     client_secret: ${GRAFANA_CLIENT_SECRET}

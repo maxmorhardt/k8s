@@ -88,7 +88,7 @@ select:-webkit-autofill {
     color 9999s ease-in-out 0s !important;
 }
 
-ak-brand-links {
+ak-brand-links, footer {
   display: none !important;
 }
 
