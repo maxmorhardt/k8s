@@ -38,16 +38,6 @@ controller:
   fsGroup: 1000
 
   containerEnv:
-    - name: JENKINS_CLIENT_ID
-      valueFrom:
-        secretKeyRef:
-          name: jenkins
-          key: jenkins-client-id
-    - name: JENKINS_CLIENT_SECRET
-      valueFrom:
-        secretKeyRef:
-          name: jenkins
-          key: jenkins-client-secret
     - name: JENKINS_ADMIN_USERNAME
       valueFrom:
         secretKeyRef:
@@ -103,7 +93,7 @@ controller:
     - git:5.8.1
     - docker-workflow:634.vedc7242b_eda_7
     - configuration-as-code:2006.v001a_2ca_6b_574
-    - oic-auth:4.626.ve5a_d9f26c051
+    - saml:4.590.v6170b_1013da_f
     - role-strategy:848.va_a_ea_673cf0b_c
     - pipeline-stage-view:2.38
     - github-branch-source:1925.v62fb_7ffb_08ce
@@ -114,23 +104,26 @@ controller:
 
   JCasC:
     securityRealm: |
-      oic:
-        serverConfiguration:
-          wellKnown:
-            wellKnownOpenIDConfigurationUrl: "https://login.maxstash.io/application/o/jenkins/.well-known/openid-configuration"
-            scopesOverride: "openid email profile"
-        clientId: "${JENKINS_CLIENT_ID}"
-        clientSecret: "${JENKINS_CLIENT_SECRET}"
-        disableSslVerification: false
-        logoutFromOpenidProvider: true
-        userNameField: "preferred_username"
-        emailFieldName: "email"
-        groupsFieldName: "groups"
-        properties:
-        - escapeHatch:
-            secret: "${JENKINS_ADMIN_PASSWORD}"
-            username: "${JENKINS_ADMIN_USERNAME}"
-            group: "jenkins-admin"
+      saml:
+        displayNameAttributeName: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+        emailAttributeName: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+        groupsAttributeName: "http://schemas.xmlsoap.org/claims/Group"
+        idpMetadataConfiguration:
+          url: "https://login.maxstash.io/application/saml/jenkins/metadata/"
+        maximumAuthenticationLifetime: 86400
+        usernameAttributeName: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+        usernameCaseConversion: "none"
+        binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+        encryptionData:
+          forceAuthn: false
+          spEntityId: "https://jenkins.maxstash.io"
+        advancedConfiguration:
+          forceAuthn: false
+          authnContextClassRef: ""
+          spMetadataEntityId: "https://jenkins.maxstash.io"
+        logout:
+          url: "https://login.maxstash.io/application/saml/jenkins/slo/"
+          binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
 
     authorizationStrategy: |
       roleBased:

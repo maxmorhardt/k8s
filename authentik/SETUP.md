@@ -67,3 +67,52 @@ Create the Authentik database and user in PostgreSQL
 - **Authorization**: `https://login.maxstash.io/application/o/authorize/`
 - **Token**: `https://login.maxstash.io/application/o/token/`
 - **UserInfo**: `https://login.maxstash.io/application/o/userinfo/`
+
+## Branding
+
+### Custom CSS
+
+```css
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: inherit !important;
+  caret-color: inherit !important;
+  transition:
+    background-color 9999s ease-in-out 0s,
+    color 9999s ease-in-out 0s !important;
+}
+
+ak-brand-links {
+  display: none !important;
+}
+
+.ak-login-container {
+  height: 100% !important;
+}
+
+.pf-c-login__main {
+  border-radius: 1rem !important;
+}
+
+.pf-c-login__main-footer-band {
+  border-radius: 0 0 1rem 1rem !important;
+}
+
+.pf-c-background-image::before {
+  background: linear-gradient(135deg, #000000 0%, #0f0f0f 50%, #000000 100%) !important;
+}
+```
+
+### Attributes
+
+```yaml
+settings:
+  theme:
+    base: dark
+```

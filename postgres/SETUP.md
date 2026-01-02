@@ -42,4 +42,4 @@ The `pg_monitor` role provides access to:
 
 ## Notes
 - Port 5432 is exposed via NodePort on the host node
-- Create databases for applications (keycloak, etc.)
+- Create databases for applications (authentik, etc.)

@@ -12,8 +12,8 @@ type: Opaque
 data:
   admin-user: <base64-encoded-admin-username>
   admin-password: <base64-encoded-admin-password>
-  client-id: <base64-encoded-keycloak-client-id>
-  client-secret: <base64-encoded-keycloak-client-secret>
+  client-id: <base64-encoded-authentik-client-id>
+  client-secret: <base64-encoded-authentik-client-secret>
 ```
 
 ## Storage
@@ -26,12 +26,13 @@ data:
 
 ## OIDC
 
-### In Keycloak:
-1. Create Client in Keycloak realm for Grafana
-   - Client Authentication must be true to obtain client secret
-   - Redirect urls and post logout urls should include https://<dns> and https://<dns>/*
-   - Standard flow and Direct Access Grants should be true
-   - Configure grafana-dedicated scope with Group Membership for claim name 'groups'
-   - More details: https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/keycloak/
+### In Authentik:
+1. Create an OAuth2/OIDC Provider for Grafana
+   - Redirect URIs: `https://grafana.maxstash.io/login/generic_oauth`
 
-2. Create group for Grafana Admin
+2. Create an Application linked to the provider
+   - Name: Grafana
+   - Slug: grafana
+   - Copy the Client ID and Client Secret
+
+3. Create a group for Grafana admins (grafana-admin)

@@ -12,20 +12,21 @@ type: Opaque
 data:
   jenkins-admin-user: <base64-encoded-admin-username>
   jenkins-admin-password: <base64-encoded-admin-password>
-  jenkins-client-id: <base64-encoded-keycloak-client-id>
-  jenkins-client-secret: <base64-encoded-keycloak-client-secret>
 ```
 
-## OIDC
+## SAML
 
-### In Keycloak:
-1. Create Client in Keycloak realm for Jenkins
-   - Client Authentication must be true to obtain client secret
-   - Redirect urls and post logout urls should include https://<dns> and https://<dns>/*
-   - Standard flow and Direct Access Grants should be true
-   - Configure jenkins-dedicated scope with Group Membership for claim name 'groups'
+### In Authentik:
+1. Create a SAML Provider for Jenkins
+   - ACS URL: `https://jenkins.maxstash.io/securityRealm/finishLogin`
+   - Audience/Entity ID: `https://jenkins.maxstash.io`
+   - Service Provider Binding: HTTP-POST
 
-2. Create group for Jenkins Admin
+2. Create an Application linked to the provider
+   - Name: Jenkins
+   - Slug: jenkins
+
+3. Create a group for Jenkins admins (jenkins-admin)
 
 ## Storage
 1. SSH into node that will host Jenkins
