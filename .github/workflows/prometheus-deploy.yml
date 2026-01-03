@@ -1,0 +1,18 @@
+name: Deploy Prometheus
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
+    with:
+      repository: maxmorhardt/k8s
+      release_name: prometheus
+      namespace: monitoring
+      values_file: prometheus/values.yaml
+      helm_repo_name: prometheus-community
+      helm_repo_url: https://prometheus-community.github.io/helm-charts
+      chart: prometheus-community/prometheus
+    secrets:
+      kube_config: ${{ secrets.KUBE_CONFIG }}

@@ -1,0 +1,19 @@
+name: Deploy Rancher
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
+    with:
+      repository: maxmorhardt/k8s
+      release_name: rancher
+      namespace: cattle-system
+      values_file: rancher/values.yaml
+      helm_repo_name: rancher-latest
+      helm_repo_url: https://releases.rancher.com/server-charts/latest
+      chart: rancher-latest/rancher
+      timeout: 15m0s
+    secrets:
+      kube_config: ${{ secrets.KUBE_CONFIG }}

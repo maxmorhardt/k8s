@@ -1,0 +1,23 @@
+name: Deploy PostgreSQL
+
+on:
+  workflow_dispatch:
+    inputs:
+      chart_version:
+        description: 'PostgreSQL chart version to deploy'
+        required: false
+        type: string
+        default: '18.2.0'
+
+jobs:
+  deploy:
+    uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
+    with:
+      repository: maxmorhardt/k8s
+      release_name: db
+      namespace: db
+      values_file: postgres/values.yaml
+      chart: oci://docker.io/bitnamicharts/postgresql
+      chart_version: ${{ github.event.inputs.chart_version }}
+    secrets:
+      kube_config: ${{ secrets.KUBE_CONFIG }}

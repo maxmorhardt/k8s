@@ -6,5 +6,5 @@ helm upgrade db oci://docker.io/bitnamicharts/postgresql \
 	--debug \
 	--history-max=3 \
 	--namespace db \
-	--version 16.7.27 \
-	--values values.yaml
+	--values values.yaml \
+	--version 18.2.0

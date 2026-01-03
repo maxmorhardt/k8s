@@ -18,13 +18,13 @@ A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with productio
 - **Container Orchestration** with Kubernetes (K3s) and Rancher management
 - **Authentication & Authorization** via Authentik OIDC/SAML provider
 - **Data Persistence** with PostgreSQL database and Redis caching/pub-sub
-- **CI/CD Pipeline** using GitHub Actions (private repo for secrets)
+- **CI/CD Pipeline** using GitHub Actions
 - **Monitoring & Observability** with Prometheus metrics and Grafana dashboards
 - **Centralized Logging** via Loki and Alloy data collection
 - **Production Ready** with persistent storage, resource limits, and security configurations
 
 ## Architecture
-The stack follows a microservices architecture where each service is independently deployable with Helm charts. Services communicate through Kubernetes networking, with Authentik providing centralized authentication for applications requiring OIDC/SAML. CI/CD is handled via GitHub Actions from a private repository.
+The stack follows a microservices architecture where each service is independently deployable with Helm charts. Services communicate through Kubernetes networking, with Authentik providing centralized authentication for applications requiring OIDC/SAML. CI/CD is handled via GitHub Actions.
 
 ```
 ┌─────────────┐    ┌──────────────┐    ┌──────────────┐
@@ -78,7 +78,7 @@ Each service directory contains:
 - **storage.yaml** - Persistent volume configurations (where applicable)
 
 ### CI/CD
-CI/CD pipelines are managed via GitHub Actions in a private repository for secure secret handling. Workflows deploy services to the cluster using kubectl/helm.
+CI/CD pipelines are managed via GitHub Actions. Workflows deploy services to the cluster using kubectl/helm.
 
 ### Secret Management
 All secrets are managed via Kubernetes secrets and mounted as environment variables. See each service's SETUP.md for required secret keys and example YAML format.

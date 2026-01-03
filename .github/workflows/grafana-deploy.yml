@@ -1,0 +1,18 @@
+name: Deploy Grafana
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
+    with:
+      repository: maxmorhardt/k8s
+      release_name: grafana
+      namespace: monitoring
+      values_file: grafana/values.yaml
+      helm_repo_name: grafana
+      helm_repo_url: https://grafana.github.io/helm-charts
+      chart: grafana/grafana
+    secrets:
+      kube_config: ${{ secrets.KUBE_CONFIG }}
