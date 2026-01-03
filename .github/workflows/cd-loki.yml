@@ -1,0 +1,17 @@
+name: Loki CD
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
+    with:
+      repository: maxmorhardt/k8s
+      release_name: loki
+      namespace: monitoring
+      values_file: loki/values.yaml
+      helm_repo_name: grafana
+      helm_repo_url: https://grafana.github.io/helm-charts
+      chart: grafana/loki
+    secrets: inherit

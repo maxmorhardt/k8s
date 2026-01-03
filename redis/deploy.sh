@@ -4,5 +4,5 @@ helm upgrade redis oci://docker.io/bitnamicharts/redis \
 	--debug \
 	--history-max=3 \
 	--namespace db \
-	--version 23.1.1 \
+	--version 24.1.0 \
 	--values values.yaml

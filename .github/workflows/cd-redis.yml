@@ -1,0 +1,22 @@
+name: Redis CD
+
+on:
+  workflow_dispatch:
+    inputs:
+      chart_version:
+        description: 'Redis chart version to deploy'
+        required: false
+        type: string
+        default: '24.1.0'
+
+jobs:
+  deploy:
+    uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
+    with:
+      repository: maxmorhardt/k8s
+      release_name: redis
+      namespace: db
+      values_file: redis/values.yaml
+      chart: oci://docker.io/bitnamicharts/redis
+      chart_version: ${{ github.event.inputs.chart_version }}
+    secrets: inherit
