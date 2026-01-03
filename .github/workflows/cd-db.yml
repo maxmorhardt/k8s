@@ -1,10 +1,10 @@
-name: Deploy PostgreSQL
+name: PostgreSQL CD
 
 on:
   workflow_dispatch:
     inputs:
       chart_version:
-        description: 'PostgreSQL chart version to deploy'
+        description: PostgreSQL chart version to deploy
         required: false
         type: string
         default: '18.2.0'

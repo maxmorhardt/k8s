@@ -1,4 +1,4 @@
-name: Deploy Grafana
+name: Grafana CD
 
 on:
   workflow_dispatch:

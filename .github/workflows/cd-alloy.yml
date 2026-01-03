@@ -1,4 +1,4 @@
-name: Deploy Alloy
+name: Alloy CD
 
 on:
   workflow_dispatch:
