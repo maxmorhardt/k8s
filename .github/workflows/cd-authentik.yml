@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  cd:
     uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
     with:
       repository: maxmorhardt/k8s
