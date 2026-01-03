@@ -32,14 +32,10 @@ Grant monitoring privileges to the application user:
 psql -h localhost -p 5432 -U postgres -d postgres
 
 -- Grant pg_monitor role for monitoring functions
-GRANT pg_monitor TO maxmorhardt;
+GRANT pg_monitor TO <user>;
 ```
 
 The `pg_monitor` role provides access to:
 - `pg_ls_waldir()` - WAL directory listing
 - `pg_ls_logdir()` - Log directory listing
 - Statistics and monitoring views
-
-## Notes
-- Port 5432 is exposed via NodePort on the host node
-- Create databases for applications (authentik, etc.)
