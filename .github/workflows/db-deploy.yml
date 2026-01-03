@@ -19,5 +19,4 @@ jobs:
       values_file: postgres/values.yaml
       chart: oci://docker.io/bitnamicharts/postgresql
       chart_version: ${{ github.event.inputs.chart_version }}
-    secrets:
-      kube_config: ${{ secrets.KUBE_CONFIG }}
+    secrets: inherit
