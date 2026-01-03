@@ -13,7 +13,7 @@ jobs:
   cd:
     uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
     with:
-      repository: maxmorhardt/k8s
+      repository: ${{ github.repository }}
       release_name: db
       namespace: db
       values_file: postgres/values.yaml

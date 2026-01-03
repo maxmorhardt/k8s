@@ -13,7 +13,7 @@ jobs:
   cd:
     uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
     with:
-      repository: maxmorhardt/k8s
+      repository: ${{ github.repository }}
       release_name: redis
       namespace: db
       values_file: redis/values.yaml
