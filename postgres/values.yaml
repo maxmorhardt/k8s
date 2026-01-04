@@ -1,37 +1,61 @@
-image:
-  tag: latest
-  pullPolicy: Always
+type: postgresql
+mode: standalone
 
-global:
-  storageClass: postgres
-  postgresql:
-    auth:
-      username: maxmorhardt
-      database: authentik
-      existingSecret: postgres-credentials
-      secretKeys:
-        adminPasswordKey: admin-password
-        userPasswordKey: user-password
+cluster:
+  instances: 3
 
-primary:
-  service:
-    type: ClusterIP
-    ports:
-      postgresql: 5432
-
-  nodeSelector:
-    kubernetes.io/hostname: max-worker
-
-  persistence:
+  storage:
+    storageClass: postgres
     size: 256Gi
 
   resources:
     requests:
-      cpu: 1
-      memory: 4Gi
+      memory: '4Gi'
+      cpu: '1'
     limits:
-      cpu: 1
-      memory: 4Gi
+      memory: '4Gi'
+      cpu: '1'
 
-metrics:
+  postgresql:
+    parameters:
+      max_connections: '200'
+      shared_buffers: '1GB'
+      effective_cache_size: '3GB'
+      maintenance_work_mem: '256MB'
+      checkpoint_completion_target: '0.9'
+      wal_buffers: '16MB'
+      default_statistics_target: '100'
+      random_page_cost: '1.1'
+      effective_io_concurrency: '200'
+      work_mem: '5242kB'
+      min_wal_size: '1GB'
+      max_wal_size: '4GB'
+
+  monitoring:
+    enabled: true
+    podMonitorEnabled: true
+
+  affinity:
+    podAntiAffinity: required
+
+backups:
   enabled: true
+  destinationPath: 's3://BUCKET_NAME/cloudnativepg/'
+
+  s3Credentials:
+    accessKeyId:
+      name: aws-s3-credentials
+      key: AWS_ACCESS_KEY_ID
+    secretAccessKey:
+      name: aws-s3-credentials
+      key: AWS_SECRET_ACCESS_KEY
+    region:
+      name: aws-s3-credentials
+      key: AWS_REGION
+
+  retentionPolicy: '30d'
+
+  scheduledBackups:
+    - name: daily-backup
+      schedule: '0 0 * * *'
+      backupOwnerReference: self

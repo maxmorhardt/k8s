@@ -1,0 +1,14 @@
+# CloudNativePG Operator Configuration
+
+# Resource limits for the operator
+resources:
+  limits:
+    cpu: 100m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Monitoring
+monitoring:
+  podMonitorEnabled: true

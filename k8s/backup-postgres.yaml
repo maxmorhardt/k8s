@@ -1,0 +1,79 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+  namespace: backup
+spec:
+  schedule: '0 0 * * *'
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: postgres-backup
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: postgres:16
+              env:
+                - name: PGHOST
+                  value: 'db-postgresql.db.svc.cluster.local'
+                - name: PGPORT
+                  value: '5432'
+                - name: PGUSER
+                  value: 'maxmorhardt'
+                - name: PGDATABASE
+                  value: 'authentik'
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-credentials
+                      key: user-password
+              envFrom:
+                - secretRef:
+                    name: aws-s3-credentials
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  set -e
+
+                  echo "Starting Postgres backup at $(date)"
+
+                  # Create backup filename with timestamp
+                  BACKUP_NAME="postgres-$(date +%Y%m%d-%H%M%S).sql.gz"
+
+                  # Dump database and compress
+                  echo "Dumping database..."
+                  pg_dump | gzip > /tmp/$BACKUP_NAME
+
+                  # Install AWS CLI
+                  echo "Installing AWS CLI..."
+                  apt-get update -qq && apt-get install -y -qq awscli > /dev/null
+
+                  # Upload to S3
+                  echo "Uploading to S3..."
+                  aws s3 cp /tmp/$BACKUP_NAME s3://${S3_BUCKET_NAME}/postgres/$BACKUP_NAME
+
+                  # Verify upload
+                  if [ $? -eq 0 ]; then
+                    echo "✓ Backup completed successfully: $BACKUP_NAME"
+                    # Get file size
+                    ls -lh /tmp/$BACKUP_NAME
+                  else
+                    echo "✗ Backup failed"
+                    exit 1
+                  fi
+
+                  # Cleanup
+                  rm /tmp/$BACKUP_NAME
+              resources:
+                requests:
+                  memory: '256Mi'
+                  cpu: '250m'
+                limits:
+                  memory: '512Mi'
+                  cpu: '500m'
