@@ -10,6 +10,7 @@ spec:
     storage: 64Gi
   accessModes:
     - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -33,6 +34,7 @@ spec:
     storage: 64Gi
   accessModes:
     - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -56,6 +58,7 @@ spec:
     storage: 64Gi
   accessModes:
     - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
   nodeAffinity:
     required:
       nodeSelectorTerms:
