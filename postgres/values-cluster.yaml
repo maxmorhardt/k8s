@@ -114,3 +114,5 @@ imageCatalog:
   create: false
 
 poolers: []
+
+externalClusters: []
