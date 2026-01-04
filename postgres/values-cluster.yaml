@@ -46,6 +46,8 @@ cluster:
   env: []
   envFrom: []
 
+  externalClusters: []
+
   enableSuperuserAccess: true
   superuserSecret: 'postgres-superuser'
 
@@ -102,7 +104,7 @@ backups:
 
   scheduledBackups:
     - name: daily-backup
-      schedule: '0 0 * * *'
+      schedule: '0 0 0 * * *'
       backupOwnerReference: self
       method: barmanObjectStore
 
