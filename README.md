@@ -54,7 +54,7 @@ The stack follows a microservices architecture where each service is independent
 |---------|---------|------|-----------|--------------|
 | **Rancher** | Kubernetes cluster management | 80/443 | cattle-system | None |
 | **Authentik** | OIDC/SAML authentication provider | 9000/9443 | authentik | PostgreSQL |
-| **PostgreSQL** | Primary database | 5432 | db | None |
+| **PostgreSQL** | Primary database | 5432 | cnpg-database | None |
 | **Redis** | Caching & pub/sub messaging | 6379 | db | None |
 | **Prometheus** | Metrics collection | 9090 | monitoring | None |
 | **Grafana** | Metrics visualization | 3000 | monitoring | Prometheus |
@@ -64,16 +64,17 @@ The stack follows a microservices architecture where each service is independent
 ## Deployment Order
 
 1. **Core Infrastructure**: K3s cluster setup
-2. **Storage**: PostgreSQL, Redis
-3. **Authentication**: Authentik (requires PostgreSQL)
-4. **Monitoring**: Prometheus, Grafana, Loki, Alloy
+2. **Operators**: CloudNativePG operator
+3. **Storage**: PostgreSQL HA cluster (3 instances), Redis
+4. **Authentication**: Authentik (requires PostgreSQL)
+5. **Monitoring**: Prometheus, Grafana, Loki, Alloy
 6. **Management**: Rancher
 
 ## Development
 
 Each service directory contains:
 - **SETUP.md** - Service-specific setup instructions and required secrets
-- **values.yaml** - Helm chart configuration
+- **values.yaml** or **values-*.yaml** - Helm chart configuration(s)
 - **deploy.sh** - Deployment script using helm upgrade
 - **storage.yaml** - Persistent volume configurations (where applicable)
 
@@ -84,7 +85,7 @@ CI/CD pipelines are managed via GitHub Actions. Workflows deploy services to the
 All secrets are managed via Kubernetes secrets and mounted as environment variables. See each service's SETUP.md for required secret keys and example YAML format.
 
 ### Node Maintenance
-Weekly automated node rehydration runs on Sunday mornings (staggered 2-5 AM) via cron:
+Weekly automated node rehydration runs on **Tuesday** mornings (staggered 2-5 AM EST) via cron:
 - Drains node
 - Updates system packages
 - Cleans up container images, logs, and temp files
@@ -101,7 +102,7 @@ Services have the following dependency chain:
 Deploy dependencies first to avoid service startup issues.
 
 ## Node Assignments
-- **main**: Control plane
-- **max-worker**: PostgreSQL, Prometheus, Grafana
-- **max-worker-2**: Available
-- **max-worker-3**: Redis, Loki
+- **max-master**: Control plane, CloudNativePG operator
+- **max-worker-1**: PostgreSQL instance 1, Prometheus, Grafana
+- **max-worker-2**: PostgreSQL instance 2
+- **max-worker-3**: PostgreSQL instance 3, Redis, Loki
