@@ -68,6 +68,59 @@ Create the Authentik database and user in PostgreSQL
 - **Token**: `https://login.maxstash.io/application/o/token/`
 - **UserInfo**: `https://login.maxstash.io/application/o/userinfo/`
 
+## Post-Logout Redirect Policy
+
+```python
+import re
+import logging
+from urllib.parse import parse_qs, unquote
+
+logger = logging.getLogger(__name__)
+
+if not context.get('flow_plan'):
+  logger.info('no flow_plan in context cannot redirect')
+  return True
+
+logger.info('starting invalid redirect policy')
+try:
+  logger.info('getting redirect uri')
+  query = parse_qs(request.http_request.GET.get('query'))
+  redirect_uris = query.get('post_logout_redirect_uri', [])
+
+  redirect_uri = None
+  if len(redirect_uris) > 0:
+    redirect_uri = unquote(redirect_uris[0])
+    logger.info('redirect_uri: %s', redirect_uri)
+  
+  if redirect_uri:
+    logger.info('redirect_uri exists checking if valid')
+    if (re.match(r'^https://[a-zA-Z0-9\-]+\.maxstash\.io(/.*)?$', redirect_uri) or 
+        re.match(r'^http://localhost:3000(/.*)?$', redirect_uri)):
+      logger.info('valid redirect_uri redirecting to %s', redirect_uri)
+      context['flow_plan'].redirect(redirect_uri)
+      return True
+
+  logger.info('getting provider redirect uri')
+  application = context.get('application')
+  provider = application.get_provider()
+  provider_logout_uri = provider.logout_uri
+  logger.info('provider_logout_uri: %s', provider_logout_uri)
+  
+  if provider_logout_uri:
+    logger.info('redirecting to provider_logout_uri %s', provider_logout_uri)
+    context['flow_plan'].redirect(provider_logout_uri)
+    return True
+  
+  logger.info('no valid redirect uri using default login.maxstash.io')
+  context['flow_plan'].redirect("https://login.maxstash.io")
+  return True
+  
+except Exception as err:
+  logger.info('error in policy: %s', err)
+  context['flow_plan'].redirect("https://login.maxstash.io")
+  return True
+```
+
 ## Branding
 
 ### Custom CSS
