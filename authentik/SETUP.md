@@ -15,8 +15,15 @@ stringData:
   AUTHENTIK_POSTGRESQL__USER: "authentik"
   AUTHENTIK_POSTGRESQL__PASSWORD: "CHANGE-ME-PASSWORD"
   AUTHENTIK_POSTGRESQL__NAME: "authentik"
-  AUTHENTIK_POSTGRESQL__HOST: "db-postgresql.db.svc.cluster.local"
+  AUTHENTIK_POSTGRESQL__HOST: "postgres-cluster-rw.cnpg-database.svc.cluster.local"
   AUTHENTIK_POSTGRESQL__PORT: "5432"
+  
+  # Read replica configuration
+  AUTHENTIK_POSTGRESQL__READ_REPLICAS__0__HOST: "postgres-cluster-ro.cnpg-database.svc.cluster.local"
+  AUTHENTIK_POSTGRESQL__READ_REPLICAS__0__NAME: "authentik"
+  AUTHENTIK_POSTGRESQL__READ_REPLICAS__0__USER: "authentik"
+  AUTHENTIK_POSTGRESQL__READ_REPLICAS__0__PASSWORD: "CHANGE-ME-PASSWORD"
+  AUTHENTIK_POSTGRESQL__READ_REPLICAS__0__PORT: "5432"
   
   # Bootstrap admin credentials
   AUTHENTIK_BOOTSTRAP_PASSWORD: "CHANGE-ME-ADMIN-PASSWORD"
