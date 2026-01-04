@@ -46,8 +46,6 @@ cluster:
   env: []
   envFrom: []
 
-  externalClusters: []
-
   enableSuperuserAccess: true
   superuserSecret: 'postgres-superuser'
 
@@ -56,7 +54,7 @@ cluster:
   monitoring:
     enabled: true
     podMonitor:
-      enabled: true
+      enabled: false
     prometheusRule:
       enabled: false
 
@@ -114,5 +112,3 @@ imageCatalog:
   create: false
 
 poolers: []
-
-externalClusters: []
