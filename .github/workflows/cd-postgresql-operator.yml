@@ -17,6 +17,8 @@ jobs:
       release_name: cloudnativepg
       namespace: cnpg-system
       values_file: postgres/values-operator.yaml
+      helm_repo_name: cnpg
+      helm_repo_url: https://cloudnative-pg.github.io/charts
       chart: cnpg/cloudnative-pg
       chart_version: ${{ github.event.inputs.chart_version }}
     secrets: inherit

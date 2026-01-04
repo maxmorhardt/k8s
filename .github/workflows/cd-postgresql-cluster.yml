@@ -17,6 +17,8 @@ jobs:
       release_name: postgres
       namespace: cnpg-database
       values_file: postgres/values-cluster.yaml
+      helm_repo_name: cnpg
+      helm_repo_url: https://cloudnative-pg.github.io/charts
       chart: cnpg/cluster
       chart_version: ${{ github.event.inputs.chart_version }}
     secrets: inherit
