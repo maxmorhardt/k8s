@@ -38,9 +38,8 @@ metadata:
   namespace: cnpg-database
 type: Opaque
 stringData:
-  AWS_ACCESS_KEY_ID: <your-access-key>
-  AWS_SECRET_ACCESS_KEY: <your-secret-key>
-  AWS_REGION: <your-region>
+  ACCESS_KEY_ID: <your-access-key>
+  SECRET_ACCESS_KEY: <your-secret-key>
 ```
 
 ## Storage Setup

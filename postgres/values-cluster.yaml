@@ -69,6 +69,7 @@ cluster:
       work_mem: '3495kB'
       min_wal_size: '512MB'
       max_wal_size: '2GB'
+      archive_timeout: '1d'
 
   initdb:
     database: authentik
