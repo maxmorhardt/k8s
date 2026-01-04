@@ -141,7 +141,7 @@ select:-webkit-autofill {
     color 9999s ease-in-out 0s !important;
 }
 
-ak-brand-links, footer {
+.pf-c-login__footer {
   display: none !important;
 }
 
