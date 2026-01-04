@@ -84,6 +84,8 @@ backups:
   enabled: true
   destinationPath: 's3://maxstash-io-bucket/postgresql/'
   provider: s3
+  s3:
+    region: us-east-1
   secret:
     create: false
     name: aws-s3-credentials
