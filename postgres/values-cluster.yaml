@@ -6,7 +6,7 @@ version:
 mode: standalone
 
 cluster:
-  instances: 3
+  instances: 2
 
   imagePullPolicy: Always
 
