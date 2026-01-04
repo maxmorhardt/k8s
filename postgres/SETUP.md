@@ -39,7 +39,7 @@ metadata:
 type: Opaque
 stringData:
   ACCESS_KEY_ID: <your-access-key>
-  SECRET_ACCESS_KEY: <your-secret-key>
+  ACCESS_SECRET_KEY: <your-secret-key>
 ```
 
 ## Storage Setup
