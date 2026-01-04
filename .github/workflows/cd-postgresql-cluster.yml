@@ -1,0 +1,22 @@
+name: PostgreSQL Cluster CD
+
+on:
+  workflow_dispatch:
+    inputs:
+      chart_version:
+        description: CloudNativePG cluster chart version to deploy
+        required: false
+        type: string
+        default: '0.5.0'
+
+jobs:
+  cd:
+    uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
+    with:
+      repository: ${{ github.repository }}
+      release_name: postgres
+      namespace: cnpg-database
+      values_file: postgres/values-cluster.yaml
+      chart: cnpg/cluster
+      chart_version: ${{ github.event.inputs.chart_version }}
+    secrets: inherit

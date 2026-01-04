@@ -10,7 +10,7 @@ alloy:
     limits:
       cpu: 200m
       memory: 256Mi
-      
+
   mounts:
     varlog: true
 
@@ -33,15 +33,6 @@ alloy:
         }
       }
 
-      local.file_match "node_logs" {
-        path_targets = [{
-            __path__  = "/var/log/syslog",
-            job       = "node/syslog",
-            node_name = sys.env("HOSTNAME"),
-            cluster   = "local",
-        }]
-      }
-
       local.file_match "rehydrate_logs" {
         path_targets = [{
             __path__  = "/var/log/rehydrate/*.log",
@@ -49,11 +40,6 @@ alloy:
             node_name = sys.env("HOSTNAME"),
             cluster   = "local",
         }]
-      }
-
-      loki.source.file "node_logs" {
-        targets    = local.file_match.node_logs.targets
-        forward_to = [loki.write.default.receiver]
       }
 
       loki.source.file "rehydrate_logs" {

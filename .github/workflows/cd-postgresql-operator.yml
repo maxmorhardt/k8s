@@ -1,22 +1,22 @@
-name: PostgreSQL CD
+name: PostgreSQL Operator CD
 
 on:
   workflow_dispatch:
     inputs:
       chart_version:
-        description: PostgreSQL chart version to deploy
+        description: CloudNativePG operator version to deploy
         required: false
         type: string
-        default: '18.2.0'
+        default: '0.27.0'
 
 jobs:
   cd:
     uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
     with:
       repository: ${{ github.repository }}
-      release_name: db
-      namespace: db
-      values_file: postgres/values.yaml
-      chart: oci://docker.io/bitnamicharts/postgresql
+      release_name: cloudnativepg
+      namespace: cnpg-system
+      values_file: postgres/values-operator.yaml
+      chart: cnpg/cloudnative-pg
       chart_version: ${{ github.event.inputs.chart_version }}
     secrets: inherit

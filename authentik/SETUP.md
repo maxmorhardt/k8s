@@ -18,11 +18,11 @@ stringData:
   AUTHENTIK_POSTGRESQL__HOST: "db-postgresql.db.svc.cluster.local"
   AUTHENTIK_POSTGRESQL__PORT: "5432"
   
-  # Bootstrap admin credentials (optional - only used on first setup)
+  # Bootstrap admin credentials
   AUTHENTIK_BOOTSTRAP_PASSWORD: "CHANGE-ME-ADMIN-PASSWORD"
   AUTHENTIK_BOOTSTRAP_EMAIL: "admin@maxstash.io"
   
-  # SMTP/Email configuration (optional - for email notifications)
+  # SMTP/Email configuration
   AUTHENTIK_EMAIL__HOST: "smtp.example.com"
   AUTHENTIK_EMAIL__PORT: "587"
   AUTHENTIK_EMAIL__USERNAME: "smtp-user@example.com"
@@ -58,8 +58,7 @@ Create the Authentik database and user in PostgreSQL
    ```
 
 5. Access Authentik at `https://login.maxstash.io`
-   - First user created automatically becomes admin
-   - Or use bootstrap credentials from secret if set
+   - Use bootstrap credentials from secret
 
 ## OIDC Endpoints
 
