@@ -50,6 +50,6 @@ Create `/data/postgresql` directories on each worker node with correct permissio
 ```bash
 # On each worker node
 mkdir -p /data/postgresql
-chown 1000:1000 /data/postgresql
+chown 26:26 /data/postgresql
 chmod 700 /data/postgresql
 ```

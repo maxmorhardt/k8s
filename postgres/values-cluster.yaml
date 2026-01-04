@@ -17,9 +17,6 @@ cluster:
   walStorage:
     enabled: false
 
-  postgresUID: 1000
-  postgresGID: 1000
-
   resources:
     limits:
       cpu: 1
