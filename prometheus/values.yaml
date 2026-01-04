@@ -188,18 +188,6 @@ extraScrapeConfigs: |
       - targets:
           - db-postgresql-metrics.db.svc.cluster.local:9187
 
-  - job_name: jenkins
-    metrics_path: /prometheus
-    scheme: https
-    tls_config:
-      insecure_skip_verify: true
-    basic_auth:
-      username_file: /etc/prometheus/secrets/jenkins-api-credentials/username
-      password_file: /etc/prometheus/secrets/jenkins-api-credentials/password
-    static_configs:
-      - targets:
-          - jenkins.maxstash.io
-
   - job_name: ages
     metrics_path: /metrics
     scheme: http
@@ -303,16 +291,6 @@ server:
   livenessProbeTimeout: 10
   livenessProbeFailureThreshold: 3
   livenessProbeSuccessThreshold: 1
-
-  extraVolumes:
-    - name: jenkins-api-credentials
-      secret:
-        secretName: jenkins-api-credentials
-
-  extraVolumeMounts:
-    - name: jenkins-api-credentials
-      mountPath: /etc/prometheus/secrets/jenkins-api-credentials
-      readOnly: true
 
   resources:
     limits:
