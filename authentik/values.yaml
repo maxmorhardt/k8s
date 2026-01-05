@@ -35,8 +35,8 @@ server:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
+      maxSurge: 0
+      maxUnavailable: 1
 
   initContainers:
     - name: clone-assets
@@ -162,8 +162,8 @@ worker:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
+      maxSurge: 0
+      maxUnavailable: 1
 
   autoscaling:
     enabled: true
@@ -223,7 +223,7 @@ worker:
     initialDelaySeconds: 5
     periodSeconds: 10
     successThreshold: 1
-    timeoutSeconds: 10
+    timeoutSeconds: 15
     exec:
       command:
         - ak
@@ -234,18 +234,18 @@ worker:
     initialDelaySeconds: 5
     periodSeconds: 10
     successThreshold: 1
-    timeoutSeconds: 10
+    timeoutSeconds: 15
     exec:
       command:
         - ak
         - healthcheck
 
   startupProbe:
-    failureThreshold: 60
+    failureThreshold: 90
     initialDelaySeconds: 30
     periodSeconds: 10
     successThreshold: 1
-    timeoutSeconds: 10
+    timeoutSeconds: 15
     exec:
       command:
         - ak
