@@ -145,6 +145,10 @@ server:
   ingress:
     enabled: true
     ingressClassName: 'nginx'
+    annotations:
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        add_header Content-Security-Policy "frame-ancestors 'self' https://maxstash.io https://*.maxstash.io http://localhost:*;" always;
+        add_header X-Frame-Options "" always;
     hosts:
       - login.maxstash.io
     paths:
