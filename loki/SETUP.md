@@ -1,5 +1,5 @@
 ## Storage
-1. SSH into node that will host Loki (max-worker-3)
+1. SSH into node that will host Loki (max-worker-2)
 2. Create directory /data/loki with 10001:10001 owner/group
    ```bash
    sudo mkdir -p /data/loki

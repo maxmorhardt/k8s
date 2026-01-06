@@ -102,7 +102,7 @@ Services have the following dependency chain:
 Deploy dependencies first to avoid service startup issues.
 
 ## Node Assignments
-- **max-master**: Control plane, CloudNativePG operator
-- **max-worker-1**: PostgreSQL instance 1, Prometheus, Grafana
-- **max-worker-2**: PostgreSQL instance 2
-- **max-worker-3**: PostgreSQL instance 3, Redis, Loki
+- **max-master**: Control plane
+- **max-worker-1**: Prometheus, Grafana
+- **max-worker-2**: Loki
+- **max-worker-3**: Redis

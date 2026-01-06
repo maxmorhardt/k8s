@@ -5,11 +5,12 @@ metadata:
   labels:
     type: local
 spec:
-  storageClassName: ""
+  storageClassName: ''
   capacity:
     storage: 8Gi
   accessModes:
     - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
   hostPath:
     path: '/data/grafana'
 ---
@@ -24,6 +25,6 @@ spec:
   resources:
     requests:
       storage: 8Gi
-  storageClassName: ""
+  storageClassName: ''
   volumeMode: Filesystem
   volumeName: grafana

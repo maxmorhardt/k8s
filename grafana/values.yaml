@@ -1,5 +1,8 @@
 replicas: 1
 
+deploymentStrategy:
+  type: Recreate
+
 readinessProbe:
   httpGet:
     path: /api/health
@@ -106,7 +109,7 @@ grafana.ini:
     allow_sign_up: true
     client_id: ${GRAFANA_CLIENT_ID}
     client_secret: ${GRAFANA_CLIENT_SECRET}
-    scopes: openid email profile offline_access roles
+    scopes: openid email profile offline_access
     email_attribute_path: email
     login_attribute_path: username
     name_attribute_path: full_name
