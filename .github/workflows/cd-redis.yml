@@ -15,7 +15,7 @@ jobs:
     with:
       repository: ${{ github.repository }}
       release_name: redis
-      namespace: db
+      namespace: redis
       values_file: redis/values.yaml
       chart: oci://docker.io/bitnamicharts/redis
       chart_version: ${{ github.event.inputs.chart_version }}

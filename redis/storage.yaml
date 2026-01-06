@@ -10,6 +10,7 @@ spec:
     storage: 8Gi
   accessModes:
     - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
   hostPath:
     path: '/bitnami/redis'
 ---
@@ -24,6 +25,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: redis
+  namespace: redis
 spec:
   storageClassName: redis
   accessModes:
