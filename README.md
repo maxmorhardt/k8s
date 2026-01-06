@@ -55,7 +55,7 @@ The stack follows a microservices architecture where each service is independent
 | **Rancher** | Kubernetes cluster management | 80/443 | cattle-system | None |
 | **Authentik** | OIDC/SAML authentication provider | 9000/9443 | authentik | PostgreSQL |
 | **PostgreSQL** | Primary database | 5432 | cnpg-database | None |
-| **Redis** | Caching & pub/sub messaging | 6379 | db | None |
+| **Redis** | Caching & pub/sub messaging | 6379 | redis | None |
 | **Prometheus** | Metrics collection | 9090 | monitoring | None |
 | **Grafana** | Metrics visualization | 3000 | monitoring | Prometheus |
 | **Loki** | Log aggregation | 3100 | monitoring | None |

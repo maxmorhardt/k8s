@@ -181,13 +181,14 @@ scrapeConfigs:
         action: replace
         target_label: node
 
-extraScrapeConfigs: |
-  - job_name: postgres
-    scheme: http
-    static_configs:
-      - targets:
-          - db-postgresql-metrics.db.svc.cluster.local:9187
+# legacy postgres
+# - job_name: postgres
+#   scheme: http
+#   static_configs:
+#     - targets:
+#         - db-postgresql-metrics.db.svc.cluster.local:9187
 
+extraScrapeConfigs: |
   - job_name: ages
     metrics_path: /metrics
     scheme: http
@@ -214,7 +215,7 @@ extraScrapeConfigs: |
     scheme: http
     static_configs:
       - targets:
-          - redis-metrics.db.svc.cluster.local:9121
+          - redis-metrics.redis.svc.cluster.local:9121
 
 configmapReload:
   prometheus:

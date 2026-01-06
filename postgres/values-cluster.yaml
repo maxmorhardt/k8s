@@ -72,7 +72,7 @@ cluster:
       archive_timeout: '1d'
 
   initdb:
-    database: authentik
+    database: maxstash
     owner: maxmorhardt
     secret:
       name: postgres-admin-user
