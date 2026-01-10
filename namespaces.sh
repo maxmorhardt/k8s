@@ -6,6 +6,10 @@ kubectl create namespace cnpg-database
 kubectl create namespace redis
 
 kubectl create namespace authentik
+
+kubectl create namespace teleport-cluster
+kubectl label namespace teleport-cluster 'pod-security.kubernetes.io/enforce=baseline'
+
 kubectl create namespace squares
 kubectl create namespace apps
 
