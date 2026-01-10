@@ -13,10 +13,10 @@
 #
 # Warning: The clusterName cannot be changed during a Teleport cluster's lifespan.
 # If you need to change it, you must redeploy a completely new cluster.
-clusterName: ""
+clusterName: 'teleport.maxstash.io'
 
 # Name for this kubernetes cluster to be used by teleport users.
-kubeClusterName: ""
+kubeClusterName: 'maxstash'
 
 ##################################################
 # Values that you may need to change.
@@ -28,7 +28,7 @@ kubeClusterName: ""
 # You will face compatibility issues trying to run a different Teleport version with it.
 #
 # If you want to run Teleport version X, you should use `helm --version X` instead.
-teleportVersionOverride: ""
+teleportVersionOverride: ''
 
 # The `proxyProtocol` value controls whether the Proxy pods will
 # accept PROXY lines with the client's IP address when they are
@@ -81,7 +81,7 @@ auth:
   #     client_idle_timeout_message: "Connection closed after 2hours without activity"
   teleportConfig: {}
 
-# `proxy` allows you to set chart values only for Kubernetes resources related to the Teleport Proxy Service. 
+# `proxy` allows you to set chart values only for Kubernetes resources related to the Teleport Proxy Service.
 # This is merged with chart-scoped values and takes precedence in case of conflict.
 # For example:
 # proxy:
@@ -118,7 +118,7 @@ authentication:
   # See Passwordless for local
   # (http://goteleport.com/docs/access-controls/guides/passwordless/#optional-enable-passwordless-by-default).
   # Defaults to "local".
-  connectorName: ""
+  connectorName: ''
 
   # Enable/disable local authentication by setting `authentication.local_auth` in `teleport.yaml`.
   # Disabling local auth is required for FedRAMP / FIPS; see https://goteleport.com/docs/zero-trust-access/compliance-frameworks/fedramp/#configure-the-teleport-auth-service
@@ -127,7 +127,7 @@ authentication:
   # Controls the locking mode: in case of network split should Teleport guarantee availability or integrity ?
   # Possible values are "best_effort" and "strict". When not defined, Teleport defaults to "best_effort".
   # See https://goteleport.com/docs/access-controls/guides/locking/#next-steps-locking-modes.
-  lockingMode: ""
+  lockingMode: ''
 
   # DEPRECATED: Second factor requirements for users of the Teleport cluster.
   # Controls the `auth_config.authentication.second_factor` field in `teleport.yaml`.
@@ -172,7 +172,7 @@ authentication:
   #   "teleport.example.com", RP ID can be "teleport.example.com" or "example.com".
   #
   #   Changing the RP ID will invalidate all already registered webauthn second factors.
-  secondFactors: ["otp", "webauthn"]
+  secondFactors: ['otp', 'webauthn']
 
   # (Optional) When using webauthn this allows to restrict which vendor and key models can be used.
   # webauthn:
@@ -202,11 +202,11 @@ authentication:
 # To use an ingress, set proxyListenerMode=multiplex, ingress.enabled=true and service.type=ClusterIP
 #
 # Possible values are 'separate' and 'multiplex'
-proxyListenerMode: "separate"
+proxyListenerMode: 'separate'
 
 # Optional setting for configuring session recording.
 # See `session_recording` under https://goteleport.com/docs/reference/config/#auth-service
-sessionRecording: ""
+sessionRecording: ''
 
 # By default, Teleport will multiplex Postgres and MongoDB database connections on the same port as the proxy's web listener (443)
 # Setting either of these values to true will separate the listeners out onto a separate port (5432 for Postgres, 27017 for MongoDB)
@@ -263,16 +263,16 @@ tunnelPublicAddr: []
 # This section is mutually exclusive with the "tls" value below.
 acme: false
 # acmeEmail is the email address to provide during certificate registration (this is a Let's Encrypt requirement)
-acmeEmail: ""
+acmeEmail: ''
 # acmeURI is the ACME server to use for getting certificates. The default is to use Let's Encrypt's production server.
-acmeURI: ""
+acmeURI: ''
 
 # Set enterprise to true to use enterprise image
 # You will need to download your Enterprise license from the Teleport dashboard and create a secret to use this:
 # kubectl -n ${TELEPORT_NAMESPACE?} create secret generic license --from-file=/path/to/downloaded/license.pem
 enterprise: false
 # Override default Enterprise license name
-licenseSecretName: "license"
+licenseSecretName: 'license'
 # CRDs are installed by default when the operator is enabled. This manual override allows to disable CRD installation
 # when deploying multiple releases in the same cluster.
 # installCRDs:
@@ -291,8 +291,8 @@ operator:
   #    memory: "1Gi"
   #  limits:
   #    memory: "1Gi"
-  joinMethod: "kubernetes"
-  token: "teleport-operator"
+  joinMethod: 'kubernetes'
+  token: 'teleport-operator'
   # This is needed to have a sensible name and predictable service account name.
   nameOverride: operator
 
@@ -309,7 +309,7 @@ global:
   # DNS service. This is used to resolve service names in the cluster.
   # The default value is `cluster.local`.
 
-  # WARNING: Changing this value must match the Kubernetes cluster's configuration 
+  # WARNING: Changing this value must match the Kubernetes cluster's configuration
   # otherwise Teleport will not be able to resolve service names.
   clusterDomain: cluster.local
 
@@ -371,7 +371,7 @@ persistence:
   enabled: true
   # Leave blank to automatically create a PersistentVolumeClaim for Teleport storage.
   # If you would like to use a pre-existing PersistentVolumeClaim, put its name here.
-  existingClaimName: ""
+  existingClaimName: ''
   # Size of persistent volume to request when created by Teleport.
   # Ignored if existingClaimName is provided.
   volumeSize: 10Gi
@@ -381,10 +381,10 @@ persistence:
 ##################################################
 aws:
   # The AWS region where the DynamoDB tables are located.
-  region: ""
+  region: ''
   # The DynamoDB table name to use for backend storage. Teleport will attempt to create this table automatically if it does not exist.
   # The container will need an appropriately-provisioned IAM role with permissions to create DynamoDB tables.
-  backendTable: ""
+  backendTable: ''
   # The DynamoDB table name to use for audit log storage. Teleport will attempt to create this table automatically if it does not exist.
   # The container will need an appropriately-provisioned IAM role with permissions to create DynamoDB tables.
   # This MUST NOT be the same table name as used for 'backendTable' as the schemas are different.
@@ -396,7 +396,7 @@ aws:
   # `aws.auditLogPrimaryBackend` value configures which backend is used for querying.
   # Teleport queries the audit backend to display the audit log in the web UI, export events
   # using the audit log collector, or perform any action that needs to inspect past audit events.
-  auditLogTable: ""
+  auditLogTable: ''
   # Whether to mirror audit log entries to stdout in JSON format (useful for external log collectors)
   auditLogMirrorOnStdout: false
   # auditLogPrimaryBackend controls which backend is used for queries when multiple
@@ -405,7 +405,7 @@ aws:
   # Athena.
   #
   # Possible values are `dynamo` and `athena`.
-  auditLogPrimaryBackend: ""
+  auditLogPrimaryBackend: ''
   # athenaURL contains the Athena audit log backend configuration
   # When this value is set, Teleport will export events to the Athena audit backend.
   #
@@ -415,10 +415,10 @@ aws:
   #
   # If both `aws.athenaURL` and `aws.auditLogTable` (DynamoDB) are set, the
   # `aws.auditLogPrimaryBackend` value configures which backend is used for querying.
-  athenaURL: ""
+  athenaURL: ''
   # The S3 bucket name to use for recorded session storage. Teleport will attempt to create this bucket automatically if it does not exist.
   # The container will need an appropriately-provisioned IAM role with permissions to create S3 buckets.
-  sessionRecordingBucket: ""
+  sessionRecordingBucket: ''
   # Whether or not to turn on DynamoDB backups
   backups: false
 
@@ -433,12 +433,12 @@ aws:
 
   # DynamoDB autoscaling settings. Required if `dynamoAutoScaling` is `true`.
   # See https://goteleport.com/docs/setup/reference/backends/#dynamodb-autoscaling
-  readMinCapacity: null      # Integer
-  readMaxCapacity: null      # Integer
-  readTargetValue: null      # Float
-  writeMinCapacity: null     # Integer
-  writeMaxCapacity: null     # Integer
-  writeTargetValue: null     # Float
+  readMinCapacity: null # Integer
+  readMaxCapacity: null # Integer
+  readTargetValue: null # Float
+  writeMinCapacity: null # Integer
+  writeMaxCapacity: null # Integer
+  writeTargetValue: null # Float
 
   # accessMonitoring configures the Access Monitoring feature of the Auth Service.
   # Using this features requires setting up specific AWS infrastructure as described
@@ -448,11 +448,11 @@ aws:
     enabled: false
     # reportResults is the bucket uri where query results are reported.
     # Example: "s3://example-athena-long-term/report_results"
-    reportResults: ""
+    reportResults: ''
     # roleARN is the ARN of the role that is assumed to run the reports.
-    roleARN: ""
+    roleARN: ''
     # workgroup is the Athena workgroup in which Teleport runs queries.
-    workgroup: ""
+    workgroup: ''
 
 ##################################################
 # GCP-specific settings (only used in "gcp" mode)
@@ -460,22 +460,22 @@ aws:
 gcp:
   # The project name being used for the GCP account where Teleport is running.
   # See https://support.google.com/googleapi/answer/7014113?hl=en
-  projectId: ""
+  projectId: ''
   # The Firestore collection to use for backend storage. Teleport will attempt to create this collection automatically if it does not exist.
   # Either of the following must be true:
   # - The container will need an appropriately-provisioned IAM role/service account with permissions to create Firestore collections
   # - The service account credentials provided via 'credentialSecretName' will need permissions to create Firestore collections.
-  backendTable: ""
+  backendTable: ''
   # The Firestore collection to use for audit log storage. Teleport will attempt to create this collection automatically if it does not exist.
   # Either of the following must be true:
   # - The container will need an appropriately-provisioned IAM role/service account with permissions to create Firestore collections
   # - The service account credentials provided via 'credentialSecretName' will need permissions to create Firestore collections.
   # This MUST NOT be the same collection name as used for 'backendTable' as the schemas are different.
-  auditLogTable: ""
+  auditLogTable: ''
   # Whether to mirror audit log entries to stdout in JSON format (useful for external log collectors)
   auditLogMirrorOnStdout: false
   # The Google storage bucket name to use for recorded session storage. This bucket must already exist in the Google account being used.
-  sessionRecordingBucket: ""
+  sessionRecordingBucket: ''
   # The name of the Kubernetes secret used to store the Google credentials.
   # You will need to create this secret manually. It must contain a JSON file from Google with the credentials that Teleport will use.
   # You can override this to a blank value if the worker node running Teleport already has a service account which grants access.
@@ -487,25 +487,25 @@ gcp:
 azure:
   # The fully qualified hostname of the Postgres database cluster hosted in Azure.
   # It should follow the format "<database name>.postgres.database.azure.com".
-  databaseHost: ""
+  databaseHost: ''
   # The Postgres user Teleport must use to connect to the backend and audit
   # databases.
-  databaseUser: ""
+  databaseUser: ''
   # The Postgres database to use for backend storage.
-  backendDatabase: "teleport_backend"
+  backendDatabase: 'teleport_backend'
   # The Postgres database to use for audit log storage.
   # This MUST NOT be the same database as used for 'backendDatabase'.
-  auditLogDatabase: "teleport_audit"
+  auditLogDatabase: 'teleport_audit'
   # Whether to mirror audit log entries to stdout in JSON format (useful for external log collectors)
   auditLogMirrorOnStdout: false
   # The fully qualified domain name of the Azure Blob Storage account to use for
   # recorded session storage. This account must already exist.
   # It should follow the format "<storage account>.blob.core.windows.net"
-  sessionRecordingStorageAccount: ""
+  sessionRecordingStorageAccount: ''
   # Azure client ID is used by the Kubernetes Service Account to know which
   # Application it should impersonate. This can be unset only if the clientID is
   # passed through other means (e.g. environment variable)
-  clientID: ""
+  clientID: ''
   # Controls the `pool_max_conns` setting passed to PostgreSQL. This is the
   # max amount of connections Teleport can open to the database. This can affect
   # performance on large clusters and depends on various factors like the
@@ -563,7 +563,7 @@ highAvailability:
     addPublicAddrs: false
     # Name of the Issuer/ClusterIssuer to use for certs
     # NOTE: You will always need to create this yourself when certManager.enabled is true.
-    issuerName: ""
+    issuerName: ''
     # Kind of Issuer that cert-manager should look for.
     # This defaults to 'Issuer' to keep everything contained within the teleport namespace.
     issuerKind: Issuer
@@ -580,14 +580,14 @@ tls:
   # Name of an existing secret to use which contains a TLS keypair. Will automatically set the https_keypairs section in teleport.yaml.
   # Create the secret in the same namespace as Teleport using `kubectl create secret tls my-tls-secret --cert=/path/to/cert/file --key=/path/to/key/file`
   # See https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets for more information.
-  existingSecretName: ""
+  existingSecretName: ''
   # (optional) Name of an existing secret to use which contains a CA or trust bundle in x509 PEM format.
   # Useful for building trust when using intermediate certificate authorities.
   # This will automatically set the SSL_CERT_FILE environment variable to trust the CA.
   # Create the secret with `kubectl create secret generic --from-file=ca.pem=/path/to/root-ca.pem
-  existingCASecretName: ""
+  existingCASecretName: ''
   # (optional) Name of an existing key in the CA secret which will be used as a trusted CA bundle file.
-  existingCASecretKeyName: "ca.pem"
+  existingCASecretKeyName: 'ca.pem'
 
 ##################################################
 # Values that you shouldn't need to change.
@@ -619,7 +619,7 @@ log:
   format: text
   # Possible extra_fields values include: timestamp, component, caller, and level.
   # All extra fields are included by default.
-  extraFields: ["timestamp", "level", "component", "caller"]
+  extraFields: ['timestamp', 'level', 'component', 'caller']
 
 ##################################
 # Extra Kubernetes configuration #
@@ -725,7 +725,7 @@ serviceAccount:
   # The name of the ServiceAccount to use.
   # If not set and serviceAccount.create is true, the name is generated using the release name.
   # If create is false, the name will be used to reference an existing service account.
-  name: ""
+  name: ''
   # To set annotations on the service account, use the annotations.serviceAccount value.
 
 # Set to true (default) to create Kubernetes ClusterRole and ClusterRoleBinding.
@@ -741,7 +741,8 @@ rbac:
 service:
   type: LoadBalancer
   # Additional entries here will be added to the service spec.
-  spec: {}
+  spec:
+    {}
     # loadBalancerIP: "1.2.3.4"
 
 # Options for ingress
@@ -760,7 +761,8 @@ ingress:
   # by the Ingress. This may be desirable if you don't use Teleport Application Access.
   suppressAutomaticWildcards: false
   # Additional entries here will be added to the ingress spec.
-  spec: {}
+  spec:
+    {}
     # ingressClassName: nginx
 
 # Extra arguments to pass to 'teleport start' for the main Teleport pod
@@ -819,12 +821,12 @@ postStart:
 #
 # Teleport will become unstable once throttling starts. We recommend not to set CPU limits.
 # See [the GitHub PR](https://github.com/gravitational/teleport/pull/36251) for technical details.
-resources: {}
-#  requests:
-#    cpu: "1"
-#    memory: "2Gi"
-#  limits:
-#    memory: "2Gi"
+resources:
+  requests:
+    cpu: '250m'
+    memory: '500Mi'
+  limits:
+    memory: '1Gi'
 
 # goMemLimitRatio configures the GOMEMLIMIT env var set by the chart.
 # GOMEMLIMIT instructs the go garbage collector to try to keep allocated memory
@@ -839,15 +841,23 @@ resources: {}
 goMemLimitRatio: 0.9
 
 # Pod security context for any pods created by the chart
-podSecurityContext: {}
-  # fsGroup: 65532
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  fsGroup: 65532
 
 # Security context to add to the container
-securityContext: {}
-  # runAsUser: 99
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 65532
 
 # Priority class name to add to the deployment
-priorityClassName: ""
+priorityClassName: ''
 
 # Tolerations for pod assignment
 # https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
