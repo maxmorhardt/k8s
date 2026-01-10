@@ -1,26 +1,26 @@
 global:
   security:
     allowInsecureImages: true
-
-  revisionHistoryLimit: 3
-
   image:
-    repository: ghcr.io/goauthentik/server
-    tag: ''
-    pullPolicy: Always
-
+    repository: docker.io
+    tag: 2025.12.0-rc3
+    pullPolicy: IfNotPresent
   securityContext:
     runAsUser: 1000
     runAsGroup: 1000
     fsGroup: 1000
-
-  affinity:
-    podAntiAffinity: soft
-
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: ScheduleAnyway
+  deploymentStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   volumes:
     - name: media
       emptyDir: {}
-
   volumeMounts:
     - name: media
       mountPath: /media
@@ -31,13 +31,15 @@ authentik:
 
 server:
   enabled: true
-
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
-
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 85
+    targetMemoryUtilizationPercentage: 85
+  pdb:
+    enabled: true
+    minAvailable: 1
   initContainers:
     - name: clone-assets
       image: alpine/git:latest
@@ -49,20 +51,6 @@ server:
       volumeMounts:
         - name: media
           mountPath: /media
-  autoscaling:
-    enabled: true
-    minReplicas: 2
-    maxReplicas: 4
-    targetCPUUtilizationPercentage: 85
-    targetMemoryUtilizationPercentage: 85
-
-  pdb:
-    enabled: true
-    minAvailable: 1
-
-  image:
-    pullPolicy: Always
-
   resources:
     requests:
       cpu: 1
@@ -70,34 +58,10 @@ server:
     limits:
       cpu: 1
       memory: 1Gi
-
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: NotIn
-                values:
-                  - max-master
-
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 100
-          podAffinityTerm:
-            labelSelector:
-              matchExpressions:
-                - key: app.kubernetes.io/component
-                  operator: In
-                  values:
-                    - server
-            topologyKey: kubernetes.io/hostname
-
   containerPorts:
     http: 9000
     https: 9443
     metrics: 9300
-
   livenessProbe:
     failureThreshold: 3
     initialDelaySeconds: 5
@@ -107,7 +71,6 @@ server:
     httpGet:
       path: '{{ .Values.authentik.web.path }}-/health/live/'
       port: http
-
   readinessProbe:
     failureThreshold: 3
     initialDelaySeconds: 5
@@ -117,7 +80,6 @@ server:
     httpGet:
       path: '{{ .Values.authentik.web.path }}-/health/ready/'
       port: http
-
   startupProbe:
     failureThreshold: 60
     initialDelaySeconds: 5
@@ -127,21 +89,11 @@ server:
     httpGet:
       path: '{{ .Values.authentik.web.path }}-/health/live/'
       port: http
-
   service:
     servicePortHttp: 80
     servicePortHttps: 443
     servicePortHttpName: http
     servicePortHttpsName: https
-
-  metrics:
-    enabled: false
-    service:
-      servicePort: 9300
-      portName: metrics
-    serviceMonitor:
-      enabled: false
-
   ingress:
     enabled: true
     ingressClassName: 'nginx'
@@ -157,70 +109,28 @@ server:
       - secretName: maxstash.io-tls
         hosts:
           - login.maxstash.io
-    https: false
 
 worker:
   enabled: true
-
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
-
   autoscaling:
     enabled: true
     minReplicas: 2
     maxReplicas: 3
     targetCPUUtilizationPercentage: 90
     targetMemoryUtilizationPercentage: 90
-
   pdb:
     enabled: true
     minAvailable: 1
-
-  image:
-    pullPolicy: Always
-
   resources:
     requests:
-      cpu: 300m
+      cpu: 250m
       memory: 512Mi
     limits:
-      cpu: 300m
+      cpu: 250m
       memory: 512Mi
-
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: NotIn
-                values:
-                  - max-master
-
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 100
-          podAffinityTerm:
-            labelSelector:
-              matchExpressions:
-                - key: app.kubernetes.io/component
-                  operator: In
-                  values:
-                    - worker
-            topologyKey: kubernetes.io/hostname
-
   containerPorts:
     http: 9000
     metrics: 9300
-
-  securityContext:
-    runAsUser: 1000
-    runAsGroup: 1000
-    fsGroup: 1000
-
   livenessProbe:
     failureThreshold: 3
     initialDelaySeconds: 5
@@ -231,7 +141,6 @@ worker:
       command:
         - ak
         - healthcheck
-
   readinessProbe:
     failureThreshold: 3
     initialDelaySeconds: 5
@@ -242,7 +151,6 @@ worker:
       command:
         - ak
         - healthcheck
-
   startupProbe:
     failureThreshold: 90
     initialDelaySeconds: 30
@@ -253,12 +161,6 @@ worker:
       command:
         - ak
         - healthcheck
-
-  metrics:
-    enabled: false
-    service:
-      servicePort: 9300
-      portName: metrics
 
 serviceAccount:
   create: true

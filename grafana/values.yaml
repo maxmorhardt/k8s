@@ -19,6 +19,7 @@ livenessProbe:
 image:
   registry: docker.io
   repository: grafana/grafana
+  tag: ""
   pullPolicy: Always
 
 securityContext:
@@ -28,6 +29,7 @@ securityContext:
   fsGroup: 1000
 
 containerSecurityContext:
+  readOnlyRootFilesystem: true
   allowPrivilegeEscalation: false
   capabilities:
     drop:
@@ -35,15 +37,9 @@ containerSecurityContext:
   seccompProfile:
     type: RuntimeDefault
 
-envValueFrom:
-  GRAFANA_CLIENT_ID:
-    secretKeyRef:
-      name: grafana-credentials
-      key: client-id
-  GRAFANA_CLIENT_SECRET:
-    secretKeyRef:
-      name: grafana-credentials
-      key: client-secret
+envFrom:
+  - secretRef:
+      name: grafana-env
 
 service:
   enabled: true
@@ -74,11 +70,7 @@ resources:
     memory: 500Mi
 
 persistence:
-  enabled: true
-  existingClaim: grafana
-
-nodeSelector:
-  kubernetes.io/hostname: max-worker
+  enabled: false
 
 initChownData:
   enabled: false
@@ -96,6 +88,16 @@ grafana.ini:
     provisioning: /etc/grafana/provisioning
   analytics:
     check_for_updates: true
+  database:
+    type: postgres
+    host: postgres-rw.cnpg-database.svc.cluster.local:5432
+    name: grafana
+    user: grafana
+    password: ${GRAFANA_DATABASE_PASSWORD}
+    ssl_mode: disable
+    max_open_conn: 25
+    max_idle_conn: 5
+    conn_max_lifetime: 14400
   log:
     mode: console
   grafana_net:

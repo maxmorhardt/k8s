@@ -279,7 +279,6 @@ server:
     enabled: false
 
   replicaCount: 1
-  revisionHistoryLimit: 3
 
   readinessProbeInitialDelay: 30
   readinessProbePeriodSeconds: 5

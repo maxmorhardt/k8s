@@ -4,7 +4,8 @@ helm repo update
 helm upgrade grafana grafana/grafana \
 	--values values.yaml \
 	--install \
-	--atomic \
+  --rollback-on-failure \
+	--wait \
 	--debug \
 	--history-max=3 \
 	--namespace monitoring

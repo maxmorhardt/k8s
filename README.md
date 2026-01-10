@@ -1,7 +1,6 @@
 # Self-Hosted Kubernetes Stack
 
 ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)
-![Rancher](https://img.shields.io/badge/Rancher-0075A8?style=for-the-badge&logo=rancher)
 ![Authentik](https://img.shields.io/badge/Authentik-FD4B2D?style=for-the-badge&logo=authentik&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
@@ -15,7 +14,7 @@
 A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with production-ready services for container orchestration, authentication, data persistence, CI/CD, monitoring, and logging. Designed for on-premises deployment with minimal external dependencies.
 
 ## Features
-- **Container Orchestration** with Kubernetes (K3s) and Rancher management
+- **Container Orchestration** with Kubernetes (K3s)
 - **Authentication & Authorization** via Authentik OIDC/SAML provider
 - **Data Persistence** with PostgreSQL database and Redis caching/pub-sub
 - **CI/CD Pipeline** using GitHub Actions
@@ -27,32 +26,31 @@ A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with productio
 The stack follows a microservices architecture where each service is independently deployable with Helm charts. Services communicate through Kubernetes networking, with Authentik providing centralized authentication for applications requiring OIDC/SAML. CI/CD is handled via GitHub Actions.
 
 ```
-┌─────────────┐    ┌──────────────┐    ┌──────────────┐
-│   Rancher   │───▶│  Kubernetes  │◀───│GitHub Actions│
-│ (Management)│    │    (K3s)     │    │   (CI/CD)    │
-└─────────────┘    └──────┬───────┘    └──────────────┘
-                          │
-         ┌────────────────┼────────────────┐
-         │                │                │
-    ┌────▼─────┐    ┌─────▼──────┐    ┌───▼────┐
-    │Authentik │    │Prometheus/ │    │ Loki/  │
-    │  (Auth)  │    │ Grafana    │    │ Alloy  │
-    └──────────┘    │(Monitoring)│    │(Logs)  │
-                    └────────────┘    └────────┘
-         ┌──────────────┼──────────────┐
-         │              │              │
-    ┌────▼─────┐   ┌────▼─────┐   ┌───▼────┐
-    │PostgreSQL│   │  Redis   │   │ Apps   │
-    │   (DB)   │   │(Cache/   │   │        │
-    └──────────┘   │ Pub/Sub) │   └────────┘
-                   └──────────┘
+      ┌──────────────┐    ┌──────────────┐
+      │  Kubernetes  │◀───│GitHub Actions│
+      │    (K3s)     │    │   (CI/CD)    │
+      └──────────────┘    └──────────────┘
+                        │
+       ┌────────────────┼────────────────┐
+       │                │                │
+  ┌────▼─────┐    ┌─────▼──────┐    ┌───▼────┐
+  │Authentik │    │Prometheus/ │    │ Loki/  │
+  │  (Auth)  │    │ Grafana    │    │ Alloy  │
+  └──────────┘    │(Monitoring)│    │(Logs)  │
+                  └────────────┘    └────────┘
+       ┌──────────────┼──────────────┐
+       │              │              │
+  ┌────▼─────┐   ┌────▼─────┐   ┌───▼────┐
+  │PostgreSQL│   │  Redis   │   │ Apps   │
+  │   (DB)   │   │(Cache/   │   │        │
+  └──────────┘   │ Pub/Sub) │   └────────┘
+                 └──────────┘
 ```
 
 ## Services
 
 | Service | Purpose | Port | Namespace | Dependencies |
 |---------|---------|------|-----------|--------------|
-| **Rancher** | Kubernetes cluster management | 80/443 | cattle-system | None |
 | **Authentik** | OIDC/SAML authentication provider | 9000/9443 | authentik | PostgreSQL |
 | **PostgreSQL** | Primary database | 5432 | cnpg-database | None |
 | **Redis** | Caching & pub/sub messaging | 6379 | redis | None |
@@ -68,7 +66,6 @@ The stack follows a microservices architecture where each service is independent
 3. **Storage**: PostgreSQL HA cluster (3 instances), Redis
 4. **Authentication**: Authentik (requires PostgreSQL)
 5. **Monitoring**: Prometheus, Grafana, Loki, Alloy
-6. **Management**: Rancher
 
 ## Development
 
@@ -97,7 +94,6 @@ Services have the following dependency chain:
 - **Authentik** → requires PostgreSQL (database)
 - **Grafana** → requires Prometheus (data source), Authentik (OIDC)
 - **Alloy** → requires Loki (log target)
-- **Rancher** → requires Authentik (OIDC)
 
 Deploy dependencies first to avoid service startup issues.
 

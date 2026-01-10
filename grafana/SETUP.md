@@ -1,6 +1,6 @@
 ## Secrets Required
 
-Create the `grafana-credentials` secret manually before deployment:
+Create the `grafana-credentials` secret for admin access:
 
 ```yaml
 apiVersion: v1
@@ -9,20 +9,34 @@ metadata:
   name: grafana-credentials
   namespace: monitoring
 type: Opaque
-data:
-  admin-user: <base64-encoded-admin-username>
-  admin-password: <base64-encoded-admin-password>
-  client-id: <base64-encoded-authentik-client-id>
-  client-secret: <base64-encoded-authentik-client-secret>
+stringData:
+  admin-user: <admin-username>
+  admin-password: <admin-password>
 ```
 
-## Storage
-1. SSH into node that will host Grafana (max-worker)
-2. Create directory /data/grafana with 1000:1000 owner/group
-   ```bash
-   sudo mkdir -p /data/grafana
-   sudo chown -R 1000:1000 /data/grafana
-   ```
+Create the `grafana-env` secret for environment variables:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: grafana-env
+  namespace: monitoring
+type: Opaque
+stringData:
+  GRAFANA_CLIENT_ID: <authentik-client-id>
+  GRAFANA_CLIENT_SECRET: <authentik-client-secret>
+  GRAFANA_DATABASE_PASSWORD: <postgres-password>
+```
+
+## Database Setup
+
+Create the Grafana database and user in PostgreSQL:
+
+```sql
+CREATE USER grafana WITH PASSWORD '<postgres-password>';
+CREATE DATABASE grafana OWNER grafana;
+```
 
 ## OIDC
 

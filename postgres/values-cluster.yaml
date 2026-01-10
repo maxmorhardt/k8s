@@ -6,17 +6,13 @@ version:
 mode: standalone
 
 cluster:
-  instances: 2
-
+  instances: 3
   imagePullPolicy: Always
-
   storage:
     size: 64Gi
     storageClass: postgres
-
   walStorage:
     enabled: false
-
   resources:
     limits:
       cpu: 1
@@ -24,37 +20,18 @@ cluster:
     requests:
       cpu: 1
       memory: 3Gi
-
   primaryUpdateMethod: switchover
   primaryUpdateStrategy: unsupervised
   logLevel: 'info'
-
-  affinity:
-    topologyKey: topology.kubernetes.io/zone
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: NotIn
-                values:
-                  - max-master
-
-  env: []
-  envFrom: []
-
   enableSuperuserAccess: true
   superuserSecret: 'postgres-superuser'
-
   enablePDB: true
-
   monitoring:
     enabled: true
     podMonitor:
       enabled: false
     prometheusRule:
       enabled: false
-
   postgresql:
     parameters:
       max_connections: '300'
@@ -69,8 +46,6 @@ cluster:
       work_mem: '3495kB'
       min_wal_size: '512MB'
       max_wal_size: '2GB'
-      archive_timeout: '1d'
-
   initdb:
     database: maxstash
     owner: maxmorhardt
@@ -87,23 +62,19 @@ backups:
   secret:
     create: false
     name: aws-s3-credentials
-
   wal:
     compression: gzip
     encryption: AES256
     maxParallel: 1
-
   data:
     compression: gzip
     encryption: AES256
     jobs: 2
-
   scheduledBackups:
     - name: daily-backup
       schedule: '0 0 0 * * *'
       backupOwnerReference: self
       method: barmanObjectStore
-
   retentionPolicy: '30d'
 
 imageCatalog:

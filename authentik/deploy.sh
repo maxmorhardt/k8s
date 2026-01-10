@@ -3,7 +3,8 @@ helm repo update
 
 helm upgrade authentik authentik/authentik \
 	--install \
-	--atomic \
+  --rollback-on-failure \
+	--wait \
 	--debug \
 	--history-max=3 \
 	--namespace authentik \

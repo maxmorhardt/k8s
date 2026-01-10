@@ -1,6 +1,7 @@
 helm upgrade redis oci://docker.io/bitnamicharts/redis \
 	--install \
-	--atomic \
+  --rollback-on-failure \
+	--wait \
 	--debug \
 	--history-max=3 \
 	--namespace redis \

@@ -1,9 +1,0 @@
-hostname: rancher.maxstash.io
-
-ingress:
-  ingressClassName: nginx
-  tls:
-    source: secret
-    secretName: maxstash.io-tls
-
-replicas: 1
