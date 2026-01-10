@@ -1,10 +1,7 @@
-helm upgrade redis oci://docker.io/bitnamicharts/redis \
-	--install \
-  --rollback-on-failure \
-	--wait \
-	--debug \
-	--history-max=3 \
-	--namespace redis \
-	--create-namespace \
-	--version 24.1.0 \
-	--values values.yaml
+helm repo add dandydev https://dandydeveloper.github.io/charts
+helm repo update
+
+helm upgrade --install redis dandydev/redis-ha \
+  --namespace redis \
+  --create-namespace \
+  -f values.yaml

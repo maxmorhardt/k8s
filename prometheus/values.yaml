@@ -1,193 +1,3 @@
-scrapeConfigs:
-  prometheus:
-    enabled: true
-    static_configs:
-      - targets:
-          - localhost:9090
-
-  kubernetes-api-servers:
-    enabled: true
-    kubernetes_sd_configs:
-      - role: endpoints
-    scheme: https
-    tls_config:
-      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-    relabel_configs:
-      - source_labels:
-          - __meta_kubernetes_namespace
-          - __meta_kubernetes_service_name
-          - __meta_kubernetes_endpoint_port_name
-        action: keep
-        regex: default;kubernetes;https
-
-  kubernetes-nodes:
-    enabled: true
-    scheme: https
-    tls_config:
-      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-    kubernetes_sd_configs:
-      - role: node
-    relabel_configs:
-      - action: labelmap
-        regex: __meta_kubernetes_node_label_(.+)
-      - target_label: __address__
-        replacement: kubernetes.default.svc:443
-      - source_labels: [__meta_kubernetes_node_name]
-        regex: (.+)
-        target_label: __metrics_path__
-        replacement: /api/v1/nodes/$1/proxy/metrics
-
-  kubernetes-nodes-cadvisor:
-    enabled: true
-    scheme: https
-    tls_config:
-      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-    kubernetes_sd_configs:
-      - role: node
-    relabel_configs:
-      - action: labelmap
-        regex: __meta_kubernetes_node_label_(.+)
-      - target_label: __address__
-        replacement: kubernetes.default.svc:443
-      - source_labels: [__meta_kubernetes_node_name]
-        regex: (.+)
-        target_label: __metrics_path__
-        replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
-
-  kubernetes-service-endpoints:
-    enabled: true
-    honor_labels: true
-    kubernetes_sd_configs:
-      - role: endpoints
-    relabel_configs:
-      - source_labels:
-          [__meta_kubernetes_service_annotation_prometheus_io_scrape]
-        action: keep
-        regex: true
-      - source_labels:
-          [__meta_kubernetes_service_annotation_prometheus_io_scrape_slow]
-        action: drop
-        regex: true
-      - source_labels:
-          [__meta_kubernetes_service_annotation_prometheus_io_scheme]
-        action: replace
-        target_label: __scheme__
-        regex: (https?)
-      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
-        action: replace
-        target_label: __metrics_path__
-        regex: (.+)
-      - source_labels:
-          - __address__
-          - __meta_kubernetes_service_annotation_prometheus_io_port
-        action: replace
-        target_label: __address__
-        regex: (.+?)(?::\d+)?;(\d+)
-        replacement: $1:$2
-      - action: labelmap
-        regex: __meta_kubernetes_service_annotation_prometheus_io_param_(.+)
-        replacement: __param_$1
-      - action: labelmap
-        regex: __meta_kubernetes_service_label_(.+)
-      - source_labels: [__meta_kubernetes_namespace]
-        action: replace
-        target_label: namespace
-      - source_labels: [__meta_kubernetes_service_name]
-        action: replace
-        target_label: service
-      - source_labels: [__meta_kubernetes_pod_node_name]
-        action: replace
-        target_label: node
-
-  kubernetes-services:
-    enabled: true
-    honor_labels: true
-    metrics_path: /probe
-    params:
-      module: [http_2xx]
-    kubernetes_sd_configs:
-      - role: service
-    relabel_configs:
-      - source_labels:
-          [__meta_kubernetes_service_annotation_prometheus_io_probe]
-        action: keep
-        regex: true
-      - source_labels: [__address__]
-        target_label: __param_target
-      - target_label: __address__
-        replacement: blackbox
-      - source_labels: [__param_target]
-        target_label: instance
-      - action: labelmap
-        regex: __meta_kubernetes_service_label_(.+)
-      - source_labels: [__meta_kubernetes_namespace]
-        target_label: namespace
-      - source_labels: [__meta_kubernetes_service_name]
-        target_label: service
-
-  kubernetes-pods:
-    enabled: true
-    honor_labels: true
-    kubernetes_sd_configs:
-      - role: pod
-    relabel_configs:
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-        action: keep
-        regex: true
-      - source_labels:
-          [__meta_kubernetes_pod_annotation_prometheus_io_scrape_slow]
-        action: drop
-        regex: true
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scheme]
-        action: replace
-        regex: (https?)
-        target_label: __scheme__
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
-        action: replace
-        target_label: __metrics_path__
-        regex: (.+)
-      - source_labels:
-          - __meta_kubernetes_pod_annotation_prometheus_io_port
-          - __meta_kubernetes_pod_ip
-        action: replace
-        regex: (\d+);(([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})
-        replacement: '[$2]:$1'
-        target_label: __address__
-      - source_labels:
-          - __meta_kubernetes_pod_annotation_prometheus_io_port
-          - __meta_kubernetes_pod_ip
-        action: replace
-        regex: (\d+);((([0-9]+?)(\.|$)){4})
-        replacement: $2:$1
-        target_label: __address__
-      - action: labelmap
-        regex: __meta_kubernetes_pod_annotation_prometheus_io_param_(.+)
-        replacement: __param_$1
-      - action: labelmap
-        regex: __meta_kubernetes_pod_label_(.+)
-      - source_labels: [__meta_kubernetes_namespace]
-        action: replace
-        target_label: namespace
-      - source_labels: [__meta_kubernetes_pod_name]
-        action: replace
-        target_label: pod
-      - source_labels: [__meta_kubernetes_pod_phase]
-        regex: Pending|Succeeded|Failed|Completed
-        action: drop
-      - source_labels: [__meta_kubernetes_pod_node_name]
-        action: replace
-        target_label: node
-
-# legacy postgres
-# - job_name: postgres
-#   scheme: http
-#   static_configs:
-#     - targets:
-#         - db-postgresql-metrics.db.svc.cluster.local:9187
-
 extraScrapeConfigs: |
   - job_name: ages
     metrics_path: /metrics
@@ -217,38 +27,88 @@ extraScrapeConfigs: |
       - targets:
           - redis-metrics.redis.svc.cluster.local:9121
 
+server:
+  name: server
+  image:
+    repository: quay.io/prometheus/prometheus
+    pullPolicy: Always
+  global:
+    scrape_interval: 90s
+    scrape_timeout: 30s
+    evaluation_interval: 90s
+  persistentVolume:
+    storageClass: longhorn
+  ingress:
+    enabled: false
+  replicaCount: 1
+  readinessProbeInitialDelay: 30
+  readinessProbePeriodSeconds: 5
+  readinessProbeTimeout: 4
+  readinessProbeFailureThreshold: 3
+  readinessProbeSuccessThreshold: 1
+  livenessProbeInitialDelay: 30
+  livenessProbePeriodSeconds: 15
+  livenessProbeTimeout: 10
+  livenessProbeFailureThreshold: 3
+  livenessProbeSuccessThreshold: 1
+  startupProbe:
+    enabled: true
+    periodSeconds: 5
+    failureThreshold: 30
+    timeoutSeconds: 10
+  resources:
+    limits:
+      cpu: 250m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 1Gi
+  securityContext:
+    runAsUser: 65534
+    runAsNonRoot: true
+    runAsGroup: 65534
+    fsGroup: 65534
+  service:
+    enabled: true
+    servicePort: 80
+    type: ClusterIP
+  retention: '14d'
+
+alertmanager:
+  resources:
+    limits:
+      cpu: 50m
+      memory: 64Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  image:
+    pullPolicy: Always
+
+prometheus-node-exporter:
+  resources:
+    limits:
+      cpu: 50m
+      memory: 64Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  image:
+    pullPolicy: Always
+
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+  image:
+    pullPolicy: Always
+
 configmapReload:
   prometheus:
-    image:
-      repository: quay.io/prometheus-operator/prometheus-config-reloader
-      tag: v0.87.1
-      pullPolicy: Always
-    containerPort: 8080
-    containerPortName: metrics
-
-    livenessProbe:
-      httpGet:
-        path: /healthz
-        port: metrics
-        scheme: HTTP
-      periodSeconds: 10
-      initialDelaySeconds: 2
-
-    readinessProbe:
-      httpGet:
-        path: /healthz
-        port: metrics
-        scheme: HTTP
-      periodSeconds: 10
-
-    startupProbe:
-      enabled: false
-      httpGet:
-        path: /healthz
-        port: metrics
-        scheme: HTTP
-      periodSeconds: 10
-
     resources:
       limits:
         cpu: 50m
@@ -257,91 +117,5 @@ configmapReload:
         cpu: 50m
         memory: 64Mi
 
-server:
-  name: server
-  image:
-    repository: quay.io/prometheus/prometheus
-    tag: 'latest'
-    pullPolicy: Always
-
-  global:
-    scrape_interval: 90s
-    scrape_timeout: 30s
-    evaluation_interval: 90s
-
-  persistentVolume:
-    existingClaim: prometheus
-
-  nodeSelector:
-    kubernetes.io/hostname: max-worker
-
-  ingress:
-    enabled: false
-
-  replicaCount: 1
-
-  readinessProbeInitialDelay: 30
-  readinessProbePeriodSeconds: 5
-  readinessProbeTimeout: 4
-  readinessProbeFailureThreshold: 3
-  readinessProbeSuccessThreshold: 1
-
-  livenessProbeInitialDelay: 30
-  livenessProbePeriodSeconds: 15
-  livenessProbeTimeout: 10
-  livenessProbeFailureThreshold: 3
-  livenessProbeSuccessThreshold: 1
-
-  resources:
-    limits:
-      cpu: 200m
-      memory: 1Gi
-    requests:
-      cpu: 200m
-      memory: 1Gi
-
-  securityContext:
-    runAsNonRoot: true
-    runAsUser: 1000
-    runAsGroup: 1000
-    fsGroup: 1000
-
-  service:
-    enabled: true
-    servicePort: 80
-    sessionAffinity: None
-    type: ClusterIP
-
-  terminationGracePeriodSeconds: 300
-  retention: '15d'
-  retentionSize: ''
-
-prometheus-node-exporter:
-  enabled: true
-  rbac:
-    pspEnabled: false
-  containerSecurityContext:
-    allowPrivilegeEscalation: false
-  resources:
-    limits:
-      cpu: 50m
-      memory: 64Mi
-    requests:
-      cpu: 50m
-      memory: 64Mi
-
-kube-state-metrics:
-  enabled: true
-  resources:
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 50m
-      memory: 64Mi
-
 prometheus-pushgateway:
-  enabled: false
-
-alertmanager:
   enabled: false

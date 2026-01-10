@@ -9,18 +9,20 @@
 ![Grafana](https://img.shields.io/badge/grafana-%23F46800.svg?style=for-the-badge&logo=grafana&logoColor=white)
 ![Loki](https://img.shields.io/badge/loki-F46800?style=for-the-badge&logo=grafana&logoColor=white)
 ![Alloy](https://img.shields.io/badge/alloy-00D4AA?style=for-the-badge&logo=grafana&logoColor=white)
+![Longhorn](https://img.shields.io/badge/longhorn-512DA8?style=for-the-badge&logo=rancher&logoColor=white)
 
 ## Overview
-A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with production-ready services for container orchestration, authentication, data persistence, CI/CD, monitoring, and logging. Designed for on-premises deployment with minimal external dependencies.
+A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with production-ready services for container orchestration, storage replication, access management, authentication, data persistence, CI/CD, monitoring, and logging. Designed for on-premises deployment with high availability.
 
 ## Features
 - **Container Orchestration** with Kubernetes (K3s)
+- **Distributed Storage** with Longhorn for replicated persistent volumes
 - **Authentication & Authorization** via Authentik OIDC/SAML provider
-- **Data Persistence** with PostgreSQL database and Redis caching/pub-sub
+- **Data Persistence** with PostgreSQL HA cluster and Redis caching/pub-sub
 - **CI/CD Pipeline** using GitHub Actions
 - **Monitoring & Observability** with Prometheus metrics and Grafana dashboards
 - **Centralized Logging** via Loki and Alloy data collection
-- **Production Ready** with persistent storage, resource limits, and security configurations
+- **Production Ready** with replicated storage, resource limits, and security configurations
 
 ## Architecture
 The stack follows a microservices architecture where each service is independently deployable with Helm charts. Services communicate through Kubernetes networking, with Authentik providing centralized authentication for applications requiring OIDC/SAML. CI/CD is handled via GitHub Actions.
@@ -47,39 +49,46 @@ The stack follows a microservices architecture where each service is independent
                  └──────────┘
 ```
 
-## Services
-
-| Service | Purpose | Port | Namespace | Dependencies |
-|---------|---------|------|-----------|--------------|
-| **Authentik** | OIDC/SAML authentication provider | 9000/9443 | authentik | PostgreSQL |
-| **PostgreSQL** | Primary database | 5432 | cnpg-database | None |
-| **Redis** | Caching & pub/sub messaging | 6379 | redis | None |
-| **Prometheus** | Metrics collection | 9090 | monitoring | None |
-| **Grafana** | Metrics visualization | 3000 | monitoring | Prometheus |
-| **Loki** | Log aggregation | 3100 | monitoring | None |
-| **Alloy** | Telemetry data collection | 12345 | monitoring | Prometheus, Loki |
-
 ## Deployment Order
 
-1. **Core Infrastructure**: K3s cluster setup
-2. **Operators**: CloudNativePG operator
-3. **Storage**: PostgreSQL HA cluster (3 instances), Redis
-4. **Authentication**: Authentik (requires PostgreSQL)
-5. **Monitoring**: Prometheus, Grafana, Loki, Alloy
+1. **Core Infrastructure**: K3s cluster with NGINX Ingress and cert-manager
+   ```bash
+	 ./namespaces.sh
+   cd k3s && ./ingress.sh
+   ```
 
-## Development
+2. **Storage Layer**: Longhorn for distributed block storage
+   ```bash
+   # Install open-iscsi on each node first
+   cd longhorn && ./deploy.sh
+   ```
 
-Each service directory contains:
-- **SETUP.md** - Service-specific setup instructions and required secrets
-- **values.yaml** or **values-*.yaml** - Helm chart configuration(s)
-- **deploy.sh** - Deployment script using helm upgrade
-- **storage.yaml** - Persistent volume configurations (where applicable)
+3. **Core Services**: Databases and observability backend (requires storage)
+   ```bash
+   cd postgres && ./deploy.sh
+   cd redis && ./deploy.sh
+   cd loki && ./deploy.sh
+   cd prometheus && ./deploy.sh
+   ```
+
+4. **Authentication**: Auth provider (requires PostgreSQL)
+   ```bash
+   cd authentik && ./deploy.sh
+   ```
+
+5. **Access & Visualization**: Secure access and dashboards (requires OIDC)
+   ```bash
+   cd grafana && ./deploy.sh
+   ```
+
+6. **Observability Collector**: Telemetry aggregation
+   ```bash
+   cd alloy && ./deploy.sh
+   ```
 
 ### CI/CD
 CI/CD pipelines are managed via GitHub Actions. Workflows deploy services to the cluster using kubectl/helm.
 
-### Secret Management
-All secrets are managed via Kubernetes secrets and mounted as environment variables. See each service's SETUP.md for required secret keys and example YAML format.
 
 ### Node Maintenance
 Weekly automated node rehydration runs on **Tuesday** mornings (staggered 2-5 AM EST) via cron:
@@ -87,18 +96,3 @@ Weekly automated node rehydration runs on **Tuesday** mornings (staggered 2-5 AM
 - Updates system packages
 - Cleans up container images, logs, and temp files
 - Logs to `/var/log/rehydrate/` (collected by Alloy)
-
-## Resource Dependencies
-
-Services have the following dependency chain:
-- **Authentik** → requires PostgreSQL (database)
-- **Grafana** → requires Prometheus (data source), Authentik (OIDC)
-- **Alloy** → requires Loki (log target)
-
-Deploy dependencies first to avoid service startup issues.
-
-## Node Assignments
-- **max-master**: Control plane
-- **max-worker-1**: Prometheus, Grafana
-- **max-worker-2**: Loki
-- **max-worker-3**: Redis

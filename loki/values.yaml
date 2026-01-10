@@ -2,19 +2,15 @@ deploymentMode: SingleBinary
 
 loki:
   auth_enabled: false
-
   memcached:
     chunk_cache:
       enabled: false
     results_cache:
       enabled: false
-
   commonConfig:
     replication_factor: 1
-
   storage:
     type: 'filesystem'
-
   schemaConfig:
     configs:
       - from: '2024-01-01'
@@ -24,11 +20,9 @@ loki:
           period: 24h
         object_store: filesystem
         schema: v13
-
   limits_config:
     retention_period: 30d
     max_query_lookback: 30d
-
   rulerConfig:
     enable_api: false
     storage:
@@ -38,10 +32,8 @@ singleBinary:
   replicas: 1
   persistence:
     enabled: true
-    storageClass: loki
+    storageClass: longhorn
     size: 10Gi
-  nodeSelector:
-    kubernetes.io/hostname: max-worker-2
   resources:
     requests:
       cpu: 250m
@@ -49,6 +41,7 @@ singleBinary:
     limits:
       cpu: 250m
       memory: 512Mi
+
 read:
   replicas: 0
 backend:

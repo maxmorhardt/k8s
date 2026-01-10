@@ -2,9 +2,7 @@ global:
   security:
     allowInsecureImages: true
   image:
-    repository: docker.io
-    tag: 2025.12.0-rc3
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   securityContext:
     runAsUser: 1000
     runAsGroup: 1000

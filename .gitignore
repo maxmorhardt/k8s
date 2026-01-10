@@ -5,3 +5,6 @@ charts
 # python
 .venv
 __pycache__
+
+# pg
+postgres-dumpall.sql

@@ -10,16 +10,16 @@ cluster:
   imagePullPolicy: Always
   storage:
     size: 64Gi
-    storageClass: postgres
+    storageClass: longhorn
   walStorage:
     enabled: false
   resources:
     limits:
       cpu: 1
-      memory: 3Gi
+      memory: 2Gi
     requests:
       cpu: 1
-      memory: 3Gi
+      memory: 2Gi
   primaryUpdateMethod: switchover
   primaryUpdateStrategy: unsupervised
   logLevel: 'info'
@@ -27,7 +27,7 @@ cluster:
   superuserSecret: 'postgres-superuser'
   enablePDB: true
   monitoring:
-    enabled: true
+    enabled: false
     podMonitor:
       enabled: false
     prometheusRule:

@@ -1,44 +1,27 @@
 image:
+  repository: public.ecr.aws/docker/library/redis
   tag: latest
   pullPolicy: Always
 
-architecture: standalone
+replicas: 3
 
-auth:
-  enabled: false
+auth: false
 
-master:
-  count: 1
-  revisionHistoryLimit: 2
-  resources:
-    requests:
-      cpu: 250m
-      memory: 1Gi
-    limits:
-      cpu: 250m
-      memory: 1Gi
-  nodeSelector:
-    kubernetes.io/hostname: max-worker-3
-  persistence:
-    enabled: true
-    path: /data
-    storageClass: redis
-    accessModes:
-      - ReadWriteOnce
-    size: 8Gi
-    existingClaim: redis
-  persistentVolumeClaimRetentionPolicy:
-    enabled: true
-    whenScaled: Retain
-    whenDeleted: Retain
-  pdb:
-    create: true
-    minAvailable: 1
-
-metrics:
+persistentVolume:
   enabled: true
-  image:
-    pullPolicy: Always
+  storageClass: longhorn
+  size: 8Gi
+
+redis:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
+
+sentinel:
   resources:
     requests:
       cpu: 50m
@@ -46,3 +29,30 @@ metrics:
     limits:
       cpu: 50m
       memory: 64Mi
+
+haproxy:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+
+exporter:
+  enabled: true
+  image: oliver006/redis_exporter
+  tag: latest
+  pullPolicy: Always
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+
+serviceAccount:
+  create: true

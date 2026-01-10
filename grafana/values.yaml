@@ -95,7 +95,7 @@ grafana.ini:
     user: grafana
     password: ${GRAFANA_DATABASE_PASSWORD}
     ssl_mode: disable
-    max_open_conn: 25
+    max_open_conn: 15
     max_idle_conn: 5
     conn_max_lifetime: 14400
   log:

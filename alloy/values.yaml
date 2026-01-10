@@ -30,7 +30,7 @@ alloy:
             __path__  = "/var/log/rehydrate/*.log",
             job       = "node/rehydrate",
             node_name = sys.env("HOSTNAME"),
-            cluster   = "local",
+            cluster   = "maxstash",
         }]
       }
 
@@ -106,7 +106,7 @@ alloy:
       loki.process "pod_logs" {
         stage.static_labels {
             values = {
-              cluster = "local",
+              cluster = "maxstash",
             }
         }
 
@@ -126,7 +126,7 @@ alloy:
 
         stage.static_labels {
           values = {
-            cluster = "local",
+            cluster = "maxstash",
           }
         }
 
@@ -144,7 +144,7 @@ serviceAccount:
 image:
   registry: docker.io
   repository: grafana/alloy
-  tag: ""
+  tag: ''
   pullPolicy: Always
 
 configReloader:

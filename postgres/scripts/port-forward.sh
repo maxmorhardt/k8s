@@ -1,1 +1,1 @@
-kubectl port-forward -n cnpg-database svc/postgres-cluster-rw 5433:5432
+kubectl port-forward -n cnpg-database pod/postgres-cluster-1 5433:5432

@@ -41,14 +41,3 @@ stringData:
   ACCESS_KEY_ID: <your-access-key>
   ACCESS_SECRET_KEY: <your-secret-key>
 ```
-
-## Storage Setup
-
-Create `/data/postgresql` directories on each worker node with correct permissions:
-
-```bash
-# On each worker node
-mkdir -p /data/postgresql
-chown 26:26 /data/postgresql
-chmod 700 /data/postgresql
-```
