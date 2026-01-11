@@ -10,6 +10,7 @@
 ![Loki](https://img.shields.io/badge/loki-F46800?style=for-the-badge&logo=grafana&logoColor=white)
 ![Alloy](https://img.shields.io/badge/alloy-00D4AA?style=for-the-badge&logo=grafana&logoColor=white)
 ![Longhorn](https://img.shields.io/badge/longhorn-512DA8?style=for-the-badge&logo=rancher&logoColor=white)
+![Envoy](https://img.shields.io/badge/envoy-AC6199?style=for-the-badge&logo=envoyproxy&logoColor=white)
 
 ## Overview
 A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with production-ready services for container orchestration, storage replication, access management, authentication, data persistence, CI/CD, monitoring, and logging. Designed for on-premises deployment with high availability.
@@ -51,10 +52,10 @@ The stack follows a microservices architecture where each service is independent
 
 ## Deployment Order
 
-1. **Core Infrastructure**: K3s cluster with NGINX Ingress and cert-manager
+1. **Core Infrastructure**: K3s cluster with Envoy Gateway and cert-manager
    ```bash
 	 ./namespaces.sh
-   cd k3s && ./ingress.sh
+   cd envoy-gateway && ./deploy.sh
    ```
 
 2. **Storage Layer**: Longhorn for distributed block storage

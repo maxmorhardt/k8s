@@ -24,9 +24,12 @@ metadata:
   namespace: monitoring
 type: Opaque
 stringData:
-  GRAFANA_CLIENT_ID: <authentik-client-id>
-  GRAFANA_CLIENT_SECRET: <authentik-client-secret>
-  GRAFANA_DATABASE_PASSWORD: <postgres-password>
+  GF_CLIENT_ID: <authentik-client-id>
+  GF_CLIENT_SECRET: <authentik-client-secret>
+  GF_DB_HOST: <postgres-host>
+  GF_DB_NAME: <postgres-db-name>
+  GF_DB_USER: <postgres-username>
+  GF_DB_PASSWORD: <postgres-password>
 ```
 
 ## Database Setup
@@ -34,8 +37,8 @@ stringData:
 Create the Grafana database and user in PostgreSQL:
 
 ```sql
-CREATE USER grafana WITH PASSWORD '<postgres-password>';
-CREATE DATABASE grafana OWNER grafana;
+CREATE USER <postgres-username> WITH PASSWORD '<postgres-password>';
+CREATE DATABASE <postgres-db-name> OWNER grafana;
 ```
 
 ## OIDC

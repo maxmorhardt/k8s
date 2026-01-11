@@ -90,10 +90,10 @@ grafana.ini:
     check_for_updates: true
   database:
     type: postgres
-    host: postgres-rw.cnpg-database.svc.cluster.local:5432
-    name: grafana
-    user: grafana
-    password: ${GRAFANA_DATABASE_PASSWORD}
+    host: ${GF_DB_HOST}
+    name: ${GF_DB_NAME}
+    user: ${GF_DB_USER}
+    password: ${GF_DB_PASSWORD}
     ssl_mode: disable
     max_open_conn: 15
     max_idle_conn: 5
@@ -109,8 +109,8 @@ grafana.ini:
     enabled: true
     name: maxstash
     allow_sign_up: true
-    client_id: ${GRAFANA_CLIENT_ID}
-    client_secret: ${GRAFANA_CLIENT_SECRET}
+    client_id: ${GF_CLIENT_ID}
+    client_secret: ${GF_CLIENT_SECRET}
     scopes: openid email profile offline_access
     email_attribute_path: email
     login_attribute_path: username

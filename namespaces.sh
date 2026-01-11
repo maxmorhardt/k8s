@@ -1,4 +1,4 @@
-kubectl create namespace ingress-nginx
+kubectl create namespace envoy-gateway-system
 kubectl create namespace longhorn-system
 
 kubectl create namespace cnpg-system

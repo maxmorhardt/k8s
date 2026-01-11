@@ -1,0 +1,148 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: eg
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  parametersRef:
+    group: gateway.envoyproxy.io
+    kind: EnvoyProxy
+    name: cloudflare-proxy
+    namespace: envoy-gateway-system
+# ---
+# apiVersion: gateway.envoyproxy.io/v1alpha1
+# kind: EnvoyProxy
+# metadata:
+#   name: cloudflare-proxy
+#   namespace: envoy-gateway-system
+# spec:
+#   provider:
+#     type: Kubernetes
+#     kubernetes:
+#       envoyService:
+#         type: LoadBalancer
+#       envoyDeployment:
+#         replicas: 2
+#         pod:
+#           resources:
+#             requests:
+#               cpu: 100m
+#               memory: 128Mi
+#             limits:
+#               cpu: 500m
+#               memory: 512Mi
+#   telemetry:
+#     metrics:
+#       prometheus:
+#         disable: false
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: cloudflare-gateway
+  namespace: envoy-gateway-system
+spec:
+  gatewayClassName: eg
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https
+      protocol: HTTPS
+      port: 443
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: maxstash.io-tls
+            namespace: envoy-gateway-system
+# ---
+# apiVersion: gateway.envoyproxy.io/v1alpha1
+# kind: ClientTrafficPolicy
+# metadata:
+#   name: cloudflare-client-ip
+#   namespace: envoy-gateway-system
+# spec:
+#   targetRefs:
+#     - group: gateway.networking.k8s.io
+#       kind: Gateway
+#       name: cloudflare-gateway
+#   clientIPDetection:
+#     xForwardedFor:
+#       numTrustedHops: 1
+#     customHeader: CF-Connecting-IP
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: cloudflare-only
+  namespace: envoy-gateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: cloudflare-gateway
+  authorization:
+    defaultAction: Deny
+    rules:
+      - name: allow-cloudflare
+        action: Allow
+        principal:
+          clientCIDRs:
+            - 173.245.48.0/20
+            - 103.21.244.0/22
+            - 103.22.200.0/22
+            - 103.31.4.0/22
+            - 141.101.64.0/18
+            - 108.162.192.0/18
+            - 190.93.240.0/20
+            - 188.114.96.0/20
+            - 197.234.240.0/22
+            - 198.41.128.0/17
+            - 162.158.0.0/15
+            - 104.16.0.0/13
+            - 104.24.0.0/14
+            - 172.64.0.0/13
+            - 131.0.72.0/22
+            - 2400:cb00::/32
+            - 2606:4700::/32
+            - 2803:f800::/32
+            - 2405:b500::/32
+            - 2405:8100::/32
+            - 2a06:98c0::/29
+            - 2c0f:f248::/32
+# ---
+# apiVersion: gateway.envoyproxy.io/v1alpha1
+# kind: BackendTrafficPolicy
+# metadata:
+#   name: rate-limit-policy
+#   namespace: envoy-gateway-system
+# spec:
+#   targetRefs:
+#     - group: gateway.networking.k8s.io
+#       kind: Gateway
+#       name: cloudflare-gateway
+#   rateLimit:
+#     type: Global
+#     global:
+#       rules:
+#         - clientSelectors:
+#             - headers:
+#                 - name: x-forwarded-for
+#                   type: Distinct
+#           limit:
+#             requests: 100
+#             unit: Minute
+#         - clientSelectors:
+#             - headers:
+#                 - name: x-forwarded-for
+#                   type: Distinct
+#           limit:
+#             requests: 1000
+#             unit: Hour
