@@ -92,6 +92,10 @@ server:
     servicePortHttps: 443
     servicePortHttpName: http
     servicePortHttpsName: https
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
   ingress:
     enabled: true
     ingressClassName: 'nginx'
@@ -155,6 +159,10 @@ worker:
       command:
         - ak
         - healthcheck
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
 
 serviceAccount:
   create: true
@@ -164,7 +172,7 @@ geoip:
 
 prometheus:
   rules:
-    enabled: false
+    enabled: true
 
 postgresql:
   enabled: false

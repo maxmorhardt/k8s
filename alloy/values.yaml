@@ -161,7 +161,6 @@ configReloader:
       cpu: 10m
       memory: 50Mi
 
-
 service:
   enabled: true
   type: ClusterIP
