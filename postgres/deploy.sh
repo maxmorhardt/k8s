@@ -19,4 +19,5 @@ helm upgrade postgres cnpg/cluster \
 	--namespace cnpg-database \
 	--create-namespace \
 	--version 0.4.0 \
-	--values values-cluster.yaml
+	--values values-cluster.yaml \
+	--timeout 15m
