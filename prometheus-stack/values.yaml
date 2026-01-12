@@ -50,16 +50,12 @@ windowsMonitoring:
 
 alertmanager:
   enabled: true
-  serviceAccount:
-    create: true
-  podDisruptionBudget:
-    enabled: false
   config:
     global:
       resolve_timeout: 5m
-      smtp_from: 'no-reply@maxstash.io'
-      smtp_smarthost_file: '/etc/alertmanager/secrets/alertmanager-smtp/smarthost'
-      smtp_auth_username_file: '/etc/alertmanager/secrets/alertmanager-smtp/username'
+      smtp_from: no-reply@maxstash.io
+      smtp_smarthost: smtp.zoho.com:587
+      smtp_auth_username: no-reply@maxstash.io
       smtp_auth_password_file: '/etc/alertmanager/secrets/alertmanager-smtp/password'
       smtp_require_tls: true
     inhibit_rules:
@@ -86,25 +82,29 @@ alertmanager:
       - target_matchers:
           - 'alertname = InfoInhibitor'
     route:
-      group_by:
-        - 'namespace'
+      group_by: ['namespace']
       group_wait: 30s
       group_interval: 5m
       repeat_interval: 12h
-      receiver: 'email'
+      receiver: 'null'
       routes:
-        - receiver: 'null'
-          matchers:
-            - alertname = "Watchdog"
+        - match:
+            alertname: Watchdog
+          receiver: 'null'
+        - match:
+            alertname: InfoInhibitor
+          receiver: 'null'
+        - receiver: 'email-receiver'
+          continue: true
     receivers:
-      - name: 'email'
+      - name: 'null'
+      - name: 'email-receiver'
         email_configs:
-          - to: 'maxmorhardt13@gmail.com'
+          - to: maxmorhardt13@gmail.com
             send_resolved: true
     templates:
       - '/etc/alertmanager/config/*.tmpl'
   service:
-    enabled: true
     port: 9093
   serviceMonitor:
     selfMonitor: true
@@ -114,17 +114,14 @@ alertmanager:
       repository: prometheus/alertmanager
       tag: v0.30.0
       pullPolicy: IfNotPresent
-    useExistingSecret: false
-    secrets:
-      - 'alertmanager-smtp'
     replicas: 1
     retention: 120h
+    secrets: ['alertmanager-smtp']
     storage:
       volumeClaimTemplate:
         spec:
           storageClassName: longhorn
-          accessModes:
-            - 'ReadWriteOnce'
+          accessModes: ['ReadWriteOnce']
           resources:
             requests:
               storage: 10Gi
@@ -133,8 +130,8 @@ alertmanager:
         cpu: 50m
         memory: 128Mi
       limits:
-        cpu: 100m
-        memory: 256Mi
+        cpu: 50m
+        memory: 128Mi
     securityContext:
       runAsGroup: 2000
       runAsNonRoot: true
@@ -164,7 +161,8 @@ prometheus:
       volumeClaimTemplate:
         spec:
           storageClassName: longhorn
-          accessModes: ['ReadWriteOnce']
+          accessModes:
+            - 'ReadWriteOnce'
           resources:
             requests:
               storage: 50Gi
