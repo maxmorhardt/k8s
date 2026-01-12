@@ -14,23 +14,8 @@ architecture: replication
 auth:
   enabled: false
 
-master:
-  count: 1
-  persistence:
-    enabled: true
-    storageClass: longhorn
-    size: 8Gi
-  resources:
-    requests:
-      cpu: 250m
-      memory: 512Mi
-    limits:
-      cpu: 250m
-      memory: 512Mi
-
 replica:
-  enabled: true
-  replicaCount: 1
+  replicaCount: 2
   persistence:
     enabled: true
     storageClass: longhorn
@@ -38,10 +23,10 @@ replica:
   resources:
     requests:
       cpu: 250m
-      memory: 256Mi
+      memory: 512Mi
     limits:
       cpu: 250m
-      memory: 256Mi
+      memory: 512Mi
 
 sentinel:
   enabled: true
@@ -61,5 +46,12 @@ sentinel:
 
 metrics:
   enabled: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
   serviceMonitor:
     enabled: true
