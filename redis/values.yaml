@@ -9,40 +9,30 @@ image:
   tag: 8.2.1
   pullPolicy: IfNotPresent
 
-architecture: replication
+architecture: standalone
 
 auth:
   enabled: false
 
-replica:
-  replicaCount: 2
+master:
+  count: 1
   persistence:
     enabled: true
     storageClass: longhorn
     size: 8Gi
   resources:
     requests:
-      cpu: 250m
-      memory: 512Mi
+      cpu: 500m
+      memory: 1Gi
     limits:
-      cpu: 250m
-      memory: 512Mi
+      cpu: 500m
+      memory: 1Gi
+
+replica:
+  replicaCount: 0
 
 sentinel:
-  enabled: true
-  image:
-    registry: docker.io
-    repository: bitnamilegacy/redis-sentinel
-    tag: 8.2.1
-    pullPolicy: IfNotPresent
-  quorum: 2
-  resources:
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 50m
-      memory: 64Mi
+  enabled: false
 
 metrics:
   enabled: true
