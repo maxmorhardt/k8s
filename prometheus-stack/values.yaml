@@ -1,0 +1,340 @@
+crds:
+  enabled: true
+
+defaultRules:
+  create: true
+  rules:
+    alertmanager: true
+    etcd: true
+    configReloaders: true
+    general: true
+    k8sContainerCpuUsageSecondsTotal: true
+    k8sContainerMemoryCache: true
+    k8sContainerMemoryRss: true
+    k8sContainerMemorySwap: true
+    k8sContainerResource: true
+    k8sContainerMemoryWorkingSetBytes: true
+    k8sPodOwner: true
+    kubeApiserverAvailability: true
+    kubeApiserverBurnrate: true
+    kubeApiserverHistogram: true
+    kubeApiserverSlos: true
+    kubeControllerManager: true
+    kubelet: true
+    kubeProxy: true
+    kubePrometheusGeneral: true
+    kubePrometheusNodeRecording: true
+    kubernetesApps: true
+    kubernetesResources: true
+    kubernetesStorage: true
+    kubernetesSystem: true
+    kubeSchedulerAlerting: true
+    kubeSchedulerRecording: true
+    kubeStateMetrics: true
+    network: true
+    node: true
+    nodeExporterAlerting: true
+    nodeExporterRecording: true
+    prometheus: true
+    prometheusOperator: true
+    windows: false
+
+additionalPrometheusRulesMap: {}
+
+global:
+  rbac:
+    create: true
+
+windowsMonitoring:
+  enabled: false
+
+alertmanager:
+  enabled: true
+  serviceAccount:
+    create: true
+  podDisruptionBudget:
+    enabled: false
+  config:
+    global:
+      resolve_timeout: 5m
+      smtp_from: 'no-reply@maxstash.io'
+      smtp_smarthost_file: '/etc/alertmanager/secrets/alertmanager-smtp/smarthost'
+      smtp_auth_username_file: '/etc/alertmanager/secrets/alertmanager-smtp/username'
+      smtp_auth_password_file: '/etc/alertmanager/secrets/alertmanager-smtp/password'
+      smtp_require_tls: true
+    inhibit_rules:
+      - source_matchers:
+          - 'severity = critical'
+        target_matchers:
+          - 'severity =~ warning|info'
+        equal:
+          - 'namespace'
+          - 'alertname'
+      - source_matchers:
+          - 'severity = warning'
+        target_matchers:
+          - 'severity = info'
+        equal:
+          - 'namespace'
+          - 'alertname'
+      - source_matchers:
+          - 'alertname = InfoInhibitor'
+        target_matchers:
+          - 'severity = info'
+        equal:
+          - 'namespace'
+      - target_matchers:
+          - 'alertname = InfoInhibitor'
+    route:
+      group_by:
+        - 'namespace'
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      receiver: 'email'
+      routes:
+        - receiver: 'null'
+          matchers:
+            - alertname = "Watchdog"
+    receivers:
+      - name: 'email'
+        email_configs:
+          - to: 'maxmorhardt13@gmail.com'
+            send_resolved: true
+    templates:
+      - '/etc/alertmanager/config/*.tmpl'
+  service:
+    enabled: true
+    port: 9093
+  serviceMonitor:
+    selfMonitor: true
+  alertmanagerSpec:
+    image:
+      registry: quay.io
+      repository: prometheus/alertmanager
+      tag: v0.30.0
+      pullPolicy: IfNotPresent
+    useExistingSecret: false
+    secrets:
+      - 'alertmanager-smtp'
+    replicas: 1
+    retention: 120h
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn
+          accessModes:
+            - 'ReadWriteOnce'
+          resources:
+            requests:
+              storage: 10Gi
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 100m
+        memory: 256Mi
+    securityContext:
+      runAsGroup: 2000
+      runAsNonRoot: true
+      runAsUser: 1000
+      fsGroup: 2000
+      seccompProfile:
+        type: RuntimeDefault
+
+prometheus:
+  enabled: true
+  serviceMonitor:
+    selfMonitor: true
+  prometheusSpec:
+    replicas: 1
+    retention: 14d
+    scrapeInterval: '90s'
+    scrapeTimeout: '60s'
+    evaluationInterval: '90s'
+    resources:
+      requests:
+        cpu: 250m
+        memory: 1Gi
+      limits:
+        cpu: 500m
+        memory: 2Gi
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn
+          accessModes: ['ReadWriteOnce']
+          resources:
+            requests:
+              storage: 50Gi
+    securityContext:
+      runAsGroup: 2000
+      runAsNonRoot: true
+      runAsUser: 1000
+      fsGroup: 2000
+      seccompProfile:
+        type: RuntimeDefault
+
+grafana:
+  enabled: true
+  defaultDashboardsEnabled: true
+  defaultDashboardsTimezone: etc
+  admin:
+    existingSecret: 'grafana-credentials'
+    userKey: admin-user
+    passwordKey: admin-password
+  envFromSecret: 'grafana-env'
+  database:
+    type: postgres
+    host: '${GF_DB_HOST}'
+    name: '${GF_DB_NAME}'
+    user: '${GF_DB_USER}'
+    password: '${GF_DB_PASSWORD}'
+    sslMode: require
+  grafana.ini:
+    server:
+      domain: grafana.maxstash.io
+      root_url: 'https://grafana.maxstash.io'
+    auth.generic_oauth:
+      enabled: true
+      name: maxstash
+      client_id: '${GF_OAUTH_CLIENT_ID}'
+      client_secret: '${GF_OAUTH_CLIENT_SECRET}'
+      scopes: 'openid email profile offline_access'
+      auth_url: 'https://login.maxstash.io/application/o/authorize/'
+      token_url: 'https://login.maxstash.io/application/o/token/'
+      api_url: 'https://login.maxstash.io/application/o/userinfo/'
+      allow_sign_up: true
+      auto_login: false
+      role_attribute_path: "contains(groups[*], 'grafana-admin') && 'Admin' || 'Viewer'"
+      role_attribute_strict: true
+      use_pkce: true
+    users:
+      allow_sign_up: false
+      auto_assign_org: true
+      auto_assign_org_role: Viewer
+    analytics:
+      reporting_enabled: false
+      check_for_updates: false
+    security:
+      disable_gravatar: true
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - grafana.maxstash.io
+    path: /
+    tls:
+      - secretName: maxstash.io-tls
+        hosts:
+          - grafana.maxstash.io
+  resources:
+    requests:
+      cpu: 250m
+      memory: 500Mi
+    limits:
+      cpu: 250m
+      memory: 500Mi
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+  persistence:
+    enabled: false
+  extraVolumes:
+    - name: tmp
+      emptyDir: {}
+  extraVolumeMounts:
+    - name: tmp
+      mountPath: /tmp
+  serviceAccount:
+    create: true
+    autoMount: true
+  sidecar:
+    dashboards:
+      enabled: true
+      searchNamespace: ALL
+    datasources:
+      enabled: true
+      defaultDatasourceEnabled: true
+  service:
+    portName: http-web
+  serviceMonitor:
+    enabled: true
+    path: '/metrics'
+
+kubernetesServiceMonitors:
+  enabled: true
+
+kubeApiServer:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    metricRelabelings:
+      - action: drop
+        regex: (etcd_request|apiserver_request_slo|apiserver_request_sli|apiserver_request)_duration_seconds_bucket;(0\.15|0\.2|0\.3|0\.35|0\.4|0\.45|0\.6|0\.7|0\.8|0\.9|1\.25|1\.5|1\.75|2|3|3\.5|4|4\.5|6|7|8|9|15|20|40|45|50)(\.0)?
+
+kubelet:
+  enabled: true
+  namespace: kube-system
+  serviceMonitor:
+    enabled: true
+    https: true
+
+kubeControllerManager:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+coreDns:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+kubeEtcd:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+kubeScheduler:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+kubeProxy:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+kubeStateMetrics:
+  enabled: true
+
+prometheus-node-exporter:
+  enabled: true
+
+prometheusOperator:
+  enabled: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+  prometheusConfigReloader:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 50m
+        memory: 64Mi
