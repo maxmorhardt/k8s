@@ -29,6 +29,7 @@ master:
       memory: 512Mi
 
 replica:
+  enabled: true
   replicaCount: 1
   persistence:
     enabled: true
