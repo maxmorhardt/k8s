@@ -7,4 +7,4 @@ charts
 __pycache__
 
 # pg
-postgres-dumpall.sql
+postgres-dumpall*.sql

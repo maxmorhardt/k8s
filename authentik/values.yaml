@@ -92,29 +92,21 @@ server:
     servicePortHttps: 443
     servicePortHttpName: http
     servicePortHttpsName: https
-  route:
-    main:
-      enabled: true
-      apiVersion: gateway.networking.k8s.io/v1
-      kind: HTTPRoute
-      hostnames:
-        - login.maxstash.io
-      parentRefs:
-        - name: cloudflare-gateway
-          namespace: envoy-gateway-system
-      httpsRedirect: false
-      https: false
-      matches:
-        - path:
-            type: PathPrefix
-            value: '{{ .Values.authentik.web.path }}'
-      filters:
-        - type: ResponseHeaderModifier
-          responseHeaderModifier:
-            add:
-              - name: Content-Security-Policy
-                value: "frame-ancestors 'self' https://maxstash.io https://*.maxstash.io http://localhost:*;"
-
+  ingress:
+    enabled: true
+    ingressClassName: 'nginx'
+    annotations:
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        add_header Content-Security-Policy "frame-ancestors 'self' https://maxstash.io https://*.maxstash.io http://localhost:*;" always;
+    hosts:
+      - login.maxstash.io
+    paths:
+      - '{{ .Values.authentik.web.path }}'
+    pathType: Prefix
+    tls:
+      - secretName: maxstash.io-tls
+        hosts:
+          - login.maxstash.io
 worker:
   enabled: true
   replicas: 2

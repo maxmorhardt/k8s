@@ -18,16 +18,12 @@ stringData:
   AUTHENTIK_POSTGRESQL__HOST: "postgres-cluster-rw.cnpg-database.svc.cluster.local"
   AUTHENTIK_POSTGRESQL__PORT: "5432"
   
-  # Read replica configuration
+  # Read replica configuration (DO NOT CONFIGURE ON INITIAL DEPLOYMENT)
   AUTHENTIK_POSTGRESQL__READ_REPLICAS__0__HOST: "postgres-cluster-ro.cnpg-database.svc.cluster.local"
   AUTHENTIK_POSTGRESQL__READ_REPLICAS__0__NAME: "authentik"
   AUTHENTIK_POSTGRESQL__READ_REPLICAS__0__USER: "authentik"
   AUTHENTIK_POSTGRESQL__READ_REPLICAS__0__PASSWORD: "CHANGE-ME-PASSWORD"
   AUTHENTIK_POSTGRESQL__READ_REPLICAS__0__PORT: "5432"
-  
-  # Bootstrap admin credentials
-  AUTHENTIK_BOOTSTRAP_PASSWORD: "CHANGE-ME-ADMIN-PASSWORD"
-  AUTHENTIK_BOOTSTRAP_EMAIL: "admin@maxstash.io"
   
   # SMTP/Email configuration
   AUTHENTIK_EMAIL__HOST: "smtp.example.com"
@@ -64,8 +60,7 @@ Create the Authentik database and user in PostgreSQL
    ./deploy.sh
    ```
 
-5. Access Authentik at `https://login.maxstash.io`
-   - Use bootstrap credentials from secret
+5. Access Authentik at `https://login.maxstash.io/if/flow/initial-setup/`
 
 ## OIDC Endpoints
 
@@ -98,16 +93,20 @@ select:-webkit-autofill {
   display: none !important;
 }
 
+.pf-c-login {
+  min-height: 100dvh !important;
+}
+
 .ak-login-container {
   height: 100% !important;
 }
 
 .pf-c-login__main {
-  border-radius: 1rem !important;
+  border-radius: .5rem !important;
 }
 
 .pf-c-login__main-footer-band {
-  border-radius: 0 0 1rem 1rem !important;
+  border-radius: 0 0 .5rem .5rem !important;
 }
 
 .pf-c-background-image::before {

@@ -30,7 +30,7 @@ alloy:
             __path__  = "/var/log/rehydrate/*.log",
             job       = "node/rehydrate",
             node_name = sys.env("HOSTNAME"),
-            cluster   = "maxstash",
+            cluster   = "default",
         }]
       }
 
@@ -106,7 +106,7 @@ alloy:
       loki.process "pod_logs" {
         stage.static_labels {
             values = {
-              cluster = "maxstash",
+              cluster = "default",
             }
         }
 
@@ -126,7 +126,7 @@ alloy:
 
         stage.static_labels {
           values = {
-            cluster = "maxstash",
+            cluster = "default",
           }
         }
 
@@ -157,18 +157,10 @@ configReloader:
     requests:
       cpu: 10m
       memory: 50Mi
-  securityContext:
-    runAsNonRoot: true
-    runAsUser: 1000
-    runAsGroup: 1000
-    fsGroup: 1000
-    allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: true
-    seccompProfile:
-      type: RuntimeDefault
-    capabilities:
-      drop:
-        - ALL
+    limits:
+      cpu: 10m
+      memory: 50Mi
+
 
 service:
   enabled: true

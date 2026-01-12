@@ -52,7 +52,7 @@ The stack follows a microservices architecture where each service is independent
 
 ## Deployment Order
 
-1. **Core Infrastructure**: K3s cluster with Envoy Gateway and cert-manager
+1. **Core Infrastructure**: K3s cluster with Envoy Gateway
    ```bash
 	 ./namespaces.sh
    cd envoy-gateway && ./deploy.sh
