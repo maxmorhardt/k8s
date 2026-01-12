@@ -1,38 +1,55 @@
+global:
+  defaultStorageClass: longhorn
+  security:
+    allowInsecureImages: true
+
 image:
-  repository: public.ecr.aws/docker/library/redis
-  tag: latest
-  pullPolicy: Always
+  registry: docker.io
+  repository: bitnamilegacy/redis
+  tag: 8.2.1
+  pullPolicy: IfNotPresent
 
-replicas: 3
+architecture: replication
 
-auth: false
+auth:
+  enabled: false
 
-persistentVolume:
-  enabled: true
-  storageClass: longhorn
-  size: 8Gi
-
-redis:
+master:
+  count: 1
+  persistence:
+    enabled: true
+    storageClass: longhorn
+    size: 8Gi
   resources:
     requests:
-      cpu: 100m
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
+
+replica:
+  replicaCount: 1
+  persistence:
+    enabled: true
+    storageClass: longhorn
+    size: 8Gi
+  resources:
+    requests:
+      cpu: 250m
       memory: 256Mi
     limits:
-      cpu: 100m
+      cpu: 250m
       memory: 256Mi
 
 sentinel:
-  resources:
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 50m
-      memory: 64Mi
-
-haproxy:
   enabled: true
-  replicas: 1
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/redis-sentinel
+    tag: 8.2.1
+    pullPolicy: IfNotPresent
+  quorum: 2
   resources:
     requests:
       cpu: 50m
@@ -41,18 +58,7 @@ haproxy:
       cpu: 50m
       memory: 64Mi
 
-exporter:
+metrics:
   enabled: true
-  image: oliver006/redis_exporter
-  tag: latest
-  pullPolicy: Always
-  resources:
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 50m
-      memory: 64Mi
-
-serviceAccount:
-  create: true
+  serviceMonitor:
+    enabled: true

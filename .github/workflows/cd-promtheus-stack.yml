@@ -1,0 +1,17 @@
+name: Kube Prometheus Stack CD
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cd:
+    uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
+    with:
+      repository: ${{ github.repository }}
+      release_name: kube-prometheus-stack
+      namespace: monitoring
+      values_file: prometheus-stack/values.yaml
+      helm_repo_name: prometheus-community
+      helm_repo_url: https://prometheus-community.github.io/helm-charts
+      chart: prometheus-community/kube-prometheus-stack
+    secrets: inherit

@@ -155,11 +155,14 @@ configReloader:
     tag: v0.81.0
   resources:
     requests:
-      cpu: 10m
+      cpu: 20m
       memory: 50Mi
     limits:
-      cpu: 10m
+      cpu: 20m
       memory: 50Mi
+
+serviceMonitor:
+  enabled: true
 
 service:
   enabled: true

@@ -2,7 +2,7 @@ global:
   imageRegistry: docker.io
 
 networkPolicies:
-  enabled: true
+  enabled: false
   type: 'k3s'
 
 image:
@@ -54,4 +54,4 @@ longhornUI:
 
 metrics:
   serviceMonitor:
-    enabled: false
+    enabled: true

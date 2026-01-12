@@ -44,6 +44,7 @@ Create the Authentik database and user in PostgreSQL
 
 1. Generate secret key:
    ```bash
+	 # SAVE THIS IMMEDIATELY
    openssl rand -base64 60
    ```
 

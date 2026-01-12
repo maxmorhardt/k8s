@@ -150,6 +150,12 @@ prometheus:
     scrapeInterval: '90s'
     scrapeTimeout: '60s'
     evaluationInterval: '90s'
+    serviceMonitorSelector: {}
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelector: {}
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelector: {}
+    ruleSelectorNilUsesHelmValues: false
     resources:
       requests:
         cpu: 250m

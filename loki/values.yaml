@@ -63,3 +63,16 @@ chunksCache:
 
 gateway:
   enabled: false
+
+monitoring:
+  dashboards:
+    enabled: true
+    namespace: monitoring
+  rules:
+    enabled: true
+    alerting: true
+    namespace: monitoring
+  serviceMonitor:
+    enabled: true
+  selfMonitoring:
+    enabled: false
