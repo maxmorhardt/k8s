@@ -253,7 +253,11 @@ grafana:
         - ALL
     readOnlyRootFilesystem: true
   persistence:
-    enabled: false
+    enabled: true
+    storageClassName: longhorn
+    accessModes:
+      - ReadWriteOnce
+    size: 8Gi
   extraVolumes:
     - name: tmp
       emptyDir: {}
@@ -337,8 +341,8 @@ prometheusOperator:
   prometheusConfigReloader:
     resources:
       requests:
-        cpu: 50m
-        memory: 64Mi
+        cpu: 10m
+        memory: 32Mi
       limits:
-        cpu: 50m
+        cpu: 100m
         memory: 64Mi
