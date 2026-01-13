@@ -51,7 +51,7 @@ server:
           mountPath: /media
   resources:
     requests:
-      cpu: 1
+      cpu: 500m
       memory: 1Gi
     limits:
       cpu: 1
@@ -121,10 +121,10 @@ worker:
     minAvailable: 1
   resources:
     requests:
-      cpu: 300m
+      cpu: 250m
       memory: 512Mi
     limits:
-      cpu: 300m
+      cpu: 500m
       memory: 512Mi
   containerPorts:
     http: 9000

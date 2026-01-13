@@ -18,8 +18,8 @@ cluster:
       cpu: 1
       memory: 3Gi
     requests:
-      cpu: 1
-      memory: 3Gi
+      cpu: 500m
+      memory: 1Gi
   primaryUpdateMethod: switchover
   primaryUpdateStrategy: unsupervised
   logLevel: 'info'
