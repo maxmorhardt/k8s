@@ -16,6 +16,8 @@ auth:
 
 master:
   count: 1
+  pdb:
+    create: false
   persistence:
     enabled: true
     storageClass: longhorn
