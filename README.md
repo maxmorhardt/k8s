@@ -63,7 +63,7 @@ The stack follows a microservices architecture where each service is independent
 CI/CD pipelines are managed via GitHub Actions. Workflows deploy services to the cluster using kubectl/helm.
 
 ### Node Maintenance
-Weekly automated node rehydration runs on **Tuesday** mornings (staggered 2-5 AM EST) via cron:
+Weekly automated node rehydration runs on **First and Third Tuesday** mornings (staggered 2-3:30 AM EST) via cron:
 - Drains node
 - Updates system packages
 - Cleans up container images, logs, and temp files
