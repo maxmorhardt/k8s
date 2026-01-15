@@ -130,9 +130,9 @@ worker:
     http: 9000
     metrics: 9300
   livenessProbe:
-    failureThreshold: 3
-    initialDelaySeconds: 5
-    periodSeconds: 10
+    failureThreshold: 5
+    initialDelaySeconds: 10
+    periodSeconds: 15
     successThreshold: 1
     timeoutSeconds: 15
     exec:
@@ -140,9 +140,9 @@ worker:
         - ak
         - healthcheck
   readinessProbe:
-    failureThreshold: 3
-    initialDelaySeconds: 5
-    periodSeconds: 10
+    failureThreshold: 5
+    initialDelaySeconds: 10
+    periodSeconds: 15
     successThreshold: 1
     timeoutSeconds: 15
     exec:
@@ -150,9 +150,9 @@ worker:
         - ak
         - healthcheck
   startupProbe:
-    failureThreshold: 90
-    initialDelaySeconds: 30
-    periodSeconds: 10
+    failureThreshold: 60
+    initialDelaySeconds: 60
+    periodSeconds: 15
     successThreshold: 1
     timeoutSeconds: 15
     exec:
