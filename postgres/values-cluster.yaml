@@ -5,11 +5,24 @@ version:
 
 mode: standalone
 
+# recovery:
+#   method: object_store
+#   clusterName: postgres-cluster
+#   database: maxstash
+#   owner: maxmorhardt
+#   destinationPath: 's3://maxstash-io-bucket/postgresql/'
+#   provider: s3
+#   s3:
+#     region: us-east-1
+#   secret:
+#     create: false
+#     name: 'aws-s3-credentials'
+
 cluster:
   instances: 3
   imagePullPolicy: Always
   storage:
-    size: 64Gi
+    size: 100Gi
     storageClass: longhorn
   walStorage:
     enabled: false

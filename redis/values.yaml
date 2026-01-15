@@ -21,7 +21,7 @@ master:
   persistence:
     enabled: true
     storageClass: longhorn
-    size: 8Gi
+    size: 1Gi
   resources:
     requests:
       cpu: 100m

@@ -21,8 +21,8 @@ loki:
         object_store: filesystem
         schema: v13
   limits_config:
-    retention_period: 30d
-    max_query_lookback: 30d
+    retention_period: 14d
+    max_query_lookback: 14d
   rulerConfig:
     enable_api: false
     storage:
@@ -33,7 +33,7 @@ singleBinary:
   persistence:
     enabled: true
     storageClass: longhorn
-    size: 10Gi
+    size: 32Gi
   resources:
     requests:
       cpu: 100m

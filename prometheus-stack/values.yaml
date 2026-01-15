@@ -56,7 +56,7 @@ alertmanager:
       smtp_from: no-reply@maxstash.io
       smtp_smarthost: smtp.zoho.com:587
       smtp_auth_username: no-reply@maxstash.io
-      smtp_auth_password_file: '/etc/alertmanager/secrets/alertmanager-smtp/password'
+      smtp_auth_password_file: '/etc/alertmanager/secrets/alertmanager/smtp-password'
       smtp_require_tls: true
     inhibit_rules:
       - source_matchers:
@@ -81,6 +81,13 @@ alertmanager:
           - 'namespace'
       - target_matchers:
           - 'alertname = InfoInhibitor'
+    time_intervals:
+      - name: maintenance-window
+        timeIntervals:
+          - weekdays: [tuesday]
+            times:
+              - start_time: "02:00"
+                end_time: "04:00"
     route:
       group_by: ['namespace']
       group_wait: 30s
@@ -94,14 +101,27 @@ alertmanager:
         - match:
             alertname: InfoInhibitor
           receiver: 'null'
-        - receiver: 'email-receiver'
+        - match:
+            severity: critical
+          receiver: 'email-receiver'
           continue: true
+          mute_time_intervals:
+            - maintenance-window
+        - receiver: 'discord-receiver'
+          continue: true
+          mute_time_intervals:
+            - maintenance-window
     receivers:
       - name: 'null'
       - name: 'email-receiver'
         email_configs:
           - to: maxmorhardt13@gmail.com
-            send_resolved: true
+            send_resolved: false 
+      - name: 'discord-receiver'
+        discord_configs:
+          - send_resolved: true
+            webhook_url_file: '/etc/alertmanager/secrets/alertmanager/discord-webhook'
+            username: "Alertmanager"
     templates:
       - '/etc/alertmanager/config/*.tmpl'
   service:
@@ -116,7 +136,7 @@ alertmanager:
       pullPolicy: IfNotPresent
     replicas: 1
     retention: 120h
-    secrets: ['alertmanager-smtp']
+    secrets: ['alertmanager']
     storage:
       volumeClaimTemplate:
         spec:
@@ -124,7 +144,7 @@ alertmanager:
           accessModes: ['ReadWriteOnce']
           resources:
             requests:
-              storage: 10Gi
+              storage: 1Gi
     resources:
       requests:
         cpu: 50m
@@ -171,7 +191,7 @@ prometheus:
             - 'ReadWriteOnce'
           resources:
             requests:
-              storage: 50Gi
+              storage: 32Gi
     securityContext:
       runAsGroup: 2000
       runAsNonRoot: true
@@ -257,7 +277,7 @@ grafana:
     storageClassName: longhorn
     accessModes:
       - ReadWriteOnce
-    size: 8Gi
+    size: 1Gi
   extraVolumes:
     - name: tmp
       emptyDir: {}

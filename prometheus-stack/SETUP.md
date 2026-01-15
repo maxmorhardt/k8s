@@ -15,8 +15,9 @@ kubectl create secret generic grafana-env \
   --from-literal=GF_OAUTH_CLIENT_SECRET=<client-secret> \
   -n monitoring
 
-kubectl create secret generic alertmanager-smtp \
-  --from-literal=password='<smtp-password>' \
+kubectl create secret generic alertmanager \
+  --from-literal=smtp-password='<smtp-password>' \
+	--from-literal=discord-webhook='<discord-webhook-url>' \
   -n monitoring
 ```
 
