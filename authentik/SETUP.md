@@ -98,12 +98,30 @@ select:-webkit-autofill {
   min-height: 100dvh !important;
 }
 
+@media (max-width: 600px) {
+  .pf-c-login {
+    padding-top: .25rem !important;
+    padding-bottom: 0 !important;
+  }
+}
+
+@media (min-width: 601px) {
+  .pf-c-login {
+    padding-top: 5rem !important;
+    padding-bottom: 5rem !important;
+  }
+}
+
+.pf-c-brand {
+  max-height: 7rem !important;
+}
+
 .ak-login-container {
   height: 100% !important;
 }
 
 .pf-c-login__main {
-  border-radius: .5rem !important;
+  border-radius: 1rem !important;
 }
 
 .pf-c-login__main-footer-band {
