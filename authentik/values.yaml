@@ -17,11 +17,11 @@ global:
       maxSurge: 0
       maxUnavailable: 1
   volumes:
-    - name: media
+    - name: sources
       emptyDir: {}
   volumeMounts:
-    - name: media
-      mountPath: /media
+    - name: sources
+      mountPath: /web/authentik/sources
 
 authentik:
   enabled: false
@@ -45,10 +45,10 @@ server:
         - sh
         - -c
         - |
-          git clone https://github.com/maxmorhardt/assets /media
+          git clone https://github.com/maxmorhardt/assets /web/authentik/sources
       volumeMounts:
-        - name: media
-          mountPath: /media
+        - name: sources
+          mountPath: /web/authentik/sources
   resources:
     requests:
       cpu: 500m
