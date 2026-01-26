@@ -1,7 +1,7 @@
 type: postgresql
 
 version:
-  postgresql: '18'
+  postgresql: '17'
 
 mode: standalone
 
@@ -69,7 +69,7 @@ cluster:
 
 backups:
   enabled: true
-  destinationPath: 's3://maxstash-io-bucket/postgresql/'
+  destinationPath: 's3://maxstash-io-bucket/'
   provider: s3
   s3:
     region: us-east-1
