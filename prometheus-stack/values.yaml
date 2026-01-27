@@ -206,9 +206,8 @@ grafana:
   enabled: true
   defaultDashboardsEnabled: true
   defaultDashboardsTimezone: etc
-  deploymentStrategy:
+  strategy:
     type: Recreate
-    rollingUpdate: null
   admin:
     existingSecret: 'grafana-credentials'
     userKey: admin-user
