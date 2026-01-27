@@ -236,7 +236,7 @@ grafana:
       allow_sign_up: false
       auto_login: false
       use_refresh_token: true
-      role_attribute_path: contains(keys("urn:zitadel:iam:org:project:357320151160324692:roles"), 'grafana-admin') && 'Admin' || 'Viewer'
+      role_attribute_path: contains(keys("urn:zitadel:iam:org:project:357320151160324692:roles"), 'grafana-admin') && 'Admin'
       role_attribute_strict: true
       use_pkce: true
     users:
