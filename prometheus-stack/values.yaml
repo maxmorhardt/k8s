@@ -235,7 +235,7 @@ grafana:
       api_url: 'https://login.maxstash.io/oidc/v1/userinfo'
       allow_sign_up: true
       auto_login: false
-      use_refresh_token: true
+      use_id_token: true
       role_attribute_path: "contains(keys('urn:zitadel:iam:org:project:roles' || `{}`), 'grafana-admin') && 'Admin' || 'Viewer'"
       role_attribute_strict: false
       use_pkce: true
