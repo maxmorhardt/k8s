@@ -233,10 +233,10 @@ grafana:
       auth_url: 'https://login.maxstash.io/oauth/v2/authorize'
       token_url: 'https://login.maxstash.io/oauth/v2/token'
       api_url: 'https://login.maxstash.io/oidc/v1/userinfo'
-      allow_sign_up: false
+      allow_sign_up: true
       auto_login: false
       use_refresh_token: true
-      role_attribute_path: contains(keys("urn:zitadel:iam:org:project:357320151160324692:roles"), 'grafana-admin') && 'Admin'
+      role_attribute_path: contains(keys("urn:zitadel:iam:org:project:roles"), 'grafana-admin') && 'Admin'
       role_attribute_strict: true
       use_pkce: true
     users:
