@@ -1,0 +1,23 @@
+name: Authentik CD
+
+on:
+  workflow_dispatch:
+    inputs:
+      chart_version:
+        description: Authentik version to deploy
+        required: false
+        type: string
+        default: '2025.12.2'
+jobs:
+  cd:
+    uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
+    with:
+      repository: ${{ github.repository }}
+      release_name: authentik
+      namespace: authentik
+      values_file: authentik/values.yaml
+      helm_repo_name: authentik
+      helm_repo_url: https://charts.goauthentik.io
+      chart: authentik/authentik
+      chart_version: ${{ github.event.inputs.chart_version }}
+    secrets: inherit
