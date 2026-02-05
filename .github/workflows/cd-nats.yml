@@ -1,0 +1,17 @@
+name: NATS CD
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cd:
+    uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
+    with:
+      repository: ${{ github.repository }}
+      release_name: nats
+      namespace: nats
+      values_file: nats/values.yaml
+      helm_repo_name: nats
+      helm_repo_url: https://nats-io.github.io/k8s/helm/charts/
+      chart: nats/nats
+    secrets: inherit
