@@ -5,7 +5,7 @@
 ![Zitadel](https://img.shields.io/badge/Zitadel-0052CC?style=for-the-badge&logo=zitadel&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
-![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
+![NATS](https://img.shields.io/badge/nats-27AAE1?style=for-the-badge&logo=nats.io&logoColor=white)
 ![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)
 ![Alertmanager](https://img.shields.io/badge/Alertmanager-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)
 ![Grafana](https://img.shields.io/badge/grafana-%23F46800.svg?style=for-the-badge&logo=grafana&logoColor=white)
@@ -20,7 +20,7 @@ A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with productio
 - **Container Orchestration** with Kubernetes (K3s)
 - **Distributed Storage** with Longhorn for replicated persistent volumes
 - **Authentication & Authorization** via Zitadel OIDC/SAML provider
-- **Data Persistence** with PostgreSQL HA cluster and Redis caching/pub-sub
+- **Data Persistence** with PostgreSQL HA cluster and NATS messaging
 - **CI/CD Pipeline** using GitHub Actions
 - **Monitoring & Observability** with Prometheus metrics and Grafana dashboards
 - **Centralized Logging** via Loki and Alloy data collection
@@ -45,8 +45,8 @@ The stack follows a microservices architecture where each service is independent
        ┌──────────────┼──────────────┐
        │              │              │
   ┌────▼─────┐   ┌────▼─────┐   ┌───▼────┐
-  │PostgreSQL│   │  Redis   │   │ Apps   │
-  │   (DB)   │   │(Cache/   │   │        │
+  │PostgreSQL│   │   NATS   │   │ Apps   │
+  │   (DB)   │   │(Messaging│   │        │
   └──────────┘   │ Pub/Sub) │   └────────┘
                  └──────────┘
 ```
@@ -55,7 +55,7 @@ The stack follows a microservices architecture where each service is independent
 
 1. **Core Infrastructure**: K3s cluster with Tailscale on nodes
 2. **Storage Layer**: Longhorn
-3. **Core Services**: Postgres Redis Loki Alloy
+3. **Core Services**: Postgres NATS Loki Alloy
 4. **Authentication**: Zitadel
 5. **Access & Visualization**: Kube Prometheus Stack 
 
