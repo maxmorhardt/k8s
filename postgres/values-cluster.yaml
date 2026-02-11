@@ -10,7 +10,7 @@ mode: standalone
 #   clusterName: postgres-cluster
 #   database: maxstash
 #   owner: maxmorhardt
-#   destinationPath: 's3://maxstash-io-bucket/postgresql/'
+#   destinationPath: 's3://maxstash-io-bucket/'
 #   provider: s3
 #   s3:
 #     region: us-east-1
@@ -58,8 +58,6 @@ cluster:
       random_page_cost: '1.1'
       effective_io_concurrency: '200'
       work_mem: '3495kB'
-      min_wal_size: '512MB'
-      max_wal_size: '2GB'
   initdb:
     database: maxstash
     owner: maxmorhardt
