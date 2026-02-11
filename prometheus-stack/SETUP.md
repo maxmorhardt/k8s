@@ -52,7 +52,7 @@ curl -X POST http://localhost:9093/api/v2/alerts -H "Content-Type: application/j
 
 ## Dependencies
 - PostgreSQL database for Grafana
-- Zitadel OIDC provider at login.maxstash.io (user with `grafana-admin` role)
+- Authentik OIDC provider at login.maxstash.io (user with `grafana-admin` group)
 
 ## Notes
 - Default retention is 14 days for Prometheus metrics
