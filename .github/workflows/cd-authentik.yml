@@ -7,7 +7,7 @@ on:
         description: Authentik version to deploy
         required: false
         type: string
-        default: '2025.12.2'
+        default: '2025.12.4'
 jobs:
   cd:
     uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main

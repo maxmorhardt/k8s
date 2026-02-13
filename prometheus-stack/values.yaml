@@ -122,6 +122,7 @@ alertmanager:
           - send_resolved: true
             webhook_url: <discord-webhook>
             # not yet supported by prom operator
+            # https://github.com/prometheus-operator/prometheus-operator/issues/7159
             # webhook_url_file: /etc/alertmanager/secrets/alertmanager/discord-webhook
             username: 'Alerts'
     templates:
