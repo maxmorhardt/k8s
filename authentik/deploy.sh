@@ -2,7 +2,7 @@ helm repo add authentik https://charts.goauthentik.io
 helm repo update
 
 helm upgrade authentik authentik/authentik \
-	--version 2025.12.2 \
+	--version 2025.12.4 \
 	--install \
   --rollback-on-failure \
 	--wait \

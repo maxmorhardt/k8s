@@ -55,9 +55,12 @@ The stack follows a microservices architecture where each service is independent
 
 1. **Core Infrastructure**: K3s cluster with Tailscale on nodes
 2. **Storage Layer**: Longhorn
-3. **Core Services**: Postgres NATS Loki Alloy
-4. **Authentication**: Authentik
-5. **Access & Visualization**: Kube Prometheus Stack 
+3. **Database Layer**: Postgres 
+4. **Access & Visualization**: Kube Prometheus Stack 
+5. **Core Services** NATS Loki Alloy
+6. **Authentication**: Authentik
+
+**Note:** Redeploys will be required if apps are installed prior to Prometheus CRDs
 
 ### CI/CD
 CI/CD pipelines are managed via GitHub Actions. Workflows deploy services to the cluster using kubectl/helm.

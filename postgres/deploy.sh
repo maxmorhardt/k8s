@@ -1,13 +1,13 @@
 helm repo add cnpg https://cloudnative-pg.github.io/charts
 helm repo update
 
-helm upgrade cloudnativepg cnpg/cloudnative-pg \
+helm upgrade cnpg cnpg/cloudnative-pg \
 	--install \
 	--rollback-on-failure \
 	--wait \
 	--namespace cnpg-system \
 	--create-namespace \
-	--version 0.27.0 \
+	--version 0.27.1 \
 	--values values-operator.yaml 
 
 helm upgrade postgres cnpg/cluster \
