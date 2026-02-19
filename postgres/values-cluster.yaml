@@ -19,6 +19,8 @@ mode: standalone
 #     name: 'aws-s3-credentials'
 
 cluster:
+  annotations:
+    cnpg.io/hibernation: 'on'
   instances: 3
   imagePullPolicy: Always
   storage:
