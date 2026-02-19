@@ -7,6 +7,11 @@ networkPolicies:
 
 image:
   pullPolicy: IfNotPresent
+  longhorn:
+    manager:
+      tag: v1.11.0-hotfix-1
+    instanceManager:
+      tag: v1.11.0-hotfix-2
 
 service:
   ui:
@@ -55,3 +60,7 @@ longhornUI:
 metrics:
   serviceMonitor:
     enabled: true
+
+preUpgradeChecker:
+  jobEnabled: true
+  upgradeVersionCheck: false
