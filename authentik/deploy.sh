@@ -4,7 +4,7 @@ helm repo update
 helm upgrade authentik authentik/authentik \
 	--version 2026.2.0 \
 	--install \
-  --rollback-on-failure \
+	--rollback-on-failure \
 	--wait \
 	--debug \
 	--history-max=3 \
