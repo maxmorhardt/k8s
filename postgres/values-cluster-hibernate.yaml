@@ -25,6 +25,8 @@ cluster:
   primaryUpdateMethod: switchover
   primaryUpdateStrategy: unsupervised
   logLevel: 'info'
+  affinity:
+    topologyKey: kubernetes.io/hostname
   enableSuperuserAccess: true
   superuserSecret: 'postgres-superuser'
   enablePDB: true
