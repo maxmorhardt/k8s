@@ -8,6 +8,15 @@ on:
         required: false
         type: string
         default: '0.6.0'
+      mode:
+        description: 'Cluster mode'
+        required: false
+        type: choice
+        options:
+          - normal
+          - recovery
+          - hibernate
+        default: normal
 
 jobs:
   cd:
@@ -16,7 +25,7 @@ jobs:
       repository: ${{ github.repository }}
       release_name: postgres
       namespace: cnpg-database
-      values_file: postgres/values-cluster.yaml
+      values_file: ${{ inputs.mode == 'recovery' && 'postgres/values-cluster-recovery.yaml' || inputs.mode == 'hibernate' && 'postgres/values-cluster-hibernate.yaml' || 'postgres/values-cluster.yaml' }}
       helm_repo_name: cnpg
       helm_repo_url: https://cloudnative-pg.github.io/charts
       chart: cnpg/cluster
