@@ -32,7 +32,7 @@ singleBinary:
   replicas: 1
   persistence:
     enabled: true
-    storageClass: longhorn
+    storageClass: local-path-retain
     size: 32Gi
   resources:
     requests:

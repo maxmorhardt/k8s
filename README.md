@@ -11,20 +11,19 @@
 ![Grafana](https://img.shields.io/badge/grafana-%23F46800.svg?style=for-the-badge&logo=grafana&logoColor=white)
 ![Loki](https://img.shields.io/badge/loki-F46800?style=for-the-badge&logo=grafana&logoColor=white)
 ![Alloy](https://img.shields.io/badge/alloy-00D4AA?style=for-the-badge&logo=grafana&logoColor=white)
-![Longhorn](https://img.shields.io/badge/longhorn-512DA8?style=for-the-badge&logo=rancher&logoColor=white)
 
 ## Overview
-A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with production-ready services for container orchestration, storage replication, access management, authentication, data persistence, CI/CD, monitoring, and logging. Designed for on-premises deployment with high availability.
+A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with production-ready services for container orchestration, access management, authentication, data persistence, CI/CD, monitoring, and logging. Designed for on-premises deployment with high availability.
 
 ## Features
 - **Container Orchestration** with Kubernetes (K3s)
-- **Distributed Storage** with Longhorn for replicated persistent volumes
+- **Persistent Storage** with local-path-retain StorageClass (Retain reclaim policy)
 - **Authentication & Authorization** via Authentik OIDC/SAML provider
 - **Data Persistence** with PostgreSQL HA cluster and NATS messaging
 - **CI/CD Pipeline** using GitHub Actions
 - **Monitoring & Observability** with Prometheus metrics and Grafana dashboards
 - **Centralized Logging** via Loki and Alloy data collection
-- **Production Ready** with replicated storage, resource limits, and security configurations
+- **Production Ready** with resource limits, application-level replication, and security configurations
 
 ## Architecture
 The stack follows a microservices architecture where each service is independently deployable with Helm charts. Services communicate through Kubernetes networking, with Authentik providing centralized authentication for applications requiring OIDC/SAML. CI/CD is handled via GitHub Actions.
@@ -54,7 +53,7 @@ The stack follows a microservices architecture where each service is independent
 ## Deployment Order
 
 1. **Core Infrastructure**: K3s cluster with Tailscale on nodes
-2. **Storage Layer**: Longhorn
+2. **Storage Layer**: `kubectl apply -f storage/local-path-retain.yaml`
 3. **Database Layer**: Postgres 
 4. **Access & Visualization**: Kube Prometheus Stack 
 5. **Core Services** NATS Loki Alloy

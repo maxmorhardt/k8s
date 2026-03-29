@@ -23,7 +23,7 @@ cluster:
   imagePullPolicy: Always
   storage:
     size: 100Gi
-    storageClass: longhorn
+    storageClass: local-path-retain
   walStorage:
     enabled: false
   resources:

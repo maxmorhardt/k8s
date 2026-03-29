@@ -1,5 +1,3 @@
-kubectl create namespace longhorn-system
-
 kubectl create namespace cnpg-system
 kubectl create namespace cnpg-database
 
