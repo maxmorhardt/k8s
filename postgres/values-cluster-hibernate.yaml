@@ -36,7 +36,6 @@ cluster:
       enabled: true
     prometheusRule:
       enabled: true
-      queries: cnpg-default-monitoring
   postgresql:
     parameters:
       max_connections: '300'
