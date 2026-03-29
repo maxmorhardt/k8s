@@ -44,10 +44,9 @@ stringData:
 
 ## Recovery
 
-1. **Enable recovery mode**: Set `mode: recovery` and uncomment the `recovery` section
-2. **Set paths**: Point `recovery.destinationPath` to existing backups (e.g., `s3://bucket/existing-backups`), and `backups.enabled` to `false`
-3. **Deploy and wait** for restore to complete
-4. **Switch to standalone**: Set `mode: standalone`, comment out `recovery` section, redeploy and set `backups.enabled` to `true`
+1. Run the **PostgreSQL Cluster CD** workflow with mode set to `recovery`
+2. Wait for all 3 instances to become ready
+3. Run the workflow again with mode set to `normal` to switch to standalone with backups enabled
 
 **Note:** Never delete WALs from the source archive — this breaks recovery.
 
