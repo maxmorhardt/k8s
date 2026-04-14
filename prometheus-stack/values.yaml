@@ -278,6 +278,9 @@ grafana:
       drop:
         - ALL
     readOnlyRootFilesystem: true
+  initChownData:
+    enabled: false
+
   persistence:
     enabled: true
     storageClassName: local-path-retain
