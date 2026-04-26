@@ -131,7 +131,7 @@ settings:
 
 ## OIDC Endpoints
 
-- **Discovery**: `https://login.maxstash.io/application/o/<app-slug>/.well-known/openid-configuration`
+- **Discovery**: `https://login.maxstash.io/application/o/<app-slug>/well-known/openid-configuration`
 - **Authorization**: `https://login.maxstash.io/application/o/authorize/`
 - **Token**: `https://login.maxstash.io/application/o/token/`
 - **UserInfo**: `https://login.maxstash.io/application/o/userinfo/`
