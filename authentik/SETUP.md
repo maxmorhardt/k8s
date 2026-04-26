@@ -95,14 +95,26 @@ ak-brand-links {
   display: none !important;
 }
 
-ak-flow-executor::part(branding) {
-  max-height: 60px;
-  padding-top: 6rem;
-  margin-bottom: 0.5rem;
-}
-
 ak-flow-executor::part(main) {
   border-radius: 0.75rem;
+}
+
+ak-flow-executor::part(branding) {
+  max-height: 60px;
+  padding-top: 5rem;
+  margin-bottom: 1.5rem;
+}
+
+.branding-logo {
+  display: block;
+  width: 300px;
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem auto 1rem;
+}
+
+.pf-c-login__main {
+  --pf-c-login__main--BoxShadow: none !important;
 }
 
 input:-webkit-autofill,
