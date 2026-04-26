@@ -8,5 +8,6 @@ kubectl create namespace authentik
 kubectl create namespace squares
 kubectl create namespace apps
 kubectl create namespace jobs
+kubectl create namespace maxstash
 
 kubectl create namespace monitoring
