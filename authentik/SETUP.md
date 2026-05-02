@@ -82,6 +82,18 @@ Create the Authentik database and user in PostgreSQL
 
 11. Configure brand for login.maxstash.io (new default) - see below config
 
+12. Create user details flow (read-only):
+    - Go to **Flows & Stages > Prompts** and create three prompts:
+      - Name `user-details-email`, field key `email`, label `Email`, type `Text`, initial value `return user.email`, order `0`, **Interpret initial value as expression: ON**
+      - Name `user-details-name`, field key `name`, label `Name`, type `Text (read-only)`, initial value `return user.name`, order `1`, **Interpret initial value as expression: ON**
+      - Name `user-details-username`, field key `username`, label `Username`, type `Text (read-only)`, initial value `return user.username`, order `2`, **Interpret initial value as expression: ON**
+    - Go to **Flows & Stages > Stages > Create > Prompt Stage**, name `user-details`, add all prompts
+    - Go to **Flows & Stages > Flows > Create**:
+      - Slug: `user-details`, designation: `Stage Configuration`, authentication: `Require authentication`
+    - Open the flow > **Stage Bindings > Bind Stage**, select `user-details` at order `0`
+    - Do **not** add a User Write stage
+    - Go to **System > Brands > Edit brand > Default flows**, set **User settings flow** to `user-details`
+
 ## Branding
 
 ### Custom CSS
@@ -115,6 +127,11 @@ ak-flow-executor::part(branding) {
 
 .pf-c-login__main {
   --pf-c-login__main--BoxShadow: none !important;
+}
+
+[slot="page-tokens"],
+li[part="tab-item"]:has(button[name="page-tokens"]) {
+  display: none !important;
 }
 
 input:-webkit-autofill,
