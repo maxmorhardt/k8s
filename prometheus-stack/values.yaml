@@ -252,6 +252,12 @@ grafana:
   ingress:
     enabled: true
     ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: '1m'
+      nginx.ingress.kubernetes.io/client-body-buffer-size: '1m'
+      nginx.ingress.kubernetes.io/limit-connections: '10'
+      nginx.ingress.kubernetes.io/limit-rps: '20'
+      nginx.ingress.kubernetes.io/limit-burst-multiplier: '3'
     hosts:
       - grafana.maxstash.io
     path: /
