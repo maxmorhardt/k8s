@@ -55,7 +55,7 @@ alloy:
         path       = "/var/log/journal"
         forward_to = [loki.write.default.receiver]
         labels     = {
-          job     = "node/journal",
+          job     = "node/network-watchdog",
           node    = sys.env("HOSTNAME"),
           cluster = "default",
         }
