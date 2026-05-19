@@ -131,7 +131,7 @@ worker:
       cpu: 250m
       memory: 512Mi
     limits:
-      cpu: 500m
+      cpu: 600m
       memory: 1Gi
   containerPorts:
     http: 9000

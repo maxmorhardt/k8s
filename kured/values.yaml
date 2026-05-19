@@ -1,0 +1,36 @@
+extraEnvVars:
+  - name: KURED_NOTIFY_URL
+    valueFrom:
+      secretKeyRef:
+        name: kured-discord
+        key: url
+
+configuration:
+  rebootDays: [tue]
+  startTime: "02:00"
+  rebootCommand: /usr/local/bin/pre-reboot.sh
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    memory: 64Mi
+
+metrics:
+  create: true
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+  interval: 60s
+
+service:
+  create: true
+
+tolerations:
+  - key: node-role.kubernetes.io/control-plane
+    operator: Exists
+    effect: NoSchedule
+  - key: node-role.kubernetes.io/master
+    operator: Exists
+    effect: NoSchedule
