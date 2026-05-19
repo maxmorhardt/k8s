@@ -8,6 +8,8 @@ extraEnvVars:
 configuration:
   rebootDays: [tue]
   startTime: "02:00"
+  endTime: "04:00"
+  timeZone: America/New_York
   rebootCommand: /usr/local/bin/pre-reboot.sh
 
 resources:
