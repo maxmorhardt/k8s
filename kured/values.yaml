@@ -11,13 +11,15 @@ configuration:
   endTime: "04:00"
   timeZone: America/New_York
   rebootCommand: /usr/local/bin/pre-reboot.sh
+  lockReleaseDelay: 10m
+  drainTimeout: 5m
 
 resources:
   requests:
     cpu: 10m
     memory: 32Mi
   limits:
-    memory: 64Mi
+    memory: 512Mi
 
 metrics:
   create: true
