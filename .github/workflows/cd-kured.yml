@@ -1,0 +1,17 @@
+name: kured CD
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cd:
+    uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
+    with:
+      repository: ${{ github.repository }}
+      release_name: kured
+      namespace: kube-system
+      values_file: kured/values.yaml
+      helm_repo_name: kubereboot
+      helm_repo_url: https://kubereboot.github.io/charts
+      chart: kubereboot/kured
+    secrets: inherit

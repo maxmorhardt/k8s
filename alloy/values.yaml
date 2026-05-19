@@ -25,17 +25,17 @@ alloy:
         }
       }
 
-      local.file_match "rehydrate_logs" {
+      local.file_match "kured_logs" {
         path_targets = [{
-            __path__  = "/var/log/rehydrate/*.log",
-            job       = "node/rehydrate",
+            __path__  = "/var/log/kured/*.log",
+            job       = "node/kured",
             node_name = sys.env("HOSTNAME"),
             cluster   = "default",
         }]
       }
 
-      loki.source.file "rehydrate_logs" {
-        targets    = local.file_match.rehydrate_logs.targets
+      loki.source.file "kured_logs" {
+        targets    = local.file_match.kured_logs.targets
         forward_to = [loki.write.default.receiver]
       }
 

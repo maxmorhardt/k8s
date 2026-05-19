@@ -50,83 +50,6 @@ windowsMonitoring:
 
 alertmanager:
   enabled: true
-  config:
-    global:
-      resolve_timeout: 5m
-      smtp_from: no-reply@maxstash.io
-      smtp_smarthost: smtp.zoho.com:587
-      smtp_auth_username: no-reply@maxstash.io
-      smtp_auth_password_file: '/etc/alertmanager/secrets/alertmanager/smtp-password'
-      smtp_require_tls: true
-    inhibit_rules:
-      - source_matchers:
-          - 'severity = critical'
-        target_matchers:
-          - 'severity =~ warning|info'
-        equal:
-          - 'namespace'
-          - 'alertname'
-      - source_matchers:
-          - 'severity = warning'
-        target_matchers:
-          - 'severity = info'
-        equal:
-          - 'namespace'
-          - 'alertname'
-      - source_matchers:
-          - 'alertname = InfoInhibitor'
-        target_matchers:
-          - 'severity = info'
-        equal:
-          - 'namespace'
-      - target_matchers:
-          - 'alertname = InfoInhibitor'
-    time_intervals:
-      - name: maintenance-window
-        time_intervals:
-          - weekdays: [tuesday]
-            times:
-              - start_time: '02:00'
-                end_time: '04:00'
-    route:
-      group_by: ['namespace']
-      group_wait: 30s
-      group_interval: 5m
-      repeat_interval: 12h
-      receiver: 'null'
-      routes:
-        - match:
-            alertname: Watchdog
-          receiver: 'null'
-        - match:
-            alertname: InfoInhibitor
-          receiver: 'null'
-        - match:
-            severity: critical
-          receiver: 'email-receiver'
-          continue: true
-          mute_time_intervals:
-            - maintenance-window
-        - receiver: 'discord-receiver'
-          continue: true
-          mute_time_intervals:
-            - maintenance-window
-    receivers:
-      - name: 'null'
-      - name: 'email-receiver'
-        email_configs:
-          - to: maxmorhardt13@gmail.com
-            send_resolved: false
-      - name: 'discord-receiver'
-        discord_configs:
-          - send_resolved: true
-            webhook_url: <discord-webhook>
-            # not yet supported by prom operator
-            # https://github.com/prometheus-operator/prometheus-operator/issues/7159
-            # webhook_url_file: /etc/alertmanager/secrets/alertmanager/discord-webhook
-            username: 'Alerts'
-    templates:
-      - '/etc/alertmanager/config/*.tmpl'
   service:
     port: 9093
   serviceMonitor:
@@ -137,9 +60,9 @@ alertmanager:
       repository: prometheus/alertmanager
       tag: v0.30.0
       pullPolicy: IfNotPresent
-    replicas: 1
+    replicas: 2
     retention: 120h
-    secrets: ['alertmanager']
+    configSecret: alertmanager
     storage:
       volumeClaimTemplate:
         spec:
@@ -148,6 +71,15 @@ alertmanager:
           resources:
             requests:
               storage: 1Gi
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: alertmanager
+              topologyKey: kubernetes.io/hostname
     resources:
       requests:
         cpu: 50m
@@ -271,7 +203,7 @@ grafana:
       memory: 256Mi
     limits:
       cpu: 250m
-      memory: 512Mi
+      memory: 768Mi
   securityContext:
     runAsNonRoot: true
     runAsUser: 1000
