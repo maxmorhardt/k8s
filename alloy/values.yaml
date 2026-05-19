@@ -12,9 +12,21 @@ alloy:
     - name: varlog
       hostPath:
         path: /var/log
+    - name: runlogjournal
+      hostPath:
+        path: /run/log/journal
+    - name: machineid
+      hostPath:
+        path: /etc/machine-id
   extraVolumeMounts:
     - name: varlog
       mountPath: /var/log
+      readOnly: true
+    - name: runlogjournal
+      mountPath: /run/log/journal
+      readOnly: true
+    - name: machineid
+      mountPath: /etc/machine-id
       readOnly: true
   configMap:
     create: true
@@ -37,6 +49,17 @@ alloy:
       loki.source.file "kured_logs" {
         targets    = local.file_match.kured_logs.targets
         forward_to = [loki.write.default.receiver]
+      }
+
+      loki.source.journal "node_journal" {
+        path       = "/var/log/journal"
+        forward_to = [loki.write.default.receiver]
+        labels     = {
+          job     = "node/journal",
+          node    = sys.env("HOSTNAME"),
+          cluster = "default",
+        }
+        matches = "_SYSTEMD_UNIT=network-watchdog.service"
       }
 
       discovery.kubernetes "pod" {
