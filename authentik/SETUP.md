@@ -158,6 +158,51 @@ settings:
     base: dark
 ```
 
+## Embedded Outpost (Proxy Forward Auth)
+
+Used to protect applications via nginx ingress forward auth without a separate outpost deployment.
+
+### Create a Proxy Provider
+
+**Applications → Providers → Create → Proxy Provider**
+
+- **Mode**: `Forward auth (single application)`
+- **External host**: `https://<your-app-domain>`
+- **Authorization flow**: `default-provider-authorization-implicit-consent`
+
+### Create an Application
+
+**Applications → Applications → Create**
+
+- **Provider**: select the proxy provider above
+- Add policy/group bindings under the **Bindings** tab to restrict access
+
+### Add Application to Outpost
+
+**Outposts → Edit embedded outpost** → move the application to **Selected Applications** → **Update**
+
+### Nginx Ingress Annotations
+
+Add to the application's ingress `values.yaml`:
+
+```yaml
+nginx.ingress.kubernetes.io/auth-url: "https://<your-authentik-domain>/outpost.goauthentik.io/auth/nginx"
+nginx.ingress.kubernetes.io/auth-signin: "https://<your-app-domain>/outpost.goauthentik.io/start?rd=https://<your-app-domain>$request_uri"
+nginx.ingress.kubernetes.io/auth-response-headers: "Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid"
+nginx.ingress.kubernetes.io/auth-snippet: |
+  proxy_set_header X-Original-URL $scheme://$http_host$request_uri;
+  proxy_set_header X-Forwarded-Host $http_host;
+nginx.ingress.kubernetes.io/server-snippet: |
+  location /outpost.goauthentik.io {
+    proxy_pass http://authentik-server.authentik.svc.cluster.local:80;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+```
+
 ## OIDC Endpoints
 
 - **Discovery**: `https://login.maxstash.io/application/o/<app-slug>/well-known/openid-configuration`
