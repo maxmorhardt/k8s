@@ -98,7 +98,7 @@ receivers:
         send_resolved: false
   - name: email-receiver
     email_configs:
-      - to: maxmorhardt13@gmail.com
+      - to: max@maxstash.io
         send_resolved: false
   - name: discord-receiver
     discord_configs:
