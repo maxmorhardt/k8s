@@ -99,6 +99,7 @@ Create the Authentik database and user in PostgreSQL
 ### Custom CSS
 
 ```css
+/* Hide locale selector and footer links */
 ak-flow-executor::part(locale-select) {
   display: none;
 }
@@ -107,16 +108,19 @@ ak-brand-links {
   display: none !important;
 }
 
+/* Round the main card */
 ak-flow-executor::part(main) {
-  border-radius: 0.75rem;
+  border-radius: 0.6rem;
 }
 
+/* Position and size the branding/logo area */
 ak-flow-executor::part(branding) {
   max-height: 60px;
   padding-top: 5rem;
   margin-bottom: 1.5rem;
 }
 
+/* Center and constrain the logo image */
 .branding-logo {
   display: block;
   width: 300px;
@@ -125,15 +129,33 @@ ak-flow-executor::part(branding) {
   margin: 1.5rem auto 1rem;
 }
 
+/* Remove drop shadow from the login card */
 .pf-c-login__main {
   --pf-c-login__main--BoxShadow: none !important;
 }
 
-[slot="page-tokens"],
-li[part="tab-item"]:has(button[name="page-tokens"]) {
+/* Hide the page-credentials tab */
+[slot="page-credentials"],
+li[part="tab-item"]:has(button[name="page-credentials"]) {
   display: none !important;
 }
 
+/* Reduce space above the submit button */
+.pf-c-form__group.pf-m-action {
+  margin-top: 0.05rem;
+}
+
+/* Add space between footer links */
+.pf-c-login__main-footer-band-item + .pf-c-login__main-footer-band-item {
+  margin-top: 0.75rem;
+}
+
+/* Add padding below the last footer link */
+.pf-c-login__main-footer-band {
+  padding-bottom: .5rem !important;
+}
+
+/* Fix autofill background on dark theme */
 input:-webkit-autofill,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:hover,
