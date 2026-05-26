@@ -7,6 +7,7 @@ charts
 __pycache__
 .env
 k3s/bootstrap/bootstrap-output/
+k3s/bootstrap/bootstrap-all.sh
 
 # pg
 postgres-dumpall*.sql
