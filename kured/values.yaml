@@ -5,6 +5,8 @@ extraEnvVars:
         name: kured-discord
         key: url
 
+hostNetwork: true
+
 configuration:
   rebootDays: [tue]
   startTime: "02:00"
