@@ -1,8 +1,9 @@
 DUMP_FILE="postgres-dumpall.sql"
-POD_NAME="postgres-cluster-1"
 NAMESPACE="cnpg-database"
 
-echo "Copying dump file to pod..."
+POD_NAME=$(kubectl get pod -n "$NAMESPACE" -l "cnpg.io/instanceRole=primary,cnpg.io/cluster=postgres-cluster" -o jsonpath='{.items[0].metadata.name}')
+
+echo "Copying dump file to pod ($POD_NAME)..."
 kubectl cp "$DUMP_FILE" "$NAMESPACE/$POD_NAME:/var/lib/postgresql/data/restore.sql" -c postgres
 
 echo "Copy complete!"
