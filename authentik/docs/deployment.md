@@ -4,7 +4,7 @@ Standing up authentik. Post-deploy config: [initial-config.md](initial-config.md
 
 ## Secrets
 
-Copy [`secret.example.yaml`](../secret.example.yaml) to `secret.yaml` (gitignored), fill in real values, generate the key with `openssl rand -base64 60` (**save it**). Holds the secret key, PostgreSQL primary + read-replica creds, and SMTP settings.
+Fill in [`secret.example.yaml`](../secret.example.yaml), generate the key with `openssl rand -base64 60` (**save it**). Holds the secret key, PostgreSQL primary + read-replica creds, and SMTP settings.
 
 > Omit the `AUTHENTIK_POSTGRESQL__READ_REPLICAS__*` keys on the **initial** deploy — add them once the replica exists.
 
