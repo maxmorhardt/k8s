@@ -19,9 +19,14 @@ global:
   volumes:
     - name: sources
       emptyDir: {}
+    - name: email-templates
+      configMap:
+        name: authentik-email-templates
   volumeMounts:
     - name: sources
       mountPath: /web/authentik/sources/custom
+    - name: email-templates
+      mountPath: /templates
 
 authentik:
   enabled: false

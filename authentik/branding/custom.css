@@ -1,0 +1,85 @@
+/* Hide locale selector and footer links */
+ak-flow-executor::part(locale-select) {
+  display: none;
+}
+
+ak-brand-links {
+  display: none !important;
+}
+
+/* Round the main card */
+ak-flow-executor::part(main) {
+  border-radius: 0.6rem;
+}
+
+/* Position and size the branding/logo area */
+ak-flow-executor::part(branding) {
+  max-height: 60px;
+  padding-top: 5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Center and constrain the logo image */
+.branding-logo {
+  display: block;
+  width: 300px;
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem auto 1rem;
+}
+
+/* Remove drop shadow from the login card */
+.pf-c-login__main {
+  --pf-c-login__main--BoxShadow: none !important;
+}
+
+/* Hide the page-credentials tab */
+[slot="page-credentials"],
+li[part="tab-item"]:has(button[name="page-credentials"]) {
+  display: none !important;
+}
+
+/* Reduce space above the submit button */
+.pf-c-form__group.pf-m-action {
+  margin-top: 0.05rem;
+}
+
+/* Add space between footer links */
+.pf-c-login__main-footer-band-item + .pf-c-login__main-footer-band-item {
+  margin-top: 0.75rem;
+}
+
+/* Add padding below the last footer link */
+.pf-c-login__main-footer-band {
+  padding-bottom: .5rem !important;
+}
+
+/* Hide "Powered by authentik" footer */
+[name="flow-links"] {
+  display: none !important;
+}
+
+/* Stop authentik's dark theme from inverting source/social login icons */
+ak-flow-executor::part(source-icon),
+.pf-c-login__main-footer-links-item img,
+.pf-c-login__main-footer-links-item .fas,
+.source-button img,
+.pf-c-data-list__cell img {
+  filter: none !important;
+}
+
+/* Fix autofill background on dark theme */
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: inherit !important;
+  caret-color: inherit !important;
+  transition:
+    background-color 9999s ease-in-out 0s,
+    color 9999s ease-in-out 0s;
+}
