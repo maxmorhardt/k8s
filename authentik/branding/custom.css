@@ -7,9 +7,10 @@ ak-brand-links {
   display: none !important;
 }
 
-/* Round the main card */
+/* Main card part */
 ak-flow-executor::part(main) {
-  border-radius: 0.6rem;
+  border-radius: 16px;
+  overflow: hidden;
 }
 
 /* Position and size the branding/logo area */
@@ -28,9 +29,16 @@ ak-flow-executor::part(branding) {
   margin: 1.5rem auto 1rem;
 }
 
-/* Remove drop shadow from the login card */
+/* Login card */
 .pf-c-login__main {
   --pf-c-login__main--BoxShadow: none !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  background: rgba(20, 21, 28, 0.85) !important;
+  overflow: hidden !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Hide the page-credentials tab */
