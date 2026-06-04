@@ -6,12 +6,6 @@ Branded overrides for authentik's stock emails. Templates live in [`templates/`]
 |------|---------|
 | [`templates/password_recovery.html`](../templates/password_recovery.html) | Password reset email for the recovery flow |
 
-## How they work
-
-- Django HTML templates extending `{% extends "email/base.html" %}`.
-- Email-stage context: `url` (action link), `user` (`user.username`, …), `expires` (`{{ expires|naturaltime }}`).
-- Sent by the **worker**, read for the dropdown by the **server** — must be mounted on both (the `global.volumeMounts` in `values.yaml` covers both).
-
 ## Deploy
 
 1. ConfigMap from the templates:
