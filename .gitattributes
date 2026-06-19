@@ -1,5 +1,1 @@
-# Force LF line endings in the working tree for the whole repo.
-# Everything here is deployed to Linux nodes (shell scripts, systemd units,
-# YAML, Python), so CRLF must never reach a node. eol=lf overrides any local
-# core.autocrlf setting on checkout.
 * text=auto eol=lf
