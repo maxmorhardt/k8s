@@ -50,9 +50,15 @@ server:
         - sh
         - -c
         - |
-          mkdir -p /web/authentik/sources/custom
-          cd /web/authentik/sources/custom
-          git clone https://github.com/maxmorhardt/assets .
+          set -e
+          DEST=/web/authentik/sources/custom
+          mkdir -p "$DEST"
+          cd "$DEST"
+          if [ -d .git ]; then
+            echo "assets already cloned, skipping"
+          else
+            git clone --depth 1 https://github.com/maxmorhardt/assets .
+          fi
       volumeMounts:
         - name: sources
           mountPath: /web/authentik/sources/custom
