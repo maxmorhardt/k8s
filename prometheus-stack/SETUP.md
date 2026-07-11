@@ -149,7 +149,8 @@ curl -X POST http://localhost:9093/api/v2/alerts -H "Content-Type: application/j
 
 ## Dependencies
 - PostgreSQL database for Grafana
-- Authentik OIDC provider at login.maxstash.io (user with `grafana-admin` group)
+- Dex OIDC provider at login.maxstash.io (`grafana` static client; admin granted by email via `role_attribute_path`)
+- Envoy Gateway (`maxstash` Gateway) for the grafana.maxstash.io HTTPRoute
 
 ## Notes
 - Default retention is 14 days for Prometheus metrics

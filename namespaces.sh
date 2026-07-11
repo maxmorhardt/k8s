@@ -3,7 +3,9 @@ kubectl create namespace cnpg-database
 
 kubectl create namespace nats
 
-kubectl create namespace authentik
+kubectl create namespace envoy-gateway-system
+
+kubectl create namespace dex
 
 kubectl create namespace squares
 kubectl create namespace apps

@@ -1,0 +1,108 @@
+replicaCount: 2
+
+envFrom:
+  - secretRef:
+      name: dex-env
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  fsGroup: 1001
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: dex
+
+httpRoute:
+  enabled: true
+  parentRefs:
+    - name: maxstash
+      namespace: envoy-gateway-system
+  hostnames:
+    - login.maxstash.io
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+
+config:
+  issuer: https://login.maxstash.io
+
+  storage:
+    type: postgres
+    config:
+      host: postgres-cluster-rw.cnpg-database.svc.cluster.local
+      port: 5432
+      database: dex
+      user: dex
+      password: $DEX_POSTGRES_PASSWORD
+      ssl:
+        mode: require
+
+  oauth2:
+    # apps deep-link to a provider with connector_id, so dex never needs its own picker/consent
+    skipApprovalScreen: true
+
+  # no local user database; identity comes only from the social connectors
+  enablePasswordDB: false
+
+  connectors:
+    - type: google
+      id: google
+      name: Google
+      config:
+        clientID: $GOOGLE_CLIENT_ID
+        clientSecret: $GOOGLE_CLIENT_SECRET
+        redirectURI: https://login.maxstash.io/callback
+
+    - type: github
+      id: github
+      name: GitHub
+      config:
+        clientID: $GITHUB_CLIENT_ID
+        clientSecret: $GITHUB_CLIENT_SECRET
+        redirectURI: https://login.maxstash.io/callback
+        loadAllGroups: false
+
+  staticClients:
+    # spas: public clients, pkce, no secret
+    - id: squares
+      name: Squares
+      public: true
+      redirectURIs:
+        - https://squares.maxstash.io/auth/callback
+        - http://localhost:3000/auth/callback
+
+    - id: olympics
+      name: Olympics
+      public: true
+      redirectURIs:
+        - https://olympics.maxstash.io/auth/callback
+        - http://localhost:3000/auth/callback
+
+    # confidential clients
+    - id: grafana
+      name: Grafana
+      secretEnv: GRAFANA_CLIENT_SECRET
+      redirectURIs:
+        - https://grafana.maxstash.io/login/generic_oauth

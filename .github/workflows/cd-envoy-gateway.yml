@@ -1,0 +1,21 @@
+name: Envoy Gateway CD
+
+on:
+  workflow_dispatch:
+    inputs:
+      chart_version:
+        description: Envoy Gateway version to deploy
+        required: false
+        type: string
+        default: 'v1.8.2'
+jobs:
+  cd:
+    uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
+    with:
+      repository: ${{ github.repository }}
+      release_name: envoy-gateway
+      namespace: envoy-gateway-system
+      values_file: envoy-gateway/values.yaml
+      chart: oci://docker.io/envoyproxy/gateway-helm
+      chart_version: ${{ github.event.inputs.chart_version }}
+    secrets: inherit
