@@ -56,6 +56,14 @@ httpRoute:
 config:
   issuer: https://login.maxstash.io
 
+  web:
+    allowedOrigins:
+      - https://squares.maxstash.io
+      - https://olympics.maxstash.io
+      - https://ages.maxstash.io
+      - https://grafana.maxstash.io
+      - http://localhost:3000
+
   storage:
     type: postgres
     config:
@@ -68,10 +76,8 @@ config:
         mode: require
 
   oauth2:
-    # apps deep-link to a provider with connector_id, so dex never needs its own picker/consent
     skipApprovalScreen: true
 
-  # no local user database; identity comes only from the social connectors
   enablePasswordDB: false
 
   connectors:
@@ -93,7 +99,6 @@ config:
         loadAllGroups: false
 
   staticClients:
-    # spas: public clients, pkce, no secret
     - id: squares
       name: Squares
       public: true
@@ -108,7 +113,13 @@ config:
         - https://olympics.maxstash.io/auth/callback
         - http://localhost:3000/auth/callback
 
-    # confidential clients
+    - id: ages
+      name: Ages
+      public: true
+      redirectURIs:
+        - https://ages.maxstash.io
+        - http://localhost:3000
+
     - id: grafana
       name: Grafana
       secretEnv: GRAFANA_CLIENT_SECRET
