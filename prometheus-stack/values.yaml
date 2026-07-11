@@ -160,17 +160,15 @@ grafana:
     auth.generic_oauth:
       enabled: true
       name: maxstash
-      # client_id is 'grafana' and the secret must match GRAFANA_CLIENT_SECRET in the dex-env secret
       client_id: '${GF_OAUTH_CLIENT_ID}'
       client_secret: '${GF_OAUTH_CLIENT_SECRET}'
       scopes: 'openid email profile offline_access'
-      auth_url: 'https://login.maxstash.io/auth'
+      auth_url: 'https://login.maxstash.io/auth?connector_id=google'
       token_url: 'https://login.maxstash.io/token'
       api_url: 'https://login.maxstash.io/userinfo'
       allow_sign_up: true
       auto_login: false
       use_refresh_token: true
-      # dex has no groups; admin is granted by email
       role_attribute_path: email == 'maxmorhardt13@gmail.com' && 'Admin'
       role_attribute_strict: true
       use_pkce: true
