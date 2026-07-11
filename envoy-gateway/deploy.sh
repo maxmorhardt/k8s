@@ -8,5 +8,3 @@ helm upgrade envoy-gateway oci://docker.io/envoyproxy/gateway-helm \
 	--namespace envoy-gateway-system \
 	--create-namespace \
 	--values values.yaml
-
-kubectl apply -f manifests/

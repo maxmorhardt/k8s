@@ -9,7 +9,7 @@ on:
         type: string
         default: 'v1.8.2'
 jobs:
-  controller:
+  cd:
     uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
     with:
       repository: ${{ github.repository }}
@@ -19,38 +19,3 @@ jobs:
       chart: oci://docker.io/envoyproxy/gateway-helm
       chart_version: ${{ github.event.inputs.chart_version }}
     secrets: inherit
-
-  gateway:
-    name: Apply Gateway manifests
-    needs: controller
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Setup Tailscale
-        uses: tailscale/github-action@v4
-        with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
-          tags: tag:ci
-
-      - name: Setup kubectl
-        uses: azure/setup-kubectl@v5
-        with:
-          version: 'latest'
-
-      - name: Configure kubeconfig
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
-
-      - name: Apply manifests
-        run: kubectl apply -f envoy-gateway/manifests/
-
-      - name: Cleanup kubeconfig
-        if: always()
-        run: |
-          rm -f $HOME/.kube/config
