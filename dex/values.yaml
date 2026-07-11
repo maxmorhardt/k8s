@@ -115,10 +115,9 @@ config:
 
     - id: ages
       name: Ages
-      public: true
+      secretEnv: AGES_CLIENT_SECRET
       redirectURIs:
-        - https://ages.maxstash.io
-        - http://localhost:3000
+        - https://ages.maxstash.io/oauth2/callback
 
     - id: grafana
       name: Grafana
