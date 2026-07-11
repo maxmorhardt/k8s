@@ -1,0 +1,69 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: maxstash
+  namespace: envoy-gateway-system
+spec:
+  gatewayClassName: maxstash
+  listeners:
+    # port 80 only exists to redirect to https (cloudflare already forces https at the edge)
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https-apex
+      port: 443
+      protocol: HTTPS
+      hostname: maxstash.io
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: maxstash.io-tls
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https-wildcard
+      port: 443
+      protocol: HTTPS
+      hostname: '*.maxstash.io'
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: maxstash.io-tls
+      allowedRoutes:
+        namespaces:
+          from: All
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: https-redirect
+  namespace: envoy-gateway-system
+spec:
+  parentRefs:
+    - name: maxstash
+      sectionName: http
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: ClientTrafficPolicy
+metadata:
+  name: maxstash
+  namespace: envoy-gateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: maxstash
+  # cloudflare is exactly one trusted hop in front of the gateway, so the
+  # rightmost-1 x-forwarded-for entry is the real client ip
+  clientIPDetection:
+    xForwardedFor:
+      numTrustedHops: 1

@@ -2,7 +2,8 @@
 
 ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)
 ![Tailscale](https://img.shields.io/badge/tailscale-242424?style=for-the-badge&logo=tailscale&logoColor=white)
-![Authentik](https://img.shields.io/badge/Authentik-FD4B2D?style=for-the-badge&logo=authentik&logoColor=white)
+![Envoy Gateway](https://img.shields.io/badge/Envoy%20Gateway-AC6199?style=for-the-badge&logo=envoyproxy&logoColor=white)
+![Dex](https://img.shields.io/badge/Dex-3778E1?style=for-the-badge&logo=openid&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
 ![NATS](https://img.shields.io/badge/nats-27AAE1?style=for-the-badge&logo=nats.io&logoColor=white)
@@ -19,7 +20,8 @@ A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with productio
 ## Features
 - **Container Orchestration** with Kubernetes (K3s)
 - **Persistent Storage** with local-path-retain StorageClass (Retain reclaim policy)
-- **Authentication & Authorization** via Authentik OIDC/SAML provider
+- **Traffic Management** via Envoy Gateway (Gateway API) — one gateway for all hostnames, APIs path-routed behind `api.maxstash.io/*`
+- **Authentication** via Dex OIDC, federating Google and GitHub sign-in
 - **Data Persistence** with PostgreSQL HA cluster and NATS messaging
 - **CI/CD Pipeline** using GitHub Actions with shared reusable workflows
 - **Monitoring & Observability** with Prometheus, Grafana dashboards, and Alertmanager (Discord + email alerts, healthchecks.io dead-man's switch)
@@ -28,7 +30,7 @@ A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with productio
 - **Production Ready** with resource limits, application-level replication, and security configurations
 
 ## Architecture
-The stack follows a microservices architecture where each service is independently deployable with Helm charts. Services communicate through Kubernetes networking, with Authentik providing centralized authentication for applications requiring OIDC/SAML. CI/CD is handled via GitHub Actions.
+The stack follows a microservices architecture where each service is independently deployable with Helm charts. All HTTP traffic enters through a single Envoy Gateway (Gateway API): UIs get a hostname each, APIs share `api.maxstash.io` split by path prefix, and Dex at `login.maxstash.io` provides OIDC with Google/GitHub sign-in. CI/CD is handled via GitHub Actions.
 
 ```
       ┌──────────────┐    ┌──────────────┐
@@ -36,11 +38,15 @@ The stack follows a microservices architecture where each service is independent
       │    (K3s)     │    │   (CI/CD)    │
       └──────────────┘    └──────────────┘
                         │
+                 ┌──────▼───────┐
+                 │Envoy Gateway │
+                 │(Gateway API) │
+                 └──────┬───────┘
        ┌────────────────┼────────────────┐
        │                │                │
   ┌────▼─────┐    ┌─────▼──────┐    ┌───▼────┐
-  │Authentik │    │Prometheus/ │    │ Loki/  │
-  │  (Auth)  │    │ Grafana    │    │ Alloy  │
+  │   Dex    │    │Prometheus/ │    │ Loki/  │
+  │  (OIDC)  │    │ Grafana    │    │ Alloy  │
   └──────────┘    │(Monitoring)│    │(Logs)  │
                   └────────────┘    └────────┘
        ┌──────────────┼──────────────┐
@@ -57,10 +63,11 @@ The stack follows a microservices architecture where each service is independent
 1. **Core Infrastructure**: K3s cluster with Tailscale on nodes
 2. **Storage Layer**: `kubectl apply -f storage/local-path-retain.yaml`
 3. **Database Layer**: Postgres
-4. **Access & Visualization**: Kube Prometheus Stack
-5. **Core Services**: NATS, Loki, Alloy
-6. **Authentication**: Authentik
-7. **Node Maintenance**: kured
+4. **Traffic Management**: Envoy Gateway
+5. **Access & Visualization**: Kube Prometheus Stack
+6. **Core Services**: NATS, Loki, Alloy
+7. **Authentication**: Dex
+8. **Node Maintenance**: kured
 
 **Note:** Redeploys will be required if apps are installed prior to Prometheus CRDs
 
