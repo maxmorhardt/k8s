@@ -87,4 +87,4 @@ kured (Kubernetes Reboot Daemon) runs as a DaemonSet on all nodes including cont
 Logs are written to `/var/log/kured` on each node. Reboot notifications are sent to Discord.
 
 ### k3s Upgrades
-Rancher's system-upgrade-controller watches the k3s stable release channel and rolls out new versions as they land. Control-plane nodes upgrade first via `server-plan`; workers wait on that plan to finish, then drain and upgrade one at a time via `agent-plan`. This handles the k3s version only — kured still owns OS updates and reboots. See [system-upgrade-controller/SETUP.md](system-upgrade-controller/SETUP.md).
+Rancher's system-upgrade-controller watches the k3s stable release channel and rolls out new versions during a Wednesday 02:00–04:00 ET window. Control-plane nodes upgrade first via `server-plan`; workers wait on that plan to finish, then drain and upgrade one at a time via `agent-plan`. This handles the k3s version only. kured still owns OS updates and reboots. See [system-upgrade-controller/SETUP.md](system-upgrade-controller/SETUP.md).

@@ -1,5 +1,4 @@
 ---
-# control-plane nodes upgrade first; agents wait on this plan via their prepare step
 apiVersion: upgrade.cattle.io/v1
 kind: Plan
 metadata:
@@ -18,9 +17,14 @@ spec:
   upgrade:
     image: rancher/k3s-upgrade
   channel: https://update.k3s.io/v1-release/channels/stable
+  window:
+    days:
+      - wednesday
+    startTime: "02:00"
+    endTime: "04:00"
+    timeZone: America/New_York
 
 ---
-# workers drain so pods reschedule before k3s restarts, one node at a time
 apiVersion: upgrade.cattle.io/v1
 kind: Plan
 metadata:
@@ -45,3 +49,9 @@ spec:
   upgrade:
     image: rancher/k3s-upgrade
   channel: https://update.k3s.io/v1-release/channels/stable
+  window:
+    days:
+      - wednesday
+    startTime: "02:00"
+    endTime: "04:00"
+    timeZone: America/New_York
