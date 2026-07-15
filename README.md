@@ -27,6 +27,7 @@ A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with productio
 - **Monitoring & Observability** with Prometheus, Grafana dashboards, and Alertmanager (Discord + email alerts, healthchecks.io dead-man's switch)
 - **Centralized Logging** via Loki and Alloy data collection
 - **Automated Node Maintenance** with kured — weekly coordinated reboots with pre-reboot cleanup (apt upgrade, image prune, log rotation)
+- **Automated k3s Upgrades** with Rancher's system-upgrade-controller — tracks the stable release channel, control plane first, one node at a time
 - **Production Ready** with resource limits, application-level replication, and security configurations
 
 ## Architecture
@@ -68,6 +69,7 @@ The stack follows a microservices architecture where each service is independent
 6. **Core Services**: NATS, Loki, Alloy
 7. **Authentication**: Dex
 8. **Node Maintenance**: kured
+9. **k3s Upgrades**: system-upgrade-controller
 
 **Note:** Redeploys will be required if apps are installed prior to Prometheus CRDs
 
@@ -83,3 +85,6 @@ kured (Kubernetes Reboot Daemon) runs as a DaemonSet on all nodes including cont
 - Clear `/tmp` and `/var/tmp`
 
 Logs are written to `/var/log/kured` on each node. Reboot notifications are sent to Discord.
+
+### k3s Upgrades
+Rancher's system-upgrade-controller watches the k3s stable release channel and rolls out new versions during a Wednesday 02:00–04:00 ET window. Control-plane nodes upgrade first via `server-plan`; workers wait on that plan to finish, then drain and upgrade one at a time via `agent-plan`. This handles the k3s version only. kured still owns OS updates and reboots. See [system-upgrade-controller/SETUP.md](system-upgrade-controller/SETUP.md).
