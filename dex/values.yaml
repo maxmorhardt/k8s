@@ -88,6 +88,7 @@ config:
         clientID: $GOOGLE_CLIENT_ID
         clientSecret: $GOOGLE_CLIENT_SECRET
         redirectURI: https://login.maxstash.io/callback
+        promptType: ""
 
     - type: github
       id: github
