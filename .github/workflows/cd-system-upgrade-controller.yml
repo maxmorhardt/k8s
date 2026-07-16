@@ -5,45 +5,16 @@ on:
 
 jobs:
   cd:
-    name: System Upgrade Controller CD
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Setup Tailscale
-        uses: tailscale/github-action@v4
-        with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
-          tags: tag:ci
-
-      - name: Setup kubectl
-        uses: azure/setup-kubectl@v5
-        with:
-          version: 'latest'
-
-      - name: Configure kubeconfig
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
-
-      - name: Deploy controller
-        run: |
-          kubectl apply \
-            -f https://github.com/rancher/system-upgrade-controller/releases/latest/download/crd.yaml \
-            -f https://github.com/rancher/system-upgrade-controller/releases/latest/download/system-upgrade-controller.yaml
-          kubectl wait --for=condition=established --timeout=60s crd/plans.upgrade.cattle.io
-          kubectl rollout status deployment/system-upgrade-controller -n system-upgrade --timeout=5m
-
-      - name: Deploy plans
-        run: |
-          kubectl apply -f system-upgrade-controller/plans.yaml
-          kubectl get plans -n system-upgrade
-
-      - name: Cleanup kubeconfig
-        if: always()
-        run: |
-          rm -f $HOME/.kube/config
+    uses: maxmorhardt/workflows/.github/workflows/cd-manifest.yml@main
+    with:
+      repository: ${{ github.repository }}
+      manifests: |
+        https://github.com/rancher/system-upgrade-controller/releases/latest/download/crd.yaml
+        https://github.com/rancher/system-upgrade-controller/releases/latest/download/system-upgrade-controller.yaml
+      wait_for: |
+        --for=condition=established crd/plans.upgrade.cattle.io
+      rollout: |
+        deployment/system-upgrade-controller -n system-upgrade
+      post_manifests: |
+        system-upgrade-controller/plans.yaml
+    secrets: inherit
