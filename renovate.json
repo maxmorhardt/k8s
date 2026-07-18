@@ -20,8 +20,8 @@
     },
     {
       "customType": "regex",
-      "description": "track pinned github-release manifest versions in cd-*.yml workflows",
-      "managerFilePatterns": ["/^\\.github/workflows/cd-.*\\.ya?ml$/"],
+      "description": "track pinned github-release manifest versions in cd-*.yml workflows and deploy.sh scripts",
+      "managerFilePatterns": ["/^\\.github/workflows/cd-.*\\.ya?ml$/", "/(^|/)deploy\\.sh$/"],
       "datasourceTemplate": "github-releases",
       "matchStrings": [
         "github\\.com/(?<depName>[^/]+/[^/]+)/releases/download/(?<currentValue>v[0-9][^/]+)/"

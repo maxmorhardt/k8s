@@ -16,24 +16,30 @@ jobs:
 
       - name: Build validation matrix from cd-*.yml
         id: discover
+        shell: bash
         run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          # read a scalar `<key>: <value>` line from a cd workflow's with: block
+          field() { grep -E "^[[:space:]]+$1:[[:space:]]" "$2" 2>/dev/null | head -1 | sed -E "s/^[[:space:]]+$1:[[:space:]]+//" | tr -d '\r' || true; }
+
           items=()
           for f in .github/workflows/cd-*.yml; do
-            uses=$(yq '.jobs.cd.uses' "$f")
-            case "$uses" in *cd-helm.yml*) ;; *) continue ;; esac
+            # only helm-based CD jobs (skip cd-manifest callers)
+            grep -qE 'uses:.*cd-helm\.yml' "$f" || continue
 
-            chart=$(yq '.jobs.cd.with.chart' "$f")
-            repo_name=$(yq '.jobs.cd.with.helm_repo_name // ""' "$f")
-            repo_url=$(yq '.jobs.cd.with.helm_repo_url // ""' "$f")
+            chart=$(field chart "$f")
+            repo_name=$(field helm_repo_name "$f")
+            repo_url=$(field helm_repo_url "$f")
 
-            version_raw=$(yq '.jobs.cd.with.chart_version' "$f")
-            version=$(printf '%s' "$version_raw" | grep -oE "'[^']+'" | tail -1 | tr -d "'")
+            # pinned fallback: the default literal after '||' in the chart_version line
+            version=$(grep -E "chart_version:.*\|\|" "$f" 2>/dev/null | head -1 | sed -E "s/.*\|\|[[:space:]]*'([^']+)'.*/\1/" | tr -d '\r' || true)
 
-            values_raw=$(yq '.jobs.cd.with.values_file // ""' "$f")
-            if printf '%s' "$values_raw" | grep -q '\${{'; then
-              values=$(printf '%s' "$values_raw" | grep -oE "'[^']*\.yaml'" | tail -1 | tr -d "'")
-            else
-              values="$values_raw"
+            values=$(field values_file "$f")
+            # collapse a conditional values_file expression to its default *.yaml
+            if printf '%s' "$values" | grep -q '{{'; then
+              values=$(printf '%s' "$values" | grep -oE "'[^']*\.yaml'" | tail -1 | tr -d "'" || true)
             fi
 
             items+=("$(jq -n -c \
@@ -45,7 +51,12 @@ jobs:
               --arg values "$values" \
               '{name:$name, chart:$chart, chart_version:$version, helm_repo_name:$repo_name, helm_repo_url:$repo_url, values_file:$values}')")
           done
-          matrix=$(printf '%s\n' "${items[@]}" | jq -s -c '{include: .}')
+
+          if [ ${#items[@]} -eq 0 ]; then
+            matrix='{"include":[]}'
+          else
+            matrix=$(printf '%s\n' "${items[@]}" | jq -s -c '{include: .}')
+          fi
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
           echo "$matrix" | jq .
 
