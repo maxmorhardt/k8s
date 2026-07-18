@@ -4,8 +4,8 @@
   "customManagers": [
     {
       "customType": "regex",
-      "description": "track pinned helm chart versions in cd-*.yml workflows",
-      "managerFilePatterns": ["/^\\.github/workflows/cd-.*\\.ya?ml$/"],
+      "description": "track pinned helm chart versions in cd-*.yml and ci-k8s.yml workflows",
+      "managerFilePatterns": ["/^\\.github/workflows/cd-.*\\.ya?ml$/", "/^\\.github/workflows/ci-k8s\\.ya?ml$/"],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: registryUrl=(?<registryUrl>\\S+))?[^']*'(?<currentValue>[^']+)'"
       ]

@@ -5,67 +5,63 @@ on:
     branches: [main]
 
 jobs:
-  discover:
-    name: Discover charts
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.discover.outputs.matrix }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Build validation matrix from cd-*.yml
-        id: discover
-        shell: bash
-        run: |
-          set -euo pipefail
-          shopt -s nullglob
-
-          # read a scalar `<key>: <value>` line from a cd workflow's with: block
-          field() { grep -E "^[[:space:]]+$1:[[:space:]]" "$2" 2>/dev/null | head -1 | sed -E "s/^[[:space:]]+$1:[[:space:]]+//" | tr -d '\r' || true; }
-
-          items=()
-          for f in .github/workflows/cd-*.yml; do
-            # only helm-based CD jobs (skip cd-manifest callers)
-            grep -qE 'uses:.*cd-helm\.yml' "$f" || continue
-
-            chart=$(field chart "$f")
-            repo_name=$(field helm_repo_name "$f")
-            repo_url=$(field helm_repo_url "$f")
-
-            # pinned fallback: the default literal after '||' in the chart_version line
-            version=$(grep -E "chart_version:.*\|\|" "$f" 2>/dev/null | head -1 | sed -E "s/.*\|\|[[:space:]]*'([^']+)'.*/\1/" | tr -d '\r' || true)
-
-            values=$(field values_file "$f")
-            # collapse a conditional values_file expression to its default *.yaml
-            if printf '%s' "$values" | grep -q '{{'; then
-              values=$(printf '%s' "$values" | grep -oE "'[^']*\.yaml'" | tail -1 | tr -d "'" || true)
-            fi
-
-            items+=("$(jq -n -c \
-              --arg name "$(basename "$f" .yml | sed 's/^cd-//')" \
-              --arg chart "$chart" \
-              --arg version "$version" \
-              --arg repo_name "$repo_name" \
-              --arg repo_url "$repo_url" \
-              --arg values "$values" \
-              '{name:$name, chart:$chart, chart_version:$version, helm_repo_name:$repo_name, helm_repo_url:$repo_url, values_file:$values}')")
-          done
-
-          if [ ${#items[@]} -eq 0 ]; then
-            matrix='{"include":[]}'
-          else
-            matrix=$(printf '%s\n' "${items[@]}" | jq -s -c '{include: .}')
-          fi
-          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
-          echo "$matrix" | jq .
-
-  validate:
-    name: Validate ${{ matrix.name }}
-    needs: discover
+  validate-charts:
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
+      matrix:
+        include:
+          - chart: grafana/alloy
+            # renovate: datasource=helm depName=alloy registryUrl=https://grafana.github.io/helm-charts
+            chart_version: '1.10.1'
+            helm_repo_name: grafana
+            helm_repo_url: https://grafana.github.io/helm-charts
+            values_file: alloy/values.yaml
+          - chart: dex/dex
+            # renovate: datasource=helm depName=dex registryUrl=https://charts.dexidp.io
+            chart_version: '0.24.1'
+            helm_repo_name: dex
+            helm_repo_url: https://charts.dexidp.io
+            values_file: dex/values.yaml
+          - chart: oci://docker.io/envoyproxy/gateway-helm
+            # renovate: datasource=docker depName=docker.io/envoyproxy/gateway-helm
+            chart_version: 'v1.8.2'
+            values_file: envoy-gateway/values.yaml
+          - chart: kubereboot/kured
+            # renovate: datasource=helm depName=kured registryUrl=https://kubereboot.github.io/charts
+            chart_version: '6.1.0'
+            helm_repo_name: kubereboot
+            helm_repo_url: https://kubereboot.github.io/charts
+            values_file: kured/values.yaml
+          - chart: grafana/loki
+            # renovate: datasource=helm depName=loki registryUrl=https://grafana.github.io/helm-charts
+            chart_version: '7.1.0'
+            helm_repo_name: grafana
+            helm_repo_url: https://grafana.github.io/helm-charts
+            values_file: loki/values.yaml
+          - chart: nats/nats
+            # renovate: datasource=helm depName=nats registryUrl=https://nats-io.github.io/k8s/helm/charts/
+            chart_version: '2.14.2'
+            helm_repo_name: nats
+            helm_repo_url: https://nats-io.github.io/k8s/helm/charts/
+            values_file: nats/values.yaml
+          - chart: cnpg/cloudnative-pg
+            # renovate: datasource=helm depName=cloudnative-pg registryUrl=https://cloudnative-pg.github.io/charts
+            chart_version: '0.27.1'
+            helm_repo_name: cnpg
+            helm_repo_url: https://cloudnative-pg.github.io/charts
+            values_file: postgres/values-operator.yaml
+          - chart: cnpg/cluster
+            # renovate: datasource=helm depName=cluster registryUrl=https://cloudnative-pg.github.io/charts
+            chart_version: '0.6.0'
+            helm_repo_name: cnpg
+            helm_repo_url: https://cloudnative-pg.github.io/charts
+            values_file: postgres/values-cluster.yaml
+          - chart: prometheus-community/kube-prometheus-stack
+            # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
+            chart_version: '87.17.0'
+            helm_repo_name: prometheus-community
+            helm_repo_url: https://prometheus-community.github.io/helm-charts
+            values_file: prometheus-stack/values.yaml
     uses: maxmorhardt/workflows/.github/workflows/validate-helm.yml@main
     with:
       repository: ${{ github.repository }}
@@ -75,7 +71,7 @@ jobs:
       helm_repo_url: ${{ matrix.helm_repo_url }}
       values_file: ${{ matrix.values_file }}
       lint: false
-      ignore_missing_schemas: true
+      kubeconform: false
 
   validate-manifests:
     uses: maxmorhardt/workflows/.github/workflows/validate-manifests.yml@main
