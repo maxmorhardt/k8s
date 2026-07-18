@@ -81,8 +81,8 @@ jobs:
         system-upgrade-controller/plans.yaml
         storage/local-path-retain.yaml
 
-  validation-complete:
-    name: Validation Complete
+  validate-complete:
+    name: Validate Complete
     if: always()
     needs: [validate-charts, validate-manifests]
     runs-on: ubuntu-latest
