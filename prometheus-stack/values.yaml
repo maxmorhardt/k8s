@@ -44,9 +44,7 @@ additionalPrometheusRulesMap:
     groups:
       - name: system-upgrade
         rules:
-          # fires when any system-upgrade-controller job exists (upgrade started),
-          # resolves ~20m after the last job is gone (upgrade done). presence-based
-          # so it ignores the per-job fail/retry churn while a node is offline.
+          # fires when any system-upgrade-controller job exists
           - alert: SUCUpgradeRunning
             expr: max_over_time((count(kube_job_created{namespace="system-upgrade"}) or vector(0))[20m:1m]) > 0
             for: 0m
