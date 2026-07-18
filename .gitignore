@@ -8,6 +8,7 @@ __pycache__
 .env
 k3s/bootstrap/bootstrap-output/
 k3s/bootstrap/bootstrap-all.sh
+k3s/bootstrap/node/network-watchdog.env
 
 # pg
 postgres-dumpall*.sql
