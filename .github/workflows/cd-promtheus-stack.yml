@@ -2,6 +2,17 @@ name: Kube Prometheus Stack CD
 
 on:
   workflow_dispatch:
+    inputs:
+      chart_version:
+        description: 'Override chart version (blank = pinned)'
+        required: false
+        type: string
+        default: ''
+  push:
+    branches: [main]
+    paths:
+      - 'prometheus-stack/**'
+      - '.github/workflows/cd-promtheus-stack.yml'
 
 jobs:
   cd:
@@ -14,4 +25,6 @@ jobs:
       helm_repo_name: prometheus-community
       helm_repo_url: https://prometheus-community.github.io/helm-charts
       chart: prometheus-community/kube-prometheus-stack
+      # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
+      chart_version: ${{ github.event.inputs.chart_version || '87.17.0' }}
     secrets: inherit

@@ -4,10 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       chart_version:
-        description: Envoy Gateway version to deploy
+        description: 'Override chart version (blank = pinned)'
         required: false
         type: string
-        default: 'v1.8.2'
+        default: ''
+  push:
+    branches: [main]
+    paths:
+      - 'envoy-gateway/**'
+      - '.github/workflows/cd-envoy-gateway.yml'
+
 jobs:
   cd:
     uses: maxmorhardt/workflows/.github/workflows/cd-helm.yml@main
@@ -17,5 +23,6 @@ jobs:
       namespace: envoy-gateway-system
       values_file: envoy-gateway/values.yaml
       chart: oci://docker.io/envoyproxy/gateway-helm
-      chart_version: ${{ github.event.inputs.chart_version }}
+      # renovate: datasource=docker depName=docker.io/envoyproxy/gateway-helm
+      chart_version: ${{ github.event.inputs.chart_version || 'v1.8.2' }}
     secrets: inherit

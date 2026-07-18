@@ -4,10 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       chart_version:
-        description: CloudNativePG operator version to deploy
+        description: 'Override chart version (blank = pinned)'
         required: false
         type: string
-        default: '0.27.1'
+        default: ''
+  push:
+    branches: [main]
+    paths:
+      - 'postgres/values-operator.yaml'
+      - '.github/workflows/cd-postgresql-operator.yml'
 
 jobs:
   cd:
@@ -20,5 +25,6 @@ jobs:
       helm_repo_name: cnpg
       helm_repo_url: https://cloudnative-pg.github.io/charts
       chart: cnpg/cloudnative-pg
-      chart_version: ${{ github.event.inputs.chart_version }}
+      # renovate: datasource=helm depName=cloudnative-pg registryUrl=https://cloudnative-pg.github.io/charts
+      chart_version: ${{ github.event.inputs.chart_version || '0.27.1' }}
     secrets: inherit

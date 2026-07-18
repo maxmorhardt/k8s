@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       chart_version:
-        description: CloudNativePG cluster chart version to deploy
+        description: 'Override chart version (blank = pinned)'
         required: false
         type: string
-        default: '0.4.0'
+        default: ''
       mode:
         description: 'Cluster mode'
         required: false
@@ -17,6 +17,11 @@ on:
           - recovery
           - hibernate
         default: normal
+  push:
+    branches: [main]
+    paths:
+      - 'postgres/values-cluster*.yaml'
+      - '.github/workflows/cd-postgresql-cluster.yml'
 
 jobs:
   cd:
@@ -29,5 +34,6 @@ jobs:
       helm_repo_name: cnpg
       helm_repo_url: https://cloudnative-pg.github.io/charts
       chart: cnpg/cluster
-      chart_version: ${{ github.event.inputs.chart_version }}
+      # renovate: datasource=helm depName=cluster registryUrl=https://cloudnative-pg.github.io/charts
+      chart_version: ${{ github.event.inputs.chart_version || '0.6.0' }}
     secrets: inherit

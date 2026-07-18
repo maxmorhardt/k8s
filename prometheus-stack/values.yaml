@@ -39,7 +39,23 @@ defaultRules:
     prometheusOperator: true
     windows: false
 
-additionalPrometheusRulesMap: {}
+additionalPrometheusRulesMap:
+  system-upgrade:
+    groups:
+      - name: system-upgrade
+        rules:
+          # fires when any system-upgrade-controller job exists
+          - alert: SUCUpgradeRunning
+            expr: max_over_time((count(kube_job_created{namespace="system-upgrade"}) or vector(0))[20m:1m]) > 0
+            for: 0m
+            labels:
+              severity: none
+              namespace: system-upgrade
+            annotations:
+              summary: k3s node upgrade running
+              description: >-
+                system-upgrade-controller has upgrade jobs in the system-upgrade
+                namespace. Firing = an upgrade started; resolved = all jobs finished.
 
 global:
   rbac:
@@ -58,7 +74,6 @@ alertmanager:
     image:
       registry: quay.io
       repository: prometheus/alertmanager
-      tag: v0.30.0
       pullPolicy: IfNotPresent
     replicas: 2
     retention: 120h

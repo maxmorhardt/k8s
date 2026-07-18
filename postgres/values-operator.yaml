@@ -2,8 +2,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/cloudnative-pg/cloudnative-pg
-  pullPolicy: Always
-  tag: ''
+  pullPolicy: IfNotPresent
 
 hostNetwork: false
 
