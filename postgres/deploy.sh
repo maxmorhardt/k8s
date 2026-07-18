@@ -1,6 +1,7 @@
 helm repo add cnpg https://cloudnative-pg.github.io/charts
 helm repo update
 
+# renovate: datasource=helm depName=cloudnative-pg registryUrl=https://cloudnative-pg.github.io/charts
 helm upgrade cnpg cnpg/cloudnative-pg \
 	--install \
 	--rollback-on-failure \
@@ -10,6 +11,7 @@ helm upgrade cnpg cnpg/cloudnative-pg \
 	--version 0.27.1 \
 	--values values-operator.yaml 
 
+# renovate: datasource=helm depName=cluster registryUrl=https://cloudnative-pg.github.io/charts
 helm upgrade postgres cnpg/cluster \
 	--install \
   --rollback-on-failure \

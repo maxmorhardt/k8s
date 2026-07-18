@@ -1,0 +1,75 @@
+name: k8s CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  discover:
+    name: Discover charts
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.discover.outputs.matrix }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Build validation matrix from cd-*.yml
+        id: discover
+        run: |
+          items=()
+          for f in .github/workflows/cd-*.yml; do
+            uses=$(yq '.jobs.cd.uses' "$f")
+            case "$uses" in *cd-helm.yml*) ;; *) continue ;; esac
+
+            chart=$(yq '.jobs.cd.with.chart' "$f")
+            repo_name=$(yq '.jobs.cd.with.helm_repo_name // ""' "$f")
+            repo_url=$(yq '.jobs.cd.with.helm_repo_url // ""' "$f")
+
+            version_raw=$(yq '.jobs.cd.with.chart_version' "$f")
+            version=$(printf '%s' "$version_raw" | grep -oE "'[^']+'" | tail -1 | tr -d "'")
+
+            values_raw=$(yq '.jobs.cd.with.values_file // ""' "$f")
+            if printf '%s' "$values_raw" | grep -q '\${{'; then
+              values=$(printf '%s' "$values_raw" | grep -oE "'[^']*\.yaml'" | tail -1 | tr -d "'")
+            else
+              values="$values_raw"
+            fi
+
+            items+=("$(jq -n -c \
+              --arg name "$(basename "$f" .yml | sed 's/^cd-//')" \
+              --arg chart "$chart" \
+              --arg version "$version" \
+              --arg repo_name "$repo_name" \
+              --arg repo_url "$repo_url" \
+              --arg values "$values" \
+              '{name:$name, chart:$chart, chart_version:$version, helm_repo_name:$repo_name, helm_repo_url:$repo_url, values_file:$values}')")
+          done
+          matrix=$(printf '%s\n' "${items[@]}" | jq -s -c '{include: .}')
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "$matrix" | jq .
+
+  validate:
+    name: Validate ${{ matrix.name }}
+    needs: discover
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
+    uses: maxmorhardt/workflows/.github/workflows/validate-helm.yml@main
+    with:
+      repository: ${{ github.repository }}
+      chart: ${{ matrix.chart }}
+      chart_version: ${{ matrix.chart_version }}
+      helm_repo_name: ${{ matrix.helm_repo_name }}
+      helm_repo_url: ${{ matrix.helm_repo_url }}
+      values_file: ${{ matrix.values_file }}
+      lint: false
+      ignore_missing_schemas: true
+
+  validate-manifests:
+    uses: maxmorhardt/workflows/.github/workflows/validate-manifests.yml@main
+    with:
+      repository: ${{ github.repository }}
+      manifests: |
+        system-upgrade-controller/plans.yaml
+        storage/local-path-retain.yaml

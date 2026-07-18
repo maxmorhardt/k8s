@@ -1,4 +1,39 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>maxmorhardt/workflows//renovate/default.json"]
+  "extends": ["github>maxmorhardt/workflows//renovate/default.json"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "track pinned helm chart versions in cd-*.yml workflows",
+      "managerFilePatterns": ["/^\\.github/workflows/cd-.*\\.ya?ml$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: registryUrl=(?<registryUrl>\\S+))?[^']*'(?<currentValue>[^']+)'"
+      ]
+    },
+    {
+      "customType": "regex",
+      "description": "track pinned helm chart versions in deploy.sh bootstrap scripts",
+      "managerFilePatterns": ["/(^|/)deploy\\.sh$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: registryUrl=(?<registryUrl>\\S+))?[\\s\\S]*?--version (?<currentValue>\\S+)"
+      ]
+    },
+    {
+      "customType": "regex",
+      "description": "track pinned github-release manifest versions in cd-*.yml workflows",
+      "managerFilePatterns": ["/^\\.github/workflows/cd-.*\\.ya?ml$/"],
+      "datasourceTemplate": "github-releases",
+      "matchStrings": [
+        "github\\.com/(?<depName>[^/]+/[^/]+)/releases/download/(?<currentValue>v[0-9][^/]+)/"
+      ]
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "chart bumps are reviewed and merged by hand, then trigger the gated CD",
+      "matchManagers": ["custom.regex"],
+      "automerge": false,
+      "addLabels": ["deploy"]
+    }
+  ]
 }

@@ -2,6 +2,17 @@ name: NATS CD
 
 on:
   workflow_dispatch:
+    inputs:
+      chart_version:
+        description: 'Override chart version (blank = pinned)'
+        required: false
+        type: string
+        default: ''
+  push:
+    branches: [main]
+    paths:
+      - 'nats/**'
+      - '.github/workflows/cd-nats.yml'
 
 jobs:
   cd:
@@ -14,4 +25,6 @@ jobs:
       helm_repo_name: nats
       helm_repo_url: https://nats-io.github.io/k8s/helm/charts/
       chart: nats/nats
+      # renovate: datasource=helm depName=nats registryUrl=https://nats-io.github.io/k8s/helm/charts/
+      chart_version: ${{ github.event.inputs.chart_version || '2.14.2' }}
     secrets: inherit

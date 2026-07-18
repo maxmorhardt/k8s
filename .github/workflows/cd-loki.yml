@@ -2,6 +2,17 @@ name: Loki CD
 
 on:
   workflow_dispatch:
+    inputs:
+      chart_version:
+        description: 'Override chart version (blank = pinned)'
+        required: false
+        type: string
+        default: ''
+  push:
+    branches: [main]
+    paths:
+      - 'loki/**'
+      - '.github/workflows/cd-loki.yml'
 
 jobs:
   cd:
@@ -14,4 +25,6 @@ jobs:
       helm_repo_name: grafana
       helm_repo_url: https://grafana.github.io/helm-charts
       chart: grafana/loki
+      # renovate: datasource=helm depName=loki registryUrl=https://grafana.github.io/helm-charts
+      chart_version: ${{ github.event.inputs.chart_version || '7.1.0' }}
     secrets: inherit

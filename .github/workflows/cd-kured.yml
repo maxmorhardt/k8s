@@ -2,6 +2,17 @@ name: kured CD
 
 on:
   workflow_dispatch:
+    inputs:
+      chart_version:
+        description: 'Override chart version (blank = pinned)'
+        required: false
+        type: string
+        default: ''
+  push:
+    branches: [main]
+    paths:
+      - 'kured/**'
+      - '.github/workflows/cd-kured.yml'
 
 jobs:
   cd:
@@ -14,4 +25,6 @@ jobs:
       helm_repo_name: kubereboot
       helm_repo_url: https://kubereboot.github.io/charts
       chart: kubereboot/kured
+      # renovate: datasource=helm depName=kured registryUrl=https://kubereboot.github.io/charts
+      chart_version: ${{ github.event.inputs.chart_version || '6.1.0' }}
     secrets: inherit
