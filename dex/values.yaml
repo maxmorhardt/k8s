@@ -56,6 +56,12 @@ httpRoute:
 config:
   issuer: https://login.maxstash.io
 
+  expiry:
+    idTokens: "12h"
+    refreshTokens:
+      validIfNotUsedFor: "720h"
+      absoluteLifetime: "2160h"
+
   web:
     allowedOrigins:
       - https://squares.maxstash.io
