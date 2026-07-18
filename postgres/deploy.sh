@@ -8,7 +8,7 @@ helm upgrade cnpg cnpg/cloudnative-pg \
 	--wait \
 	--namespace cnpg-system \
 	--create-namespace \
-	--version 0.27.1 \
+	--version 0.29.0 \
 	--values values-operator.yaml 
 
 # renovate: datasource=helm depName=cluster registryUrl=https://cloudnative-pg.github.io/charts
@@ -20,6 +20,6 @@ helm upgrade postgres cnpg/cluster \
 	--history-max=3 \
 	--namespace cnpg-database \
 	--create-namespace \
-	--version 0.6.0 \
+	--version 0.8.0 \
 	--values values-cluster.yaml \
 	--timeout 15m
