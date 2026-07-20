@@ -1,4 +1,4 @@
-## kured
+## Overview
 
 Handles weekly node drain → pre-reboot cleanup → reboot → uncordon automatically, one node at a time.
 
@@ -24,8 +24,6 @@ kubectl create secret generic kured-discord \
   --from-literal=url="discord://token@id"
 ```
 
-## Deploy
-
-Argo CD syncs the [kured Application](../argocd/kured.yaml) once [values.yaml](values.yaml) lands on `main`.
+## Notes
 
 Only enable after all nodes are bootstrapped and the cluster is healthy.

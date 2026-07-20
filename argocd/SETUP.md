@@ -1,62 +1,69 @@
+## Overview
+
+GitOps control plane at `argocd.maxstash.io`. Every workload is an `Application` reconciled
+from this repo — CI holds no kubeconfig, it builds an artifact and commits a version here.
+
+```
+argocd/
+  bootstrap.sh   installs and repairs Argo itself
+  values.yaml    argo-cd chart values (excluded from root's scan)
+  root.yaml      app-of-apps, recurses over this directory
+  infra/         one Application per infra component, incl. argocd
+  apps/          one Application per application chart
+```
+
+Adding anything is a new file in `infra/` or `apps/`; root picks it up within 3 minutes. Any
+other non-Application yaml under `argocd/` **will** be applied to the cluster.
+
 ## Applications
 
-**Infra** charts are upstream; their values stay at `<component>/values.yaml`. Each uses two
-sources — the chart, plus this repo as `ref: values` — so `valueFiles` can reference
-`$values/dex/values.yaml`. Versions carry `# renovate:` comments, so merging the PR is the
-deploy.
+**Infra** charts are upstream; values stay at `<component>/values.yaml`. Each uses two sources
+— the chart, plus this repo as `ref: values` — so `valueFiles` can reference
+`$values/dex/values.yaml`. Versions carry `# renovate:` comments, so merging the PR is the deploy.
 
-**Apps** come from `ghcr.io/maxmorhardt/charts`, with both `targetRevision` and
-`helm.parameters[image.tag]` pinned exactly and committed by CI — the app repo commits the
-image tag, the charts repo commits the chart version. Each `deploy` job `needs:` its publish
-job, so a version is only committed once the artifact exists. Ranges are avoided deliberately — they roll out with nothing in git recording what is
-deployed and no commit to revert.
+**Apps** come from `ghcr.io/maxmorhardt/charts`, with chart version and image tag pinned
+exactly and committed by CI once the artifact exists:
 
+```
+app repo    tag 1.3.2         → publishes image     → commits image.tag
+charts repo tag squares/1.0.2 → publishes OCI chart → commits targetRevision
+```
+
+Ranges are avoided deliberately — they roll out with nothing in git recording what is deployed.
 Secrets are sealed in [secrets/](../secrets/), synced by [infra/secrets.yaml](infra/secrets.yaml).
 
 ## Bootstrap
 
 Argo cannot deploy itself, so [bootstrap.sh](bootstrap.sh) runs by hand; re-running it repairs
-Argo. The first cutover must be a **no-op** — Argo adopts what is already running. Do not
-`helm uninstall` anything first, that deletes live resources.
+Argo.
 
 ```bash
-cd argocd && ./bootstrap.sh                   # install, nothing syncs yet
-
-for f in infra/*.yaml apps/*.yaml; do         # create with sync disabled
-  yq 'del(.spec.syncPolicy.automated)' "$f" | kubectl apply -f -
-done
-
-for f in infra/*.yaml apps/*.yaml; do         # expect empty diffs
-  argocd app diff "$(basename "$f" .yaml)" || true
-done
-
-./bootstrap.sh --apply-root                   # hand over
+cd argocd && ./bootstrap.sh
 ```
 
-A non-empty diff means the manifest does not match reality — fix the manifest, not the
-cluster. Helm's `managed-by` labels show as noise and settle after the first sync. The CLI
-needs a session first: port-forward and `argocd login localhost:8080` before SSO exists, or
+Argo **adopts** what is already running rather than redeploying it, so never `helm uninstall`
+first — that deletes live resources. Helm's `managed-by` labels show as diff noise and settle
+after the first sync.
+
+The CLI needs a session: port-forward and `argocd login localhost:8080` before SSO exists, or
 `argocd login argocd.maxstash.io --grpc-web` through the gateway.
 
 ## SSO
 
-Argo federates to the cluster's own [Dex](../dex/SETUP.md), so the bundled dex stays off.
-Two clients in [dex/values.yaml](../dex/values.yaml): `argocd` for the UI, public
-`argocd-cli` for `argocd login --sso`. Identity is the verified **email** claim — this Dex has
-no groups, so `rbac.scopes` is `[email]`; the chart default `[groups]` would never resolve.
-Everyone gets `role:readonly`, admin is per email in `policy.csv`.
+Argo federates to the cluster's own [Dex](../dex/SETUP.md), so the bundled dex stays off. Two
+clients in [dex/values.yaml](../dex/values.yaml): `argocd` for the UI, public `argocd-cli` for
+`argocd login --sso`. Identity is the verified **email** claim — this Dex has no groups, so
+`rbac.scopes` is `[email]`; the chart default `[groups]` would never resolve. Everyone gets
+`role:readonly`, admin is per email in `policy.csv`.
 
-The client secret must exist on both sides — `ARGOCD_CLIENT_SECRET` in Dex's `dex-env`, and
-sealed here. The `part-of` label is required or Argo cannot resolve the `$argocd-oidc:` ref:
+The secret must exist on both sides — `ARGOCD_CLIENT_SECRET` in Dex's `dex-env`, and sealed
+here. The `part-of` label is required or Argo cannot resolve the `$argocd-oidc:` reference:
 
 ```bash
-secret=$(openssl rand -hex 32)
-
 kubectl create secret generic argocd-oidc --namespace argocd \
-  --from-literal=clientSecret="$secret" --dry-run=client -o yaml \
+  --from-literal=clientSecret="$(openssl rand -hex 32)" --dry-run=client -o yaml \
 | kubectl label --local -f - app.kubernetes.io/part-of=argocd -o yaml \
-| kubeseal --format yaml --cert sealed-secrets/pub-cert.pem \
-  > secrets/argocd/argocd-oidc.yaml
+| kubeseal --format yaml --cert sealed-secrets/pub-cert.pem > secrets/argocd/argocd-oidc.yaml
 ```
 
 ## Notes

@@ -1,19 +1,13 @@
-# Envoy Gateway
+## Overview
 
 Gateway API implementation fronting all HTTP traffic for `maxstash.io`. Replaces ingress-nginx.
 
 Two pieces:
 
-1. **envoy-gateway** (this directory) — the upstream controller Helm chart (`oci://docker.io/envoyproxy/gateway-helm`) deployed to `envoy-gateway-system`. Also installs the Gateway API CRDs. Deployed by Argo CD from [argocd/envoy-gateway.yaml](../argocd/envoy-gateway.yaml).
-2. **maxstash-gateway** — chart in the `charts` repo (`charts/maxstash-gateway`) with the actual Gateway resources: the `maxstash` GatewayClass + Gateway (listeners for `maxstash.io` and `*.maxstash.io` on 443, http→https redirect on 80), the `EnvoyProxy` config (2 proxy replicas), and a `ClientTrafficPolicy` resolving the real client IP from `X-Forwarded-For` against the trusted Cloudflare CIDRs. Deploy via the charts repo Chart CD workflow with namespace `envoy-gateway-system`.
+1. **envoy-gateway** (this directory) — the upstream controller chart, plus the Gateway API CRDs. Synced from [argocd/infra/envoy-gateway.yaml](../argocd/infra/envoy-gateway.yaml).
+2. **maxstash-gateway** — chart in the `charts` repo with the actual Gateway resources: the `maxstash` GatewayClass + Gateway (listeners for `maxstash.io` and `*.maxstash.io` on 443, http→https redirect on 80), the `EnvoyProxy` config (2 proxy replicas), and a `ClientTrafficPolicy` resolving the real client IP from `X-Forwarded-For` against the trusted Cloudflare CIDRs. Synced from [argocd/apps/maxstash-gateway.yaml](../argocd/apps/maxstash-gateway.yaml).
 
 Apps attach by creating an `HTTPRoute` in their own namespace with `parentRefs` pointing at `maxstash` / `envoy-gateway-system`. The Gateway allows routes from all namespaces.
-
-## Routing model
-
-- UIs: hostname-per-app (`squares.maxstash.io`, `olympics.maxstash.io`, `maxstash.io`).
-- APIs: single hostname `api.maxstash.io`, path-per-app (`/squares`, `/olympics`). Routes strip the prefix (`ReplacePrefixMatch: /`) so containers stay prefix-agnostic.
-- Auth: `login.maxstash.io` → Dex.
 
 ## Prerequisites
 
@@ -24,15 +18,6 @@ kubectl get secret maxstash.io-tls -n <existing-ns> -o yaml \
   | sed 's/namespace: .*/namespace: envoy-gateway-system/' \
   | kubectl apply -f -
 ```
-
-## Cutover from ingress-nginx
-
-k3s klipper-lb can only bind host ports 80/443 for one LoadBalancer service. Order matters:
-
-1. Deploy the controller and the `maxstash-gateway` chart (both Argo Applications). The envoy LoadBalancer service will sit pending on 80/443 while nginx still holds them — expected.
-2. Deploy the HTTPRoute-based app charts (they can coexist with the old Ingress objects).
-3. `helm uninstall ingress-nginx -n ingress-nginx` — klipper then binds 80/443 to envoy within seconds.
-4. Delete the leftover Ingress objects / the `ingress-nginx` namespace.
 
 ## Notes
 

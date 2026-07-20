@@ -1,100 +1,72 @@
-# Sealed Secrets
+## Overview
 
-Encrypts secrets so they can live in git. A `SealedSecret` is asymmetrically encrypted
-with a public key; the controller in the cluster holds the private half and unseals it
-into a real `Secret`. Ciphertext is useless to anyone without that key, so this repo can
-be the source of truth for secrets the same way it already is for everything else.
+Encrypts secrets so they can live in git. A `SealedSecret` is encrypted with a public key;
+only the controller holds the private half and unseals it into a real `Secret`. Sealed
+manifests live in [secrets/](../secrets/), applied by their own Application.
 
-One Helm release in the `sealed-secrets` namespace (`sealed-secrets` from
-https://bitnami.github.io/sealed-secrets), config in [values.yaml](values.yaml).
-Sealed manifests live in [secrets/](../secrets/) and are applied by their own Application.
+The [sealed-secrets Application](../argocd/infra/sealed-secrets.yaml) carries `sync-wave: -1`
+so the CRD exists before anything tries to create a `SealedSecret`.
 
-## One-time setup
+## Setup
 
-1. Merge to `main` — Argo CD syncs the [sealed-secrets Application](../argocd/infra/sealed-secrets.yaml).
-   It carries `sync-wave: -1` so the CRD exists before anything tries to create a `SealedSecret`.
-2. Install the CLI locally: `brew install kubeseal` (or grab the release binary).
-3. **Back up the sealing key** — see below. Do this before sealing anything.
-4. Export the public cert so sealing works without cluster access:
+1. `brew install kubeseal` (or grab the release binary)
+2. **Back up the sealing key — before sealing anything.** See below.
+3. Export the public cert so sealing works without cluster access. It is public and committed
+   on purpose:
    ```bash
    kubeseal --controller-name sealed-secrets --controller-namespace sealed-secrets \
      --fetch-cert > sealed-secrets/pub-cert.pem
    ```
-   This is a public key and is committed on purpose.
 
-## Sealing a secret
-
-Write the plaintext `Secret` to a scratch file (never commit it), then seal:
+## Sealing
 
 ```bash
+# from a scratch file (never commit the plaintext)
 kubeseal --format yaml --cert sealed-secrets/pub-cert.pem \
-  < secret.yaml > secrets/<namespace>/<name>.yaml
-rm secret.yaml
+  < secret.yaml > secrets/<namespace>/<name>.yaml && rm secret.yaml
+
+# or from a secret already in the cluster
+kubectl get secret dex-env -n dex -o yaml \
+  | kubeseal --format yaml --cert sealed-secrets/pub-cert.pem > secrets/dex/dex-env.yaml
 ```
 
-Commit the output. Argo applies it, the controller unseals it, the app sees a normal `Secret`.
+Changing one key means re-sealing the whole secret — there is no partial edit, and you cannot
+read the plaintext back out of git. Keep it in a password manager.
 
-To seal a secret that already exists in the cluster, read it out rather than retyping:
+To adopt a `Secret` the controller did not create, annotate it first or the sync fails with
+*"already exists and is not managed by SealedSecret"*:
 
 ```bash
-kubectl get secret dex-env -n dex -o yaml \
-  | kubeseal --format yaml --cert sealed-secrets/pub-cert.pem \
-  > secrets/dex/dex-env.yaml
+kubectl annotate secret <name> -n <namespace> sealedsecrets.bitnami.com/managed=true
 ```
-
-Changing one key means re-sealing the whole secret — there is no partial edit. Keep the
-plaintext somewhere you control (a password manager), because you cannot read it back out
-of git.
 
 ## Backing up the sealing key
 
 Lose the private key and **every sealed manifest in this repo becomes permanently
-undecryptable**. Git history stops being a backup and the only recovery is reissuing each
-secret from upstream — Google and GitHub OAuth clients, AWS credentials, Postgres passwords.
+undecryptable** — the only recovery is reissuing each secret from upstream.
 
 ```bash
 kubectl get secret -n sealed-secrets \
-  -l sealedsecrets.bitnami.com/sealed-secrets-key \
-  -o yaml > sealed-secrets-key.yaml
+  -l sealedsecrets.bitnami.com/sealed-secrets-key -o yaml > sealed-secrets-key.yaml
 ```
 
-Store it outside the cluster and outside this repo. `sealed-secrets-key*.yaml` is
-gitignored so it cannot be committed by accident.
-
-To restore onto a rebuilt cluster, apply the backup **before** the controller starts, then
-restart it so it picks the key up:
+Store it outside the cluster and outside this repo; `sealed-secrets-key*.yaml` is gitignored.
+To restore onto a rebuilt cluster, apply it **before** the controller starts, then restart it:
 
 ```bash
 kubectl apply -f sealed-secrets-key.yaml
 kubectl rollout restart deploy/sealed-secrets -n sealed-secrets
 ```
 
-Key rotation is disabled (`keyrenewperiod: '0'`). The default is a fresh key every 30 days,
-which quietly makes the backup stale — one file, backed up once, is the safer trade here.
-
-## Migrating an existing secret
-
-The controller will not take over a `Secret` it did not create. Annotate first, or the
-sync fails with *"already exists and is not managed by SealedSecret"*:
-
-```bash
-kubectl annotate secret <name> -n <namespace> sealedsecrets.bitnami.com/managed=true
-```
-
-Then seal it from the live value as above and commit. The next sync adopts it in place —
-no restart, no downtime for the consuming app.
-
-Secrets to migrate: `dex-env` ([dex](../dex/SETUP.md)), and `postgres-superuser`,
-`postgres-admin-user`, `aws-s3-credentials` ([postgres](../postgres/SETUP.md)).
+Rotation is disabled (`keyrenewperiod: '0'`). The default 30-day rotation quietly makes the
+backup stale — one file, backed up once, is the safer trade.
 
 ## Notes
 
-- Sealed secrets are **strict-scoped**: the ciphertext is bound to both namespace and
-  name. Renaming a secret or moving it to another namespace requires re-sealing.
-- Only values are encrypted — key names stay readable in git. Fine for
-  `GOOGLE_CLIENT_SECRET`, worth remembering if a key name would itself leak something.
-- The [secrets Application](../argocd/infra/secrets.yaml) runs with `prune: false`. A
-  bad manifest pruning a live `SealedSecret` would garbage-collect the `Secret` it owns and
-  take the consuming app down, so removals are a deliberate `kubectl delete`.
-- `selfHeal` still applies: editing an unsealed `Secret` by hand is reverted on the next
-  reconcile. Change the sealed manifest instead.
+- Strict-scoped: ciphertext is bound to both namespace and name. Renaming or moving a secret
+  requires re-sealing.
+- Only values are encrypted — key names stay readable in git.
+- The [secrets Application](../argocd/infra/secrets.yaml) runs `prune: false`; pruning a live
+  `SealedSecret` would garbage-collect the `Secret` it owns and take the app down.
+- `selfHeal` reverts hand-edits to an unsealed `Secret` on the next reconcile.
+- Still to migrate: `dex-env`, `postgres-superuser`, `postgres-admin-user`, `aws-s3-credentials`.

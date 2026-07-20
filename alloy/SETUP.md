@@ -1,5 +1,6 @@
 ## Overview
-Alloy is deployed as a DaemonSet that collects logs from:
+
+Alloy runs as a DaemonSet in `monitoring`, collecting logs from:
 - Kubernetes pods
 - kured pre-reboot logs (`/var/log/kured/*.log`)
 - network-watchdog systemd journal (`{job="node/network-watchdog"}`)
