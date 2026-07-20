@@ -33,12 +33,12 @@ A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with productio
 - **Production Ready** with resource limits, application-level replication, and security configurations
 
 ## Architecture
-The stack follows a microservices architecture where each service is independently deployable with Helm charts. All HTTP traffic enters through a single Envoy Gateway (Gateway API): UIs get a hostname each, APIs share `api.maxstash.io` split by path prefix, and Dex at `login.maxstash.io` provides OIDC with Google/GitHub sign-in. Deployment is GitOps: Argo CD reconciles the cluster from this repo and the charts repo, and GitHub Actions only builds, tests, and commits.
+The stack follows a microservices architecture where each service is independently deployable with Helm charts. All HTTP traffic enters through a single Envoy Gateway (Gateway API): UIs get a hostname each, APIs share `api.maxstash.io` split by path prefix, and Dex at `login.maxstash.io` provides OIDC with Google/GitHub sign-in. Deployment is GitOps: Argo CD reconciles the cluster from this repo, and GitHub Actions only builds, tests, and commits.
 
 ```
    ┌──────────────┐   ┌─────────┐   ┌──────────────┐
    │  Kubernetes  │◀──│ Argo CD │◀──│     git      │
-   │    (K3s)     │   │ (GitOps)│   │(k8s + charts)│
+   │    (K3s)     │   │ (GitOps)│   │  (this repo) │
    └──────────────┘   └─────────┘   └──────────────┘
                         │
                  ┌──────▼───────┐
@@ -69,7 +69,7 @@ Editing a values file and merging to `main` **is** the deploy; there is no `helm
 
 The one exception is Argo CD itself, which cannot deploy itself from nothing: [argocd/bootstrap.sh](argocd/bootstrap.sh) installs and repairs it, run by hand from a workstation with cluster access. Keeping that local is why no CI workflow anywhere holds a kubeconfig.
 
-Application charts live in the [charts](https://github.com/maxmorhardt/charts) repo and are deployed by `Application`s in its `deploy/` directory, which Argo discovers through the `charts` Application here.
+Application charts are published as OCI artifacts by the [charts](https://github.com/maxmorhardt/charts) repo, but the `Application`s that deploy them live here in [argocd/apps/](argocd/apps/) — that repo holds chart source only, no deployment state.
 
 On a bare cluster the bootstrap order is:
 
