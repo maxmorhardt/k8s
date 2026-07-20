@@ -131,3 +131,17 @@ config:
       secretEnv: GRAFANA_CLIENT_SECRET
       redirectURIs:
         - https://grafana.maxstash.io/login/generic_oauth
+
+    - id: argocd
+      name: Argo CD
+      secretEnv: ARGOCD_CLIENT_SECRET
+      redirectURIs:
+        - https://argocd.maxstash.io/auth/callback
+
+    # `argocd login --sso` spawns a local listener rather than a browser
+    # redirect back to the cluster, so the CLI needs its own public client
+    - id: argocd-cli
+      name: Argo CD CLI
+      public: true
+      redirectURIs:
+        - http://localhost:8085/auth/callback

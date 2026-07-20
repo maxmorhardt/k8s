@@ -26,9 +26,6 @@ kubectl create secret generic kured-discord \
 
 ## Deploy
 
-```bash
-cd kured
-bash deploy.sh
-```
+Argo CD syncs the [kured Application](../argocd/kured.yaml) once [values.yaml](values.yaml) lands on `main`.
 
-Run after all nodes are bootstrapped and the cluster is healthy.
+Only enable after all nodes are bootstrapped and the cluster is healthy.

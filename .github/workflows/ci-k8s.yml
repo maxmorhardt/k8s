@@ -62,6 +62,12 @@ jobs:
             helm_repo_name: prometheus-community
             helm_repo_url: https://prometheus-community.github.io/helm-charts
             values_file: prometheus-stack/values.yaml
+          - chart: sealed-secrets/sealed-secrets
+            # renovate: datasource=helm depName=sealed-secrets registryUrl=https://bitnami.github.io/sealed-secrets
+            chart_version: '2.19.1'
+            helm_repo_name: sealed-secrets
+            helm_repo_url: https://bitnami.github.io/sealed-secrets
+            values_file: sealed-secrets/values.yaml
     uses: maxmorhardt/workflows/.github/workflows/validate-helm.yml@main
     with:
       repository: ${{ github.repository }}
@@ -78,6 +84,9 @@ jobs:
     with:
       repository: ${{ github.repository }}
       manifests: |
+        argocd/root.yaml
+        argocd/infra
+        argocd/apps
         system-upgrade-controller/plans.yaml
         storage/local-path-retain.yaml
 

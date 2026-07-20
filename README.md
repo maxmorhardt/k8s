@@ -23,7 +23,9 @@ A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with productio
 - **Traffic Management** via Envoy Gateway (Gateway API) — one gateway for all hostnames, APIs path-routed behind `api.maxstash.io/*`
 - **Authentication** via Dex OIDC, federating Google and GitHub sign-in
 - **Data Persistence** with PostgreSQL HA cluster and NATS messaging
-- **CI/CD Pipeline** using GitHub Actions with shared reusable workflows
+- **GitOps CD** with Argo CD — every workload reconciled from git, self-healing and pruning
+- **Secrets in Git** with Sealed Secrets — encrypted at rest in this repo, unsealed in-cluster by the controller
+- **CI Pipeline** using GitHub Actions with shared reusable workflows
 - **Monitoring & Observability** with Prometheus, Grafana dashboards, and Alertmanager (Discord + email alerts, healthchecks.io dead-man's switch)
 - **Centralized Logging** via Loki and Alloy data collection
 - **Automated Node Maintenance** with kured — weekly coordinated reboots with pre-reboot cleanup (apt upgrade, image prune, log rotation)
@@ -31,13 +33,13 @@ A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with productio
 - **Production Ready** with resource limits, application-level replication, and security configurations
 
 ## Architecture
-The stack follows a microservices architecture where each service is independently deployable with Helm charts. All HTTP traffic enters through a single Envoy Gateway (Gateway API): UIs get a hostname each, APIs share `api.maxstash.io` split by path prefix, and Dex at `login.maxstash.io` provides OIDC with Google/GitHub sign-in. CI/CD is handled via GitHub Actions.
+The stack follows a microservices architecture where each service is independently deployable with Helm charts. All HTTP traffic enters through a single Envoy Gateway (Gateway API): UIs get a hostname each, APIs share `api.maxstash.io` split by path prefix, and Dex at `login.maxstash.io` provides OIDC with Google/GitHub sign-in. Deployment is GitOps: Argo CD reconciles the cluster from this repo and the charts repo, and GitHub Actions only builds, tests, and commits.
 
 ```
-      ┌──────────────┐    ┌──────────────┐
-      │  Kubernetes  │◀───│GitHub Actions│
-      │    (K3s)     │    │   (CI/CD)    │
-      └──────────────┘    └──────────────┘
+   ┌──────────────┐   ┌─────────┐   ┌──────────────┐
+   │  Kubernetes  │◀──│ Argo CD │◀──│     git      │
+   │    (K3s)     │   │ (GitOps)│   │(k8s + charts)│
+   └──────────────┘   └─────────┘   └──────────────┘
                         │
                  ┌──────▼───────┐
                  │Envoy Gateway │
@@ -59,22 +61,28 @@ The stack follows a microservices architecture where each service is independent
                  └──────────┘
 ```
 
-## Deployment Order
+## Deployment
+
+Everything in the cluster is reconciled from git by **Argo CD** — see [argocd/SETUP.md](argocd/SETUP.md). This repo is the single source of truth for cluster desired state: infra Applications in [argocd/infra/](argocd/infra/), application Applications in [argocd/apps/](argocd/apps/), and every infra `values.yaml` where it has always been.
+
+Editing a values file and merging to `main` **is** the deploy; there is no `helm upgrade` step and no per-component `deploy.sh` anymore. App releases work by CI committing a new `image.tag` into [argocd/apps/](argocd/apps/), which Argo then rolls out — CI holds no kubeconfig and never reaches into the cluster.
+
+The one exception is Argo CD itself, which cannot deploy itself from nothing: [argocd/bootstrap.sh](argocd/bootstrap.sh) installs and repairs it, run by hand from a workstation with cluster access. Keeping that local is why no CI workflow anywhere holds a kubeconfig.
+
+Application charts live in the [charts](https://github.com/maxmorhardt/charts) repo and are deployed by `Application`s in its `deploy/` directory, which Argo discovers through the `charts` Application here.
+
+On a bare cluster the bootstrap order is:
 
 1. **Core Infrastructure**: K3s cluster with Tailscale on nodes
-2. **Storage Layer**: `kubectl apply -f storage/local-path-retain.yaml`
-3. **Database Layer**: Postgres
-4. **Traffic Management**: Envoy Gateway
-5. **Access & Visualization**: Kube Prometheus Stack
-6. **Core Services**: NATS, Loki, Alloy
-7. **Authentication**: Dex
-8. **Node Maintenance**: kured
-9. **k3s Upgrades**: system-upgrade-controller
+2. **Namespaces**: `./namespaces.sh`
+3. **Argo CD**: `cd argocd && ./bootstrap.sh` — everything below is then reconciled automatically
+4. **Sealing key**: restore the Sealed Secrets private key before anything that needs a secret syncs — see [sealed-secrets/SETUP.md](sealed-secrets/SETUP.md)
+5. **Storage Layer**, **Database Layer** (Postgres), **Traffic Management** (Envoy Gateway), **Kube Prometheus Stack**, **Core Services** (NATS, Loki, Alloy), **Authentication** (Dex), **kured**, **system-upgrade-controller**
 
-**Note:** Redeploys will be required if apps are installed prior to Prometheus CRDs
+**Note:** Redeploys will be required if apps are installed prior to Prometheus CRDs. Argo handles this on its own — it retries until the CRDs exist.
 
 ### CI/CD
-CI/CD pipelines are managed via GitHub Actions using a shared reusable workflow at `maxmorhardt/workflows`. Workflows deploy services to the cluster over Tailscale.
+CI validates charts and manifests via GitHub Actions using shared reusable workflows at `maxmorhardt/workflows`. CD is Argo CD pulling from git — CI pushes nothing to the cluster. An app's release pipeline ends by committing its new image tag into [argocd/apps/](argocd/apps/).
 
 ### Node Maintenance
 kured (Kubernetes Reboot Daemon) runs as a DaemonSet on all nodes including control plane. On Tuesdays at 02:00 it checks for `/var/run/reboot-required` and coordinates rolling reboots — only one node at a time. Before each reboot, `pre-reboot.sh` runs on the host to:

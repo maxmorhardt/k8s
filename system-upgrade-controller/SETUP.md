@@ -6,12 +6,7 @@ Both plans only create upgrade jobs Wednesday 02:00–04:00 America/New_York
 
 ## Deploy
 
-Run the [system-upgrade-controller CD](../.github/workflows/cd-system-upgrade-controller.yml) workflow, or locally:
-
-```bash
-cd system-upgrade-controller
-bash deploy.sh
-```
+Argo CD syncs the [system-upgrade-controller Application](../argocd/system-upgrade-controller.yaml), which builds [kustomization.yaml](kustomization.yaml) — the upstream CRDs and controller manifests plus [plans.yaml](plans.yaml).
 
 ## Verify
 

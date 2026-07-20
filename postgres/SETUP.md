@@ -1,5 +1,10 @@
 ## Secrets Required
 
+These are the shapes, not the values. Fill one in, seal it into
+[secrets/cnpg-database/](../secrets/cnpg-database/), and delete the plaintext — see
+[sealed-secrets/SETUP.md](../sealed-secrets/SETUP.md). Argo applies the sealed manifest;
+nothing here is `kubectl apply`'d by hand.
+
 Create the `postgres-superuser` secret for the postgres superuser:
 
 ```yaml

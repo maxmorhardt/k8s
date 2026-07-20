@@ -4,7 +4,7 @@ Gateway API implementation fronting all HTTP traffic for `maxstash.io`. Replaces
 
 Two pieces:
 
-1. **envoy-gateway** (this directory) — the upstream controller Helm chart (`oci://docker.io/envoyproxy/gateway-helm`) deployed to `envoy-gateway-system`. Also installs the Gateway API CRDs. Deploy with `./deploy.sh` or the Envoy Gateway CD workflow.
+1. **envoy-gateway** (this directory) — the upstream controller Helm chart (`oci://docker.io/envoyproxy/gateway-helm`) deployed to `envoy-gateway-system`. Also installs the Gateway API CRDs. Deployed by Argo CD from [argocd/envoy-gateway.yaml](../argocd/envoy-gateway.yaml).
 2. **maxstash-gateway** — chart in the `charts` repo (`charts/maxstash-gateway`) with the actual Gateway resources: the `maxstash` GatewayClass + Gateway (listeners for `maxstash.io` and `*.maxstash.io` on 443, http→https redirect on 80), the `EnvoyProxy` config (2 proxy replicas), and a `ClientTrafficPolicy` resolving the real client IP from `X-Forwarded-For` against the trusted Cloudflare CIDRs. Deploy via the charts repo Chart CD workflow with namespace `envoy-gateway-system`.
 
 Apps attach by creating an `HTTPRoute` in their own namespace with `parentRefs` pointing at `maxstash` / `envoy-gateway-system`. The Gateway allows routes from all namespaces.
@@ -29,7 +29,7 @@ kubectl get secret maxstash.io-tls -n <existing-ns> -o yaml \
 
 k3s klipper-lb can only bind host ports 80/443 for one LoadBalancer service. Order matters:
 
-1. Deploy the controller (`./deploy.sh`) and the `maxstash-gateway` chart. The envoy LoadBalancer service will sit pending on 80/443 while nginx still holds them — expected.
+1. Deploy the controller and the `maxstash-gateway` chart (both Argo Applications). The envoy LoadBalancer service will sit pending on 80/443 while nginx still holds them — expected.
 2. Deploy the HTTPRoute-based app charts (they can coexist with the old Ingress objects).
 3. `helm uninstall ingress-nginx -n ingress-nginx` — klipper then binds 80/443 to envoy within seconds.
 4. Delete the leftover Ingress objects / the `ingress-nginx` namespace.
