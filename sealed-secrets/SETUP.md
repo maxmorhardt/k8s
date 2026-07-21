@@ -9,7 +9,7 @@ so the CRD exists before anything tries to create a `SealedSecret`.
 
 ## Setup
 
-1. Grab the release binary
+1. Install `kubeseal` (kubeseal CLI): download the release binary from Bitnami Sealed Secrets (or `brew install kubeseal` on macOS)
 2. **Back up the sealing key — before sealing anything.**
 3. Export the public cert so sealing works without cluster access. It is public and committed
    on purpose:
@@ -25,9 +25,11 @@ kubeseal --format yaml --cert sealed-secrets/pub-cert.pem \
 ```
 
 ### Existing secret
-```bash
-kubectl annotate secret <name> -n <namespace> sealedsecrets.bitnami.com/managed=true
-```
+    # If the Secret already exists in-cluster, adopt it first so the controller can manage it
+    kubectl annotate secret <name> -n <namespace> sealedsecrets.bitnami.com/managed=true
+
+    kubectl get secret <name> -n <namespace> -o yaml \
+      | kubeseal --format yaml --cert sealed-secrets/pub-cert.pem > argocd/secrets/<namespace>/<name>.yaml
 
 ## Backing up the sealing key
 
