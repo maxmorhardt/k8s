@@ -27,7 +27,7 @@ configs:
         clusters:
           - '*'
   rbac:
-    policy.default: role:readonly
+    policy.default: ''
     scopes: '[email]'
     policy.csv: |
       g, maxmorhardt13@gmail.com, role:admin
@@ -91,7 +91,9 @@ server:
   httproute:
     enabled: true
     parentRefs:
-      - name: maxstash
+      - group: gateway.networking.k8s.io
+        kind: Gateway
+        name: maxstash
         namespace: envoy-gateway-system
     hostnames:
       - argocd.maxstash.io

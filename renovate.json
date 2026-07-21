@@ -4,34 +4,38 @@
   "customManagers": [
     {
       "customType": "regex",
-      "description": "track pinned helm chart versions in cd-*.yml and ci-k8s.yml workflows",
-      "managerFilePatterns": ["/^\\.github/workflows/cd-.*\\.ya?ml$/", "/^\\.github/workflows/ci-k8s\\.ya?ml$/"],
+      "description": "track pinned helm chart versions in the ci-k8s validate matrix",
+      "managerFilePatterns": ["/^\\.github/workflows/ci-k8s\\.ya?ml$/"],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: registryUrl=(?<registryUrl>\\S+))?[^']*'(?<currentValue>[^']+)'"
       ]
     },
     {
       "customType": "regex",
-      "description": "track pinned helm chart versions in deploy.sh bootstrap scripts",
-      "managerFilePatterns": ["/(^|/)deploy\\.sh$/"],
+      "description": "track the pinned argo-cd chart version in bootstrap.sh",
+      "managerFilePatterns": ["/(^|/)bootstrap\\.sh$/"],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: registryUrl=(?<registryUrl>\\S+))?[\\s\\S]*?--version (?<currentValue>\\S+)"
       ]
     },
     {
       "customType": "regex",
-      "description": "track pinned github-release manifest versions in cd-*.yml workflows and deploy.sh scripts",
-      "managerFilePatterns": ["/^\\.github/workflows/cd-.*\\.ya?ml$/", "/(^|/)deploy\\.sh$/"],
+      "description": "track pinned github-release manifest urls in kustomizations",
+      "managerFilePatterns": ["/(^|/)kustomization\\.ya?ml$/"],
       "datasourceTemplate": "github-releases",
       "matchStrings": [
         "github\\.com/(?<depName>[^/]+/[^/]+)/releases/download/(?<currentValue>v[0-9][^/]+)/"
       ]
     }
   ],
+  "argocd": {
+    "description": "infra Application chart versions; apps/ is left alone, CI commits those",
+    "managerFilePatterns": ["/^argocd/infra/.*\\.ya?ml$/"]
+  },
   "packageRules": [
     {
       "description": "chart bumps are reviewed and merged by hand, then trigger the gated CD",
-      "matchManagers": ["custom.regex"],
+      "matchManagers": ["custom.regex", "argocd"],
       "automerge": false,
       "addLabels": ["deploy"]
     }

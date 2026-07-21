@@ -43,7 +43,9 @@ topologySpreadConstraints:
 httpRoute:
   enabled: true
   parentRefs:
-    - name: maxstash
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: maxstash
       namespace: envoy-gateway-system
   hostnames:
     - login.maxstash.io
