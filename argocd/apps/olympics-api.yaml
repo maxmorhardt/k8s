@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: olympics-api
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: apps
+  source:
+    repoURL: ghcr.io/maxmorhardt/charts
+    chart: olympics-api
+    targetRevision: 1.0.1
+    helm:
+      parameters:
+        - name: image.tag
+          value: 1.0.1
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

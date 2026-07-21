@@ -1,4 +1,4 @@
-## kured
+## Overview
 
 Handles weekly node drain → pre-reboot cleanup → reboot → uncordon automatically, one node at a time.
 
@@ -24,11 +24,6 @@ kubectl create secret generic kured-discord \
   --from-literal=url="discord://token@id"
 ```
 
-## Deploy
+## Notes
 
-```bash
-cd kured
-bash deploy.sh
-```
-
-Run after all nodes are bootstrapped and the cluster is healthy.
+Only enable after all nodes are bootstrapped and the cluster is healthy.

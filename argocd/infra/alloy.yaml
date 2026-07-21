@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: alloy
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  sources:
+    - repoURL: https://grafana.github.io/helm-charts
+      chart: alloy
+      # renovate: datasource=helm depName=alloy registryUrl=https://grafana.github.io/helm-charts
+      targetRevision: 1.10.1
+      helm:
+        valueFiles:
+          - $values/alloy/values.yaml
+    - repoURL: https://github.com/maxmorhardt/k8s.git
+      targetRevision: main
+      ref: values
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
