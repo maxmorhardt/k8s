@@ -16,8 +16,9 @@ spec:
     path: argocd
     directory:
       recurse: true
-      # the argo-cd chart's own values, consumed by infra/argocd.yaml
-      exclude: values.yaml
+      # values.yaml is the argo-cd chart's own, consumed by infra/argocd.yaml;
+      # secrets/ has its own Application so it can run prune: false
+      exclude: '{values.yaml,secrets/*}'
   syncPolicy:
     automated:
       prune: true

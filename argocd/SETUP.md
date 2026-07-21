@@ -30,7 +30,8 @@ charts repo tag squares/1.0.2 → publishes OCI chart → commits targetRevision
 ```
 
 Ranges are avoided deliberately — they roll out with nothing in git recording what is deployed.
-Secrets are sealed in [secrets/](../secrets/), synced by [infra/secrets.yaml](infra/secrets.yaml).
+Secrets are sealed in [secrets/](secrets/), synced by [infra/secrets.yaml](infra/secrets.yaml).
+Root excludes that directory so it can run `prune: false` on its own Application.
 
 ## Bootstrap
 

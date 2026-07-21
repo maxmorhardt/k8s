@@ -5,7 +5,7 @@ CloudNativePG in two Applications: the operator in `cnpg-system`, and the cluste
 
 ## Secrets
 
-Three secrets in `cnpg-database`, sealed into `secrets/cnpg-database/` — see
+Three secrets in `cnpg-database`, sealed into `argocd/secrets/cnpg-database/` — see
 [sealed-secrets/SETUP.md](../sealed-secrets/SETUP.md). Argo applies the sealed manifest;
 nothing here is `kubectl apply`'d by hand.
 

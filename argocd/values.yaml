@@ -51,11 +51,11 @@ controller:
   replicas: 1
   resources:
     requests:
-      cpu: 100m
-      memory: 256Mi
+      cpu: 250m
+      memory: 768Mi
     limits:
-      cpu: 500m
-      memory: 1Gi
+      cpu: 1000m
+      memory: 2Gi
   metrics:
     enabled: true
     serviceMonitor:
