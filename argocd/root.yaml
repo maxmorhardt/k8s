@@ -16,7 +16,7 @@ spec:
     path: argocd
     directory:
       recurse: true
-      exclude: '{values.yaml,secrets/*}'
+      exclude: '{values.yaml,secrets/**}'
   syncPolicy:
     automated:
       prune: true

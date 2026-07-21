@@ -16,6 +16,7 @@ spec:
       # renovate: datasource=helm depName=cloudnative-pg registryUrl=https://cloudnative-pg.github.io/charts
       targetRevision: 0.29.0
       helm:
+        releaseName: cloudnativepg
         valueFiles:
           - $values/postgres/values-operator.yaml
     - repoURL: https://github.com/maxmorhardt/k8s.git
