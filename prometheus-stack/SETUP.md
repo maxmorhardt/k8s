@@ -15,7 +15,7 @@ Config template: [alertmanager.example.yaml](alertmanager.example.yaml).
 
 ## Secrets
 
-Three secrets in `monitoring`, sealed into `secrets/monitoring/` — see
+Three secrets in `monitoring`, sealed into `argocd/secrets/monitoring/` — see
 [sealed-secrets/SETUP.md](../sealed-secrets/SETUP.md):
 
 | secret | keys |
