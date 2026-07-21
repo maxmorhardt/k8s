@@ -11,15 +11,10 @@ One Helm release in the `dex` namespace: the upstream chart (`dex/dex` from http
    CREATE USER dex WITH PASSWORD '...';
    CREATE DATABASE dex OWNER dex;
    ```
-2. **Google OAuth client**: Google Cloud Console → APIs & Services → Credentials → Create OAuth client ID (Web application). Authorized redirect URI: `https://login.maxstash.io/callback`. Configure the consent screen (external, publish).
-3. **GitHub OAuth app**: Settings → Developer settings → OAuth Apps → New. Authorization callback URL: `https://login.maxstash.io/callback`.
+2. **Google OAuth client**
+3. **GitHub OAuth app**
 4. Create the secret: `cp secret.example.yaml secret.yaml`, fill it in, then seal it and
-   delete the plaintext (see [sealed-secrets/SETUP.md](../sealed-secrets/SETUP.md)):
-   ```bash
-   kubeseal --format yaml --cert sealed-secrets/pub-cert.pem \
-     < secret.yaml > argocd/secrets/dex/dex-env.yaml
-   rm secret.yaml
-   ```
+   delete the plaintext (see [sealed-secrets/SETUP.md](../sealed-secrets/SETUP.md))
 5. Deploy: merge to `main` - Argo CD syncs the [dex Application](../argocd/infra/dex.yaml)
    and the sealed `dex-env` secret.
 
