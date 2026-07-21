@@ -14,8 +14,6 @@ spec:
     repoURL: https://github.com/maxmorhardt/k8s.git
     targetRevision: main
     path: storage
-    directory:
-      recurse: false
   syncPolicy:
     automated:
       prune: false
