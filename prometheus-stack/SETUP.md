@@ -1,8 +1,8 @@
 ## Overview
 
-Prometheus, Grafana, and Alertmanager. Grafana is at `grafana.maxstash.io`, backed by Postgres
-and signed in through Dex (admin granted by email via `role_attribute_path`). Retention: 14 days
-for metrics, 120h for Alertmanager.
+Prometheus, Grafana, and Alertmanager. Grafana is at `grafana.maxstash.io`, backed by SQLite on
+its own PVC and signed in through Dex (admin granted by email via `role_attribute_path`).
+Retention: 14 days for metrics, 120h for Alertmanager.
 
 ## Alert routing
 
@@ -20,7 +20,7 @@ Three secrets in `monitoring`, sealed into `argocd/secrets/monitoring/` — see
 | secret | keys |
 | --- | --- |
 | `grafana-credentials` | `admin-user`, `admin-password` |
-| `grafana-env` | `GF_DB_*` (host/name/user/password), `GF_OAUTH_CLIENT_ID`, `GF_OAUTH_CLIENT_SECRET` |
+| `grafana-env` | `GF_OAUTH_CLIENT_ID`, `GF_OAUTH_CLIENT_SECRET` |
 | `alertmanager` | `alertmanager.yaml` |
 
 ## Fire a test alert
