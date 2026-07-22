@@ -161,13 +161,6 @@ grafana:
     userKey: admin-user
     passwordKey: admin-password
   envFromSecret: 'grafana-env'
-  database:
-    type: postgres
-    host: '${GF_DB_HOST}'
-    name: '${GF_DB_NAME}'
-    user: '${GF_DB_USER}'
-    password: '${GF_DB_PASSWORD}'
-    sslMode: require
   grafana.ini:
     server:
       domain: grafana.maxstash.io
@@ -300,6 +293,16 @@ kubeProxy:
 
 kubeStateMetrics:
   enabled: true
+
+nodeExporter:
+  enabled: true
+  operatingSystems:
+    linux:
+      enabled: false
+    darwin:
+      enabled: false
+    aix:
+      enabled: false
 
 prometheus-node-exporter:
   enabled: true

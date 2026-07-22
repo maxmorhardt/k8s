@@ -167,7 +167,6 @@ serviceAccount:
 image:
   registry: docker.io
   repository: grafana/alloy
-  tag: ''
   pullPolicy: Always
 
 configReloader:
