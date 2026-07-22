@@ -1,13 +1,6 @@
 name = "maxstash-maintenance"
 main = "worker.js"
 compatibility_date = "2026-07-01"
-
-# wrangler auto-detects the account after `wrangler login` when you have one.
-# If you belong to multiple accounts, uncomment and set:
-# account_id = "<your-cloudflare-account-id>"
-
-# Whole zone: every hostname + the apex. Present only while in maintenance.
-# `wrangler deploy` attaches these routes; `wrangler delete` removes them.
 routes = [
   { pattern = "maxstash.io/*", zone_name = "maxstash.io" },
   { pattern = "*.maxstash.io/*", zone_name = "maxstash.io" },
