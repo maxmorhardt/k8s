@@ -70,6 +70,7 @@ config:
       - https://olympics.maxstash.io
       - https://ages.maxstash.io
       - https://grafana.maxstash.io
+      - https://argocd.maxstash.io
       - http://localhost:3000
 
   storage:
