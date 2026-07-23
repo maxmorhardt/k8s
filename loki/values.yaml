@@ -66,8 +66,8 @@ gateway:
 
 monitoring:
   dashboards:
-    enabled: true
-    namespace: monitoring
+    # replaced by the provisioned Loki dashboard in prometheus-stack/dashboards
+    enabled: false
   rules:
     enabled: true
     alerting: true

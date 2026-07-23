@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: olympics
+  name: grafana-dashboards
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -9,18 +9,15 @@ spec:
   project: default
   destination:
     server: https://kubernetes.default.svc
-    namespace: apps
+    namespace: monitoring
   source:
-    repoURL: ghcr.io/maxmorhardt/charts
-    chart: olympics
-    targetRevision: 1.0.2
-    helm:
-      parameters:
-        - name: image.tag
-          value: 1.0.1
+    repoURL: https://github.com/maxmorhardt/k8s.git
+    targetRevision: main
+    path: prometheus-stack/dashboards
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
