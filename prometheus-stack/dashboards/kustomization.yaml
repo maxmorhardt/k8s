@@ -25,3 +25,9 @@ configMapGenerator:
   - name: grafana-dashboard-loki
     files:
       - loki.json
+  - name: grafana-dashboard-kured
+    files:
+      - kured.json
+  - name: grafana-dashboard-sealed-secrets
+    files:
+      - sealed-secrets.json

@@ -183,7 +183,7 @@ configReloader:
       memory: 64Mi
 
 serviceMonitor:
-  enabled: true
+  enabled: false
 
 service:
   enabled: true
