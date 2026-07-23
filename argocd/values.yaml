@@ -10,7 +10,7 @@ configs:
     timeout.reconciliation: 180s
     kustomize.buildOptions: --enable-helm
     oidc.config: |
-      name: Dex
+      name: maxstash
       issuer: https://login.maxstash.io
       clientID: argocd
       clientSecret: $argocd-oidc:clientSecret
