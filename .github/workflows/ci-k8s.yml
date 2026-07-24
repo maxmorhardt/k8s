@@ -12,7 +12,7 @@ jobs:
         include:
           - chart: grafana/alloy
             # renovate: datasource=helm depName=alloy registryUrl=https://grafana.github.io/helm-charts
-            chart_version: '1.10.1'
+            chart_version: '1.11.0'
             helm_repo_name: grafana
             helm_repo_url: https://grafana.github.io/helm-charts
             values_file: alloy/values.yaml
@@ -58,13 +58,13 @@ jobs:
             values_file: postgres/values-operator.yaml
           - chart: cnpg/cluster
             # renovate: datasource=helm depName=cluster registryUrl=https://cloudnative-pg.github.io/charts
-            chart_version: '0.8.0'
+            chart_version: '0.8.1'
             helm_repo_name: cnpg
             helm_repo_url: https://cloudnative-pg.github.io/charts
             values_file: postgres/values-cluster.yaml
           - chart: prometheus-community/kube-prometheus-stack
             # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-            chart_version: '87.17.0'
+            chart_version: '87.18.0'
             helm_repo_name: prometheus-community
             helm_repo_url: https://prometheus-community.github.io/helm-charts
             values_file: prometheus-stack/values.yaml
