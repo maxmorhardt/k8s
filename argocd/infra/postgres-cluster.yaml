@@ -16,7 +16,7 @@ spec:
     - repoURL: https://cloudnative-pg.github.io/charts
       chart: cluster
       # renovate: datasource=helm depName=cluster registryUrl=https://cloudnative-pg.github.io/charts
-      targetRevision: 0.8.0
+      targetRevision: 0.8.1
       helm:
         valueFiles:
           # swap to values-cluster-recovery.yaml or values-cluster-hibernate.yaml to change cluster mode
