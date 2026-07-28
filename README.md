@@ -65,11 +65,7 @@ The stack follows a microservices architecture where each service is independent
 
 Everything in the cluster is reconciled from git by **Argo CD** — see [argocd/SETUP.md](argocd/SETUP.md). This repo is the single source of truth for cluster desired state: infra Applications in [argocd/infra/](argocd/infra/), application Applications in [argocd/apps/](argocd/apps/), and every infra `values.yaml` where it has always been.
 
-Editing a values file and merging to `main` **is** the deploy; there is no `helm upgrade` step and no per-component `deploy.sh` anymore. App releases work by CI committing a new `image.tag` into [argocd/apps/](argocd/apps/), which Argo then rolls out — CI holds no kubeconfig and never reaches into the cluster.
-
 The one exception is Argo CD itself, which cannot deploy itself from nothing: [argocd/bootstrap.sh](argocd/bootstrap.sh) installs and repairs it, run by hand from a workstation with cluster access. Keeping that local is why no CI workflow anywhere holds a kubeconfig.
-
-Application charts are published as OCI artifacts by the [charts](https://github.com/maxmorhardt/charts) repo, but the `Application`s that deploy them live here in [argocd/apps/](argocd/apps/) — that repo holds chart source only, no deployment state.
 
 On a bare cluster the bootstrap order is:
 
@@ -78,8 +74,6 @@ On a bare cluster the bootstrap order is:
 3. **Argo CD**: `cd argocd && ./bootstrap.sh` — everything below is then reconciled automatically
 4. **Sealing key**: restore the Sealed Secrets private key before anything that needs a secret syncs — see [sealed-secrets/SETUP.md](sealed-secrets/SETUP.md)
 5. **Storage Layer**, **Database Layer** (Postgres), **Traffic Management** (Envoy Gateway), **Kube Prometheus Stack**, **Core Services** (NATS, Loki, Alloy), **Authentication** (Dex), **kured**, **system-upgrade-controller**
-
-**Note:** Redeploys will be required if apps are installed prior to Prometheus CRDs. Argo handles this on its own — it retries until the CRDs exist.
 
 ### CI/CD
 CI validates charts and manifests via GitHub Actions using shared reusable workflows at `maxmorhardt/workflows`. CD is Argo CD pulling from git — CI pushes nothing to the cluster. An app's release pipeline ends by committing its new image tag into [argocd/apps/](argocd/apps/).
