@@ -18,7 +18,7 @@ jobs:
             values_file: alloy/values.yaml
           - chart: argo/argo-cd
             # renovate: datasource=helm depName=argo-cd registryUrl=https://argoproj.github.io/argo-helm
-            chart_version: '10.2.1'
+            chart_version: '10.3.0'
             helm_repo_name: argo
             helm_repo_url: https://argoproj.github.io/argo-helm
             values_file: argocd/values.yaml
