@@ -64,7 +64,7 @@ jobs:
             values_file: postgres/values-cluster.yaml
           - chart: prometheus-community/kube-prometheus-stack
             # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-            chart_version: '87.21.0'
+            chart_version: '88.1.5'
             helm_repo_name: prometheus-community
             helm_repo_url: https://prometheus-community.github.io/helm-charts
             values_file: prometheus-stack/values.yaml
