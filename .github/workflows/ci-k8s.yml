@@ -18,7 +18,7 @@ jobs:
             values_file: alloy/values.yaml
           - chart: argo/argo-cd
             # renovate: datasource=helm depName=argo-cd registryUrl=https://argoproj.github.io/argo-helm
-            chart_version: '10.3.0'
+            chart_version: '10.4.0'
             helm_repo_name: argo
             helm_repo_url: https://argoproj.github.io/argo-helm
             values_file: argocd/values.yaml
@@ -30,7 +30,7 @@ jobs:
             values_file: dex/values.yaml
           - chart: oci://docker.io/envoyproxy/gateway-helm
             # renovate: datasource=docker depName=docker.io/envoyproxy/gateway-helm
-            chart_version: '1.8.3'
+            chart_version: '1.9.0'
             values_file: envoy-gateway/values.yaml
           - chart: kubereboot/kured
             # renovate: datasource=helm depName=kured registryUrl=https://kubereboot.github.io/charts
@@ -40,13 +40,13 @@ jobs:
             values_file: kured/values.yaml
           - chart: grafana/loki
             # renovate: datasource=helm depName=loki registryUrl=https://grafana.github.io/helm-charts
-            chart_version: '7.2.0'
+            chart_version: '7.3.0'
             helm_repo_name: grafana
             helm_repo_url: https://grafana.github.io/helm-charts
             values_file: loki/values.yaml
           - chart: nats/nats
             # renovate: datasource=helm depName=nats registryUrl=https://nats-io.github.io/k8s/helm/charts/
-            chart_version: '2.14.4'
+            chart_version: '2.14.5'
             helm_repo_name: nats
             helm_repo_url: https://nats-io.github.io/k8s/helm/charts/
             values_file: nats/values.yaml
@@ -70,7 +70,7 @@ jobs:
             values_file: prometheus-stack/values.yaml
           - chart: sealed-secrets/sealed-secrets
             # renovate: datasource=helm depName=sealed-secrets registryUrl=https://bitnami.github.io/sealed-secrets
-            chart_version: '2.19.1'
+            chart_version: '2.19.3'
             helm_repo_name: sealed-secrets
             helm_repo_url: https://bitnami.github.io/sealed-secrets
             values_file: sealed-secrets/values.yaml
