@@ -3,12 +3,12 @@
 ## Project Context
 
 - Project: Self-Hosted Kubernetes Stack (`github.com/maxmorhardt/k8s`)
-- Language: YAML (Helm values, Kubernetes manifests, Argo CD Applications), plus shell for bootstrap
+- Language: YAML (Helm values, Kubernetes manifests, Argo CD Applications), plus HCL for out-of-cluster resources and shell for bootstrap
 - Purpose: The GitOps source of truth for a self-hosted K3s cluster. Argo CD reconciles everything here into the cluster.
 - Target environments: A single on-premises K3s cluster with Tailscale on nodes, high availability at the application level.
 - Related repos: `charts` (chart source for the apps deployed here), `workflows` (the shared validation workflows this repo's CI calls).
 
-**Editing a file and merging to `main` is the deploy.** There is no `helm upgrade` step, no per-component `deploy.sh`, and no CI workflow anywhere that holds a kubeconfig.
+**Editing a file and merging to `main` is the deploy.** There is no `helm upgrade` step, no per-component `deploy.sh`, and no CI workflow anywhere that holds a kubeconfig. `terraform/` deploys the same way, by `terraform apply` in CI rather than an Argo sync.
 
 ## Repository Layout
 
@@ -22,8 +22,10 @@
 - `<component>/` - one directory per infra component (`alloy/`, `dex/`, `envoy-gateway/`, `kured/`, `loki/`, `nats/`, `postgres/`, `prometheus-stack/`, `sealed-secrets/`, `storage/`, `system-upgrade-controller/`, `k3s/`), each with its `values.yaml` or raw manifests plus a `SETUP.md`.
 - `prometheus-stack/dashboards/` - Grafana dashboard JSON plus a `kustomization.yaml` wrapping each file into a ConfigMap. Deployed by its own `grafana-dashboards` Application.
 - `cloudflare-maintenance/` - Cloudflare Worker serving a maintenance page. Deployed with wrangler, not Kubernetes.
+- `terraform/` - the resources Argo CD cannot reach: the S3 backup bucket with its IAM identity, Cloudflare DNS, and GitHub repository rulesets. Three root modules (`aws/`, `cloudflare/`, `github/`), remote state in S3, planned on PR and applied on merge by `cd-terraform.yml`. See `terraform/SETUP.md`.
 - `namespaces.sh` - creates namespaces on a bare cluster, before Argo CD exists.
-- `.github/workflows/ci-k8s.yml` - kubeconform validation via the shared workflows. **CI validates only; it never applies.**
+- `.github/workflows/ci-k8s.yml` - chart, manifest, and Terraform validation via the shared workflows, fanning into the `Validate Complete` check the rulesets require. **Never applies to the cluster.**
+- `.github/workflows/cd-terraform.yml` - applies `terraform/` on merge, and plans it weekly with `fail_on_diff` to catch drift.
 
 ## Core Principles
 
@@ -43,6 +45,9 @@
    - `image.tag` and `targetRevision` in `argocd/apps/` are written by CI in the app and `charts` repos. Editing them by hand works but is overwritten by the next release.
 7. Runbooks live beside config
    - Each component's `SETUP.md` is its operational runbook and stays current with its values file.
+8. Terraform is applied, not reconciled
+   - A merge applies `terraform/`, but nothing watches it afterwards. Drift stays invisible until the Monday scheduled plan, unlike Argo's continuous self-heal.
+   - Everything it manages already existed and was adopted by import. A plan reporting anything other than no changes means the HCL is wrong, not the infrastructure.
 
 ## Agent Instructions
 
@@ -52,6 +57,7 @@
 - Adding a component means creating `<component>/` with `values.yaml` and `SETUP.md`, then adding `argocd/infra/<component>.yaml`. Nothing runs until the `Application` exists.
 - Grafana runs on SQLite and dashboards are provisioned from ConfigMaps, so a dashboard edited in the Grafana UI is not persisted. Export the JSON and commit it to `prometheus-stack/dashboards/`.
 - When a values change alters how a component is reached, backed up, or recovered, update its `SETUP.md` in the same commit.
+- In `terraform/`, never resolve a plan diff by changing live infrastructure. Match the HCL to what exists, then change it deliberately in its own commit. `aws_s3_bucket.backups` carries `prevent_destroy` because it holds the database backups.
 - Deleting a file is a destructive cluster operation. Confirm the resource is genuinely meant to be removed, not just moved.
 
 ## New Component Checklist
@@ -71,6 +77,8 @@ Rendering and validating is the test. There is no test suite; a bad merge reconc
 helm template <name> <chart> -f <component>/values.yaml   # infra values
 kubeconform -strict -summary <manifest>                   # raw manifests
 kustomize build prometheus-stack/dashboards               # dashboards
+terraform -chdir=terraform/<module> validate              # HCL
+terraform -chdir=terraform/<module> plan                  # against live state
 ```
 
 - Always render before pushing. A values key that the upstream chart does not recognize is silently ignored, so confirm the rendered output actually changed the way you expect.
@@ -126,6 +134,7 @@ Example commit subjects:
 - `feat(dex): add github connector`
 - `fix(loki): raise retention to 30d`
 - `chore(argocd): bump squares targetRevision to 1.0.3`
+- `chore(terraform): import the bucket policy`
 - `docs(postgres): document the recovery values file`
 
 ## Non-Goals for Routine Changes
@@ -136,3 +145,4 @@ Example commit subjects:
 - Adding a component directory without its Argo CD `Application`.
 - Working around Argo by running `kubectl edit`, which `selfHeal` reverts anyway.
 - Adding a second component that duplicates a concern the stack already covers.
+- Managing cluster resources with Terraform, or out-of-cluster resources with Argo CD.
