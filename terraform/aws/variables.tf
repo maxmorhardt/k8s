@@ -23,7 +23,7 @@ variable "backup_retention_days" {
 }
 
 variable "backup_noncurrent_days" {
-  description = "How long a version lingers after CNPG deletes it; versioning means expiration alone never removes these"
+  description = "How long a version lingers after expiration"
   type        = number
   default     = 30
 }
