@@ -17,3 +17,14 @@ postgres-dumpall*.sql
 
 # wrangler
 .wrangler
+
+# terraform
+.terraform
+
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+
+*.auto.tfvars
+terraform.tfvars
