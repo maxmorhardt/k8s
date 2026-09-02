@@ -12,13 +12,13 @@ jobs:
         include:
           - chart: grafana/alloy
             # renovate: datasource=helm depName=alloy registryUrl=https://grafana.github.io/helm-charts
-            chart_version: '1.11.1'
+            chart_version: '1.12.1'
             helm_repo_name: grafana
             helm_repo_url: https://grafana.github.io/helm-charts
             values_file: alloy/values.yaml
           - chart: argo/argo-cd
             # renovate: datasource=helm depName=argo-cd registryUrl=https://argoproj.github.io/argo-helm
-            chart_version: '10.4.0'
+            chart_version: '10.4.2'
             helm_repo_name: argo
             helm_repo_url: https://argoproj.github.io/argo-helm
             values_file: argocd/values.yaml
@@ -30,7 +30,7 @@ jobs:
             values_file: dex/values.yaml
           - chart: oci://docker.io/envoyproxy/gateway-helm
             # renovate: datasource=docker depName=docker.io/envoyproxy/gateway-helm
-            chart_version: '1.9.0'
+            chart_version: '1.9.1'
             values_file: envoy-gateway/values.yaml
           - chart: kubereboot/kured
             # renovate: datasource=helm depName=kured registryUrl=https://kubereboot.github.io/charts
@@ -46,7 +46,7 @@ jobs:
             values_file: loki/values.yaml
           - chart: nats/nats
             # renovate: datasource=helm depName=nats registryUrl=https://nats-io.github.io/k8s/helm/charts/
-            chart_version: '2.14.5'
+            chart_version: '2.14.6'
             helm_repo_name: nats
             helm_repo_url: https://nats-io.github.io/k8s/helm/charts/
             values_file: nats/values.yaml
@@ -64,7 +64,7 @@ jobs:
             values_file: postgres/values-cluster.yaml
           - chart: prometheus-community/kube-prometheus-stack
             # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-            chart_version: '88.5.4'
+            chart_version: '88.6.1'
             helm_repo_name: prometheus-community
             helm_repo_url: https://prometheus-community.github.io/helm-charts
             values_file: prometheus-stack/values.yaml
