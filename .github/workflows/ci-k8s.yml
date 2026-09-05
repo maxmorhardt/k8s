@@ -18,7 +18,7 @@ jobs:
             values_file: alloy/values.yaml
           - chart: argo/argo-cd
             # renovate: datasource=helm depName=argo-cd registryUrl=https://argoproj.github.io/argo-helm
-            chart_version: '10.4.2'
+            chart_version: '10.6.4'
             helm_repo_name: argo
             helm_repo_url: https://argoproj.github.io/argo-helm
             values_file: argocd/values.yaml
@@ -64,7 +64,7 @@ jobs:
             values_file: postgres/values-cluster.yaml
           - chart: prometheus-community/kube-prometheus-stack
             # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-            chart_version: '88.6.1'
+            chart_version: '88.6.2'
             helm_repo_name: prometheus-community
             helm_repo_url: https://prometheus-community.github.io/helm-charts
             values_file: prometheus-stack/values.yaml
