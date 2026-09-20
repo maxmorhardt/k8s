@@ -232,12 +232,6 @@ grafana:
     accessModes:
       - ReadWriteOnce
     size: 1Gi
-  extraVolumes:
-    - name: tmp
-      emptyDir: {}
-  extraVolumeMounts:
-    - name: tmp
-      mountPath: /tmp
   serviceAccount:
     create: true
     autoMount: true
