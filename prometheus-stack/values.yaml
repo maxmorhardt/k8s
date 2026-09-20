@@ -187,6 +187,9 @@ grafana:
     analytics:
       reporting_enabled: false
       check_for_updates: false
+      check_for_plugin_updates: false
+    plugins:
+      preinstall_auto_update: false
     security:
       disable_gravatar: true
   route:
@@ -245,6 +248,14 @@ grafana:
     datasources:
       enabled: true
       defaultDatasourceEnabled: true
+  additionalDataSources:
+    - name: loki
+      type: loki
+      uid: loki
+      url: http://loki.monitoring.svc.cluster.local:3100
+      access: proxy
+      jsonData:
+        maxLines: 1000
   service:
     portName: http-web
   serviceMonitor:
