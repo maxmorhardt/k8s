@@ -8,7 +8,7 @@ helm repo update
 
 # renovate: datasource=helm depName=argo-cd registryUrl=https://argoproj.github.io/argo-helm
 helm upgrade argocd argo/argo-cd \
-	--version 10.9.1 \
+	--version 10.9.2 \
 	--install \
 	--wait \
 	--timeout 10m \
