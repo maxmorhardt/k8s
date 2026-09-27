@@ -112,6 +112,15 @@ config:
     - id: squares
       name: Squares
       public: true
+      trustedPeers:
+        - squares-mobile
+      redirectURIs:
+        - https://squares.maxstash.io/auth/callback
+        - http://localhost:3000/auth/callback
+
+    - id: squares-mobile
+      name: Squares
+      public: true
       redirectURIs:
         - https://squares.maxstash.io/auth/callback
         - http://localhost:3000/auth/callback
