@@ -12,19 +12,19 @@ jobs:
         include:
           - chart: grafana/alloy
             # renovate: datasource=helm depName=alloy registryUrl=https://grafana.github.io/helm-charts
-            chart_version: '1.13.0'
+            chart_version: '1.13.1'
             helm_repo_name: grafana
             helm_repo_url: https://grafana.github.io/helm-charts
             values_file: alloy/values.yaml
           - chart: argo/argo-cd
             # renovate: datasource=helm depName=argo-cd registryUrl=https://argoproj.github.io/argo-helm
-            chart_version: '10.9.6'
+            chart_version: '10.10.1'
             helm_repo_name: argo
             helm_repo_url: https://argoproj.github.io/argo-helm
             values_file: argocd/values.yaml
           - chart: dex/dex
             # renovate: datasource=helm depName=dex registryUrl=https://charts.dexidp.io
-            chart_version: '0.25.2'
+            chart_version: '0.26.0'
             helm_repo_name: dex
             helm_repo_url: https://charts.dexidp.io
             values_file: dex/values.yaml
