@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: squares-api
+  name: squares-contests
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -12,12 +12,12 @@ spec:
     namespace: squares
   source:
     repoURL: ghcr.io/maxmorhardt/charts
-    chart: squares-api
-    targetRevision: 1.2.0
+    chart: squares-contests
+    targetRevision: 1.0.0
     helm:
       parameters:
         - name: image.tag
-          value: 1.4.10
+          value: 1.0.0
   syncPolicy:
     automated:
       prune: true
