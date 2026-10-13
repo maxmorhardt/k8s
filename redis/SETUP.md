@@ -42,10 +42,15 @@ Secret, one key per user ([secret.example.yaml](secret.example.yaml)).
 
 ## Setup
 
-1. Fill `secret.example.yaml` with two random passwords (`openssl rand -hex 32`) and seal it to
-   `argocd/secrets/redis/redis-users.yaml` (see [sealed-secrets/SETUP.md](../sealed-secrets/SETUP.md)).
-2. Merge; Argo creates the namespace and syncs [argocd/infra/redis.yaml](../argocd/infra/redis.yaml).
-3. Put the `squares` password into `REDIS_URL` in `squares-api-env` and reseal it.
+`scripts/seal-squares-secrets.sh` (from the repository root, with cluster access) generates both
+passwords, seals `argocd/secrets/redis/redis-users.yaml`, and seals each squares service's secret
+with the matching `REDIS_URL`. Commit all the files it writes together. To do it by hand instead,
+fill [secret.example.yaml](secret.example.yaml) with two `openssl rand -hex 32` values and seal it
+(see [sealed-secrets/SETUP.md](../sealed-secrets/SETUP.md)).
+
+Argo creates the namespace and syncs [argocd/infra/redis.yaml](../argocd/infra/redis.yaml) once
+merged; create it first (`kubectl create namespace redis`) so the sealed secret applies on the
+first sync.
 
 Rotating a password: update and reseal `redis-users`, restart the `redis` deployment (the init
 container rebuilds the ACL file), then update `REDIS_URL` and restart the squares services.
