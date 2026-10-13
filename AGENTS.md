@@ -6,7 +6,7 @@
 - Language: YAML (Helm values, Kubernetes manifests, Argo CD Applications), plus HCL for out-of-cluster resources and shell for bootstrap
 - Purpose: The GitOps source of truth for a self-hosted K3s cluster. Argo CD reconciles everything here into the cluster.
 - Target environments: A single on-premises K3s cluster with Tailscale on nodes, high availability at the application level.
-- Related repos: `charts` (chart source for the apps deployed here), `workflows` (the shared validation workflows this repo's CI calls).
+- Related repos: `maxstash` (the public monorepo: app source, each app's chart under `apps/<app>/chart`, and the infra charts under `charts/`; all published to `ghcr.io/maxmorhardt/charts`), `ages` (private apps), `workflows` (the shared validation workflows this repo's CI calls).
 
 **Editing a file and merging to `main` is the deploy.** There is no `helm upgrade` step, no per-component `deploy.sh`, and no CI workflow anywhere that holds a kubeconfig. `terraform/` deploys the same way, by `terraform apply` in CI rather than an Argo sync.
 
@@ -19,7 +19,7 @@
   - `secrets/<namespace>/` - SealedSecrets, encrypted at rest and safe to commit.
   - `bootstrap.sh` - installs and repairs Argo CD itself. Run by hand from a workstation with cluster access.
   - `SETUP.md` - how Argo CD is configured and bootstrapped.
-- `<component>/` - one directory per infra component (`alloy/`, `dex/`, `envoy-gateway/`, `kured/`, `loki/`, `nats/`, `postgres/`, `prometheus-stack/`, `sealed-secrets/`, `storage/`, `system-upgrade-controller/`, `k3s/`), each with its `values.yaml` or raw manifests plus a `SETUP.md`.
+- `<component>/` - one directory per infra component (`alloy/`, `dex/`, `envoy-gateway/`, `kured/`, `loki/`, `nats/`, `postgres/`, `redis/`, `prometheus-stack/`, `sealed-secrets/`, `storage/`, `system-upgrade-controller/`, `k3s/`), each with its `values.yaml` or raw manifests plus a `SETUP.md`.
 - `prometheus-stack/dashboards/` - Grafana dashboard JSON plus a `kustomization.yaml` wrapping each file into a ConfigMap. Deployed by its own `grafana-dashboards` Application.
 - `cloudflare-maintenance/` - Cloudflare Worker serving a maintenance page. Deployed with wrangler, not Kubernetes.
 - `terraform/` - the resources Argo CD cannot reach: the S3 backup bucket with its IAM identity, Cloudflare DNS, and GitHub repository rulesets. Three root modules (`aws/`, `cloudflare/`, `github/`), remote state in S3, planned on PR and applied on merge by `cd-terraform.yml`. See `terraform/SETUP.md`.
@@ -39,10 +39,10 @@
    - Argo CD itself is the one exception, bootstrapped by hand because it cannot deploy itself from nothing.
 4. Secrets are encrypted, never plaintext
    - Only SealedSecrets are committed. The sealing key is restored out of band.
-5. Separation of concerns with `charts`
-   - `charts` holds chart source. This repo holds which version of that chart runs, and where.
+5. Separation of concerns with the app repos
+   - `maxstash` holds chart source. This repo holds which version of that chart runs, and where.
 6. Ownership of pinned lines
-   - `image.tag` and `targetRevision` in `argocd/apps/` are written by CI in the app and `charts` repos. Editing them by hand works but is overwritten by the next release.
+   - `image.tag` and `targetRevision` in `argocd/apps/` are written by release CI in `maxstash`. Editing them by hand works but is overwritten by the next release.
 7. Runbooks live beside config
    - Each component's `SETUP.md` is its operational runbook and stays current with its values file.
 8. Terraform is applied, not reconciled
