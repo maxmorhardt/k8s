@@ -1,6 +1,7 @@
-# Valkey, the Redis-compatible fork, as one persistent instance. The squares services use it for
-# shared caches, rate limits, idempotency keys, and token revocations, and fail open when it is
-# down, so a restart costs cache hits rather than requests.
+# Valkey, the Redis-compatible fork, as one persistent instance. The squares services keep their
+# event streams here (one per contest, plus games and users) along with caches, rate limits,
+# idempotency keys, and token revocations. Requests keep working while it is down; events wait in
+# each service's postgres outbox and live updates pause until it is back.
 fullnameOverride: redis
 
 # a single pod on a node-local volume; Recreate avoids two pods contending for the same data dir
@@ -8,17 +9,20 @@ deploymentStrategy: Recreate
 
 resources:
   requests:
-    cpu: 100m
-    memory: 256Mi
+    cpu: 250m
+    memory: 512Mi
   limits:
     cpu: 500m
-    memory: 256Mi
+    memory: 512Mi
 
+# every key has a ttl; under memory pressure the shortest-lived go first, which are the caches,
+# long before the streams (7 days) or revocations (30 days).
+# fsync on every write: an event acknowledged to the outbox relay must survive a crash
 valkeyConfig: |
-  maxmemory 192mb
-  maxmemory-policy volatile-lru
+  maxmemory 384mb
+  maxmemory-policy volatile-ttl
   appendonly yes
-  appendfsync everysec
+  appendfsync always
 
 dataStorage:
   enabled: true

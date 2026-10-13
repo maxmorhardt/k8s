@@ -4,14 +4,26 @@ Valkey (the open-source, Redis-compatible fork) in the `redis` namespace, from t
 [valkey-helm](https://valkey.io/valkey-helm/) chart. One instance with append-only persistence on
 a 2Gi `local-path-retain` volume.
 
-The squares services use it for shared caches (leaderboard, stats, upcoming games), rate limits,
-`Idempotency-Key` records, and token revocations. Every call **fails open**: if Redis is down the
-services skip the cache, allow the request, and log a warning. A restart costs cache hits and
-briefly forgets in-flight idempotency keys and revocations; accounts re-syncs revocations from
-Postgres on startup.
+The squares services keep two kinds of data here:
 
-Every key is prefixed `squares:` and has a TTL, so `maxmemory-policy volatile-lru` evicts the
-least recently used keys when it reaches `maxmemory` (192mb, under the 256Mi limit).
+- **Event streams** - `squares:events:contest:<id>` (contests writes, realtime reads),
+  `squares:events:games` (games writes, contests reads), and `squares:events:users` (accounts
+  writes, contests reads). Each service appends through its Postgres outbox, so nothing is lost
+  while Redis is down: events wait there and the relay catches up. Entries older than 7 days are
+  trimmed, and a stream that gets no events for 7 days expires.
+- **Short-lived state** - caches (leaderboard, stats, upcoming games), rate limits,
+  `Idempotency-Key` records, and token revocations. These **fail open**: without Redis the
+  services skip the cache and allow the request. Accounts rebuilds revocations from Postgres on
+  every start.
+
+While Redis is down, contests, games, and accounts keep serving (they start and stay ready
+without it), but live updates stop: realtime is not ready and open streams end. Viewers reconnect
+with their `Last-Event-ID` when it is back.
+
+Every key is prefixed `squares:` and has a TTL. `maxmemory-policy volatile-ttl` evicts the keys
+closest to expiring first when memory reaches `maxmemory` (384mb, under the 512Mi limit), which
+are the caches, long before any stream. `appendfsync always` makes every acknowledged append
+durable.
 
 ## Access
 
@@ -47,5 +59,10 @@ kubectl -n redis exec -it deploy/redis -c redis -- valkey-cli --user default --p
 ```
 
 - `make redis` in `apps/squares/api` port-forwards it for local development.
-- Backup is not needed: everything here is derived or short-lived. Losing the volume loses
-  nothing that Postgres cannot rebuild.
+- Stream state: `XLEN squares:events:games`, `XINFO STREAM squares:events:users`. Contests'
+  position in each stream is in Postgres: `SELECT * FROM contests.stream_offsets`.
+- Backup is not needed. If the volume is lost: caches and rate limits refill; revocations come
+  back on the next accounts restart; viewers whose `Last-Event-ID` no longer exists get a fresh
+  snapshot; contests keeps reading from where it was, since new entry ids are newer than its
+  saved position. Only events appended in the moment before the loss are gone, and the next
+  change to the same game or profile carries the full state again.
