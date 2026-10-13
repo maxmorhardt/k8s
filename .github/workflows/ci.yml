@@ -44,12 +44,6 @@ jobs:
             helm_repo_name: grafana
             helm_repo_url: https://grafana.github.io/helm-charts
             values_file: loki/values.yaml
-          - chart: nats/nats
-            # renovate: datasource=helm depName=nats registryUrl=https://nats-io.github.io/k8s/helm/charts/
-            chart_version: '2.15.0'
-            helm_repo_name: nats
-            helm_repo_url: https://nats-io.github.io/k8s/helm/charts/
-            values_file: nats/values.yaml
           - chart: valkey/valkey
             # renovate: datasource=helm depName=valkey registryUrl=https://valkey.io/valkey-helm/
             chart_version: '0.12.0'
