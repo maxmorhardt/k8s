@@ -16,9 +16,6 @@ configMapGenerator:
   - name: grafana-dashboard-nginx
     files:
       - nginx.json
-  - name: grafana-dashboard-nats
-    files:
-      - nats.json
   - name: grafana-dashboard-argocd
     files:
       - argocd.json

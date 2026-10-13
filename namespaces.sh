@@ -1,7 +1,6 @@
 kubectl create namespace cnpg-system
 kubectl create namespace cnpg-database
 
-kubectl create namespace nats
 kubectl create namespace redis
 
 kubectl create namespace envoy-gateway-system
