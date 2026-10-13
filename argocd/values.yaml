@@ -43,6 +43,11 @@ configs:
       type: helm
       url: docker.io/envoyproxy
       enableOCI: 'true'
+    cloudpirates:
+      name: cloudpirates
+      type: helm
+      url: docker.io/cloudpirates
+      enableOCI: 'true'
 
 crds:
   install: true

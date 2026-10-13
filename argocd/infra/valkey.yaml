@@ -11,10 +11,10 @@ spec:
     server: https://kubernetes.default.svc
     namespace: valkey
   sources:
-    - repoURL: https://valkey.io/valkey-helm/
+    - repoURL: docker.io/cloudpirates
       chart: valkey
-      # renovate: datasource=helm depName=valkey registryUrl=https://valkey.io/valkey-helm/
-      targetRevision: 0.12.0
+      # renovate: datasource=docker depName=docker.io/cloudpirates/valkey
+      targetRevision: 0.25.13
       helm:
         valueFiles:
           - $values/valkey/values.yaml

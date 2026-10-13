@@ -101,7 +101,7 @@ Before adding a new component or upstream chart, verify:
 
 - **Ingress**: a single Envoy Gateway (Gateway API) for all traffic. UIs get a hostname each; APIs share `api.maxstash.io` split by path prefix. TLS terminates at the gateway. Charts attach via `HTTPRoute` with a `parentRef` to the `maxstash` gateway in `envoy-gateway-system`.
 - **Auth**: Dex at `login.maxstash.io` provides OIDC, federating Google and GitHub. Email is the identity.
-- **Data**: PostgreSQL HA via CloudNativePG (`postgres-operator` plus `postgres-cluster`), Valkey (`valkey/`) for caches and the squares event streams.
+- **Data**: PostgreSQL HA via CloudNativePG (`postgres-operator` plus `postgres-cluster`), Valkey with Sentinel failover (`valkey/`) for caches and the squares event streams.
 - **Observability**: kube-prometheus-stack (Prometheus, Alertmanager, Grafana) plus Loki and Alloy for logs. Alertmanager routes to Discord and email with a healthchecks.io dead-man's switch.
 - **Node maintenance**: kured coordinates rolling reboots Tuesdays at 02:00, one node at a time, running `pre-reboot.sh` first. system-upgrade-controller tracks the k3s stable channel in a Wednesday 02:00 to 04:00 ET window, control plane first.
 
