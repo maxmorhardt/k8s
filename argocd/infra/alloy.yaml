@@ -18,7 +18,7 @@ spec:
       helm:
         valueFiles:
           - $values/alloy/values.yaml
-    - repoURL: https://github.com/maxmorhardt/k8s.git
+    - repoURL: https://github.com/maxmorhardt/infra.git
       targetRevision: main
       ref: values
   syncPolicy:

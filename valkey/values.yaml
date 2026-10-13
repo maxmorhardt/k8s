@@ -1,0 +1,58 @@
+# Valkey as one persistent instance. The squares services keep their
+# event streams here (one per contest, plus games and users) along with caches, rate limits,
+# idempotency keys, and token revocations. Requests keep working while it is down; events wait in
+# each service's postgres outbox and live updates pause until it is back.
+fullnameOverride: valkey
+
+# a single pod on a node-local volume; Recreate avoids two pods contending for the same data dir
+deploymentStrategy: Recreate
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# every key has a ttl; under memory pressure the shortest-lived go first, which are the caches,
+# long before the streams (7 days) or revocations (30 days).
+# fsync on every write: an event acknowledged to the outbox relay must survive a crash
+valkeyConfig: |
+  maxmemory 384mb
+  maxmemory-policy volatile-ttl
+  appendonly yes
+  appendfsync always
+
+dataStorage:
+  enabled: true
+  requestedSize: 2Gi
+  className: local-path-retain
+  keepPvc: true
+
+auth:
+  enabled: true
+  # sealed in argocd/secrets/valkey/valkey-users.yaml; one key per user
+  usersExistingSecret: valkey-users
+  aclUsers:
+    default:
+      permissions: "~* &* +@all"
+    # every squares key is prefixed squares:, so the services cannot touch anything else
+    squares:
+      permissions: "~squares:* resetchannels +@all -@dangerous"
+
+readinessProbe:
+  enabled: true
+
+metrics:
+  enabled: true
+  exporter:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 64Mi
+  serviceMonitor:
+    enabled: true

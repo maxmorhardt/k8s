@@ -4,8 +4,8 @@
   "customManagers": [
     {
       "customType": "regex",
-      "description": "track pinned helm chart versions in the ci-k8s validate matrix",
-      "managerFilePatterns": ["/^\\.github/workflows/ci-k8s\\.ya?ml$/"],
+      "description": "track pinned helm chart versions in the ci validate matrix",
+      "managerFilePatterns": ["/^\\.github/workflows/ci\\.ya?ml$/"],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: registryUrl=(?<registryUrl>\\S+))?[^']*'(?<currentValue>[^']+)'"
       ]

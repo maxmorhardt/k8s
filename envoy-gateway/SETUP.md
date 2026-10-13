@@ -5,7 +5,7 @@ Gateway API implementation fronting all HTTP traffic for `maxstash.io`. Replaces
 Two pieces:
 
 1. **envoy-gateway** (this directory) — the upstream controller chart, plus the Gateway API CRDs. Synced from [argocd/infra/envoy-gateway.yaml](../argocd/infra/envoy-gateway.yaml).
-2. **maxstash-gateway** — chart in the `charts` repo with the actual Gateway resources: the `maxstash` GatewayClass + Gateway (listeners for `maxstash.io` and `*.maxstash.io` on 443, http→https redirect on 80), the `EnvoyProxy` config (2 proxy replicas), and a `ClientTrafficPolicy` resolving the real client IP from `X-Forwarded-For` against the trusted Cloudflare CIDRs. Synced from [argocd/apps/maxstash-gateway.yaml](../argocd/apps/maxstash-gateway.yaml).
+2. **maxstash-gateway** — chart in the `charts` repo with the actual Gateway resources: the `maxstash` GatewayClass + Gateway (listeners for `maxstash.io` and `*.maxstash.io` on 443, http→https redirect on 80), the `EnvoyProxy` config (2 proxy replicas), and a `ClientTrafficPolicy` resolving the real client IP from `X-Forwarded-For` against the trusted Cloudflare CIDRs, and that strips client-supplied identity headers (`X-Auth-*`, `X-Internal-Token`) before any route sees them. Synced from [argocd/apps/maxstash-gateway.yaml](../argocd/apps/maxstash-gateway.yaml).
 
 Apps attach by creating an `HTTPRoute` in their own namespace with `parentRefs` pointing at `maxstash` / `envoy-gateway-system`. The Gateway allows routes from all namespaces.
 
@@ -24,4 +24,5 @@ kubectl get secret maxstash.io-tls -n <existing-ns> -o yaml \
 - Client IP: the `ClientTrafficPolicy` walks `X-Forwarded-For` right-to-left and takes the first address outside the trusted Cloudflare CIDRs - the same trust model as the old nginx `proxy-real-ip-cidr` setup. The `cloudflare-cidr` cronjob keeps the CIDR list current.
 - Rate limits: per-route `BackendTrafficPolicy` (Local type) in each app chart replaces the nginx `limit-rps` annotations.
 - Request body size caps moved into the apps themselves (`request_size` middleware); the gateway does not enforce one.
-- WebSocket upgrades (`/ws` on squares-api) are enabled by default for HTTPRoutes in Envoy Gateway — no extra config.
+- Authentication: the squares API validates OIDC tokens at the gateway. Its chart's `SecurityPolicy` checks the bearer JWT against Dex (`https://login.maxstash.io/keys`, audiences `squares` and `squares-mobile`) and copies the claims into `X-Auth-Email`, `X-Auth-Name`, `X-Auth-Email-Verified`, `X-Auth-Iat` and `X-Auth-Exp`. The JWT is optional so public routes still work; the services reject protected routes without `X-Auth-Email`. The header stripping above is what makes those headers trustworthy, so it must ship before or with any chart that relies on them.
+- Server-sent events: the squares realtime route (`/squares/events/...`) sets `timeouts.request: 0s` so long-lived streams are not cut off; the service sends a heartbeat every 25s to keep idle connections open through Cloudflare.

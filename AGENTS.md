@@ -2,11 +2,11 @@
 
 ## Project Context
 
-- Project: Self-Hosted Kubernetes Stack (`github.com/maxmorhardt/k8s`)
+- Project: Self-Hosted Kubernetes Stack (`github.com/maxmorhardt/infra`)
 - Language: YAML (Helm values, Kubernetes manifests, Argo CD Applications), plus HCL for out-of-cluster resources and shell for bootstrap
 - Purpose: The GitOps source of truth for a self-hosted K3s cluster. Argo CD reconciles everything here into the cluster.
 - Target environments: A single on-premises K3s cluster with Tailscale on nodes, high availability at the application level.
-- Related repos: `charts` (chart source for the apps deployed here), `workflows` (the shared validation workflows this repo's CI calls).
+- Related repos: `charts` (chart source for everything in `argocd/apps`, published to `ghcr.io/maxmorhardt/charts`), `maxstash` (the public app monorepo, whose releases set `image.tag`), `ages` (private apps), `workflows` (the shared validation workflows this repo's CI calls).
 
 **Editing a file and merging to `main` is the deploy.** There is no `helm upgrade` step, no per-component `deploy.sh`, and no CI workflow anywhere that holds a kubeconfig. `terraform/` deploys the same way, by `terraform apply` in CI rather than an Argo sync.
 
@@ -19,12 +19,12 @@
   - `secrets/<namespace>/` - SealedSecrets, encrypted at rest and safe to commit.
   - `bootstrap.sh` - installs and repairs Argo CD itself. Run by hand from a workstation with cluster access.
   - `SETUP.md` - how Argo CD is configured and bootstrapped.
-- `<component>/` - one directory per infra component (`alloy/`, `dex/`, `envoy-gateway/`, `kured/`, `loki/`, `nats/`, `postgres/`, `prometheus-stack/`, `sealed-secrets/`, `storage/`, `system-upgrade-controller/`, `k3s/`), each with its `values.yaml` or raw manifests plus a `SETUP.md`.
+- `<component>/` - one directory per infra component (`alloy/`, `dex/`, `envoy-gateway/`, `kured/`, `loki/`, `postgres/`, `valkey/`, `prometheus-stack/`, `sealed-secrets/`, `storage/`, `system-upgrade-controller/`, `k3s/`), each with its `values.yaml` or raw manifests plus a `SETUP.md`.
 - `prometheus-stack/dashboards/` - Grafana dashboard JSON plus a `kustomization.yaml` wrapping each file into a ConfigMap. Deployed by its own `grafana-dashboards` Application.
 - `cloudflare-maintenance/` - Cloudflare Worker serving a maintenance page. Deployed with wrangler, not Kubernetes.
 - `terraform/` - the resources Argo CD cannot reach: the S3 backup bucket with its IAM identity, Cloudflare DNS, and GitHub repository rulesets. Three root modules (`aws/`, `cloudflare/`, `github/`), remote state in S3, planned on PR and applied on merge by `cd-terraform.yml`. See `terraform/SETUP.md`.
 - `namespaces.sh` - creates namespaces on a bare cluster, before Argo CD exists.
-- `.github/workflows/ci-k8s.yml` - chart, manifest, and Terraform validation via the shared workflows, fanning into the `Validate Complete` check the rulesets require. **Never applies to the cluster.**
+- `.github/workflows/ci.yml` - chart, manifest, and Terraform validation via the shared workflows, fanning into the `Validate Complete` check the rulesets require. **Never applies to the cluster.**
 - `.github/workflows/cd-terraform.yml` - applies `terraform/` on merge, and plans it weekly with `fail_on_diff` to catch drift.
 
 ## Core Principles
@@ -42,7 +42,7 @@
 5. Separation of concerns with `charts`
    - `charts` holds chart source. This repo holds which version of that chart runs, and where.
 6. Ownership of pinned lines
-   - `image.tag` and `targetRevision` in `argocd/apps/` are written by CI in the app and `charts` repos. Editing them by hand works but is overwritten by the next release.
+   - `image.tag` and `targetRevision` in `argocd/apps/` are written by release CI: `image.tag` by the app's release in `maxstash`, `targetRevision` by the chart's release in `charts`. Editing them by hand works but is overwritten by the next release.
 7. Runbooks live beside config
    - Each component's `SETUP.md` is its operational runbook and stays current with its values file.
 8. Terraform is applied, not reconciled
@@ -101,7 +101,7 @@ Before adding a new component or upstream chart, verify:
 
 - **Ingress**: a single Envoy Gateway (Gateway API) for all traffic. UIs get a hostname each; APIs share `api.maxstash.io` split by path prefix. TLS terminates at the gateway. Charts attach via `HTTPRoute` with a `parentRef` to the `maxstash` gateway in `envoy-gateway-system`.
 - **Auth**: Dex at `login.maxstash.io` provides OIDC, federating Google and GitHub. Email is the identity.
-- **Data**: PostgreSQL HA via CloudNativePG (`postgres-operator` plus `postgres-cluster`), NATS for pub/sub.
+- **Data**: PostgreSQL HA via CloudNativePG (`postgres-operator` plus `postgres-cluster`), Valkey (`valkey/`) for caches and the squares event streams.
 - **Observability**: kube-prometheus-stack (Prometheus, Alertmanager, Grafana) plus Loki and Alloy for logs. Alertmanager routes to Discord and email with a healthchecks.io dead-man's switch.
 - **Node maintenance**: kured coordinates rolling reboots Tuesdays at 02:00, one node at a time, running `pre-reboot.sh` first. system-upgrade-controller tracks the k3s stable channel in a Wednesday 02:00 to 04:00 ET window, control plane first.
 
@@ -113,7 +113,7 @@ On a bare cluster only. Everything after step 3 is reconciled automatically.
 2. `./namespaces.sh`
 3. `cd argocd && ./bootstrap.sh`
 4. Restore the Sealed Secrets private key **before** anything needing a secret syncs
-5. Storage, Postgres, Envoy Gateway, kube-prometheus-stack, NATS, Loki, Alloy, Dex, kured, system-upgrade-controller
+5. Storage, Postgres, Envoy Gateway, kube-prometheus-stack, Valkey, Loki, Alloy, Dex, kured, system-upgrade-controller
 
 Apps installed before the Prometheus CRDs exist will fail to sync. Argo retries until they do.
 

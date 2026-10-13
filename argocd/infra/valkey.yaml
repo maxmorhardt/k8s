@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: nats
+  name: valkey
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -9,16 +9,16 @@ spec:
   project: default
   destination:
     server: https://kubernetes.default.svc
-    namespace: nats
+    namespace: valkey
   sources:
-    - repoURL: https://nats-io.github.io/k8s/helm/charts/
-      chart: nats
-      # renovate: datasource=helm depName=nats registryUrl=https://nats-io.github.io/k8s/helm/charts/
-      targetRevision: 2.15.0
+    - repoURL: https://valkey.io/valkey-helm/
+      chart: valkey
+      # renovate: datasource=helm depName=valkey registryUrl=https://valkey.io/valkey-helm/
+      targetRevision: 0.12.0
       helm:
         valueFiles:
-          - $values/nats/values.yaml
-    - repoURL: https://github.com/maxmorhardt/k8s.git
+          - $values/valkey/values.yaml
+    - repoURL: https://github.com/maxmorhardt/infra.git
       targetRevision: main
       ref: values
   syncPolicy:
