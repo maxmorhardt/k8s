@@ -1,52 +1,62 @@
-# Valkey as one persistent instance. The squares services keep their
-# event streams here (one per contest, plus games and users) along with caches, rate limits,
-# idempotency keys, and token revocations. Requests keep working while it is down; events wait in
-# each service's postgres outbox and live updates pause until it is back.
 fullnameOverride: valkey
 
-# a single pod on a node-local volume; Recreate avoids two pods contending for the same data dir
-deploymentStrategy: Recreate
+architecture: replication
+replicaCount: 3
+
+auth:
+  existingSecret: valkey-users
+  existingSecretPasswordKey: default
+
+config:
+  maxMemory: 384mb
+  maxMemoryPolicy: volatile-ttl
+  save: ""
+  extraConfig:
+    - appendonly yes
+    - appendfsync always
+    - min-replicas-to-write 1
+    - min-replicas-max-lag 10
+    # sha256 of the squares password in valkey-users
+    - user squares on #d85e6a7a3d22aadd139137e12828b655cb0e9d1a71e9c62008610f59b21a1d1e ~squares:* resetchannels +@all -@dangerous
 
 resources:
   requests:
-    cpu: 250m
+    cpu: 100m
     memory: 512Mi
   limits:
     cpu: 500m
     memory: 512Mi
 
-# every key has a ttl; under memory pressure the shortest-lived go first, which are the caches,
-# long before the streams (7 days) or revocations (30 days).
-# fsync on every write: an event acknowledged to the outbox relay must survive a crash
-valkeyConfig: |
-  maxmemory 384mb
-  maxmemory-policy volatile-ttl
-  appendonly yes
-  appendfsync always
+persistence:
+  storageClass: local-path-retain
+  size: 2Gi
 
-dataStorage:
+pdb:
   enabled: true
-  requestedSize: 2Gi
-  className: local-path-retain
-  keepPvc: true
+  minAvailable: 2
 
-auth:
-  enabled: true
-  # sealed in argocd/secrets/valkey/valkey-users.yaml; one key per user
-  usersExistingSecret: valkey-users
-  aclUsers:
-    default:
-      permissions: "~* &* +@all"
-    # every squares key is prefixed squares:, so the services cannot touch anything else
-    squares:
-      permissions: "~squares:* resetchannels +@all -@dangerous"
+terminationGracePeriodSeconds: 60
 
-readinessProbe:
-  enabled: true
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - topologyKey: kubernetes.io/hostname
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: valkey
 
-metrics:
+sentinel:
   enabled: true
-  exporter:
+  masterName: valkey
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
+  masterProxy:
+    enabled: true
     resources:
       requests:
         cpu: 10m
@@ -54,5 +64,15 @@ metrics:
       limits:
         cpu: 100m
         memory: 64Mi
+
+metrics:
+  enabled: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
   serviceMonitor:
     enabled: true
