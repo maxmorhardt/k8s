@@ -1,0 +1,54 @@
+# Valkey, the Redis-compatible fork, as one persistent instance. The squares services use it for
+# shared caches, rate limits, idempotency keys, and token revocations, and fail open when it is
+# down, so a restart costs cache hits rather than requests.
+fullnameOverride: redis
+
+# a single pod on a node-local volume; Recreate avoids two pods contending for the same data dir
+deploymentStrategy: Recreate
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+valkeyConfig: |
+  maxmemory 192mb
+  maxmemory-policy volatile-lru
+  appendonly yes
+  appendfsync everysec
+
+dataStorage:
+  enabled: true
+  requestedSize: 2Gi
+  className: local-path-retain
+  keepPvc: true
+
+auth:
+  enabled: true
+  # sealed in argocd/secrets/redis/redis-users.yaml; one key per user
+  usersExistingSecret: redis-users
+  aclUsers:
+    default:
+      permissions: "~* &* +@all"
+    # every squares key is prefixed squares:, so the services cannot touch anything else
+    squares:
+      permissions: "~squares:* resetchannels +@all -@dangerous"
+
+readinessProbe:
+  enabled: true
+
+metrics:
+  enabled: true
+  exporter:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 64Mi
+  serviceMonitor:
+    enabled: true
