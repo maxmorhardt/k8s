@@ -1,6 +1,6 @@
 locals {
   repositories = {
-    # monorepo for maxstash, squares, and the infra charts; ci.yml only builds what changed
+    # monorepo for every public app; ci.yml only builds what changed
     "maxstash" = {
       checks = [
         "pr-title / pr-title",
@@ -8,6 +8,14 @@ locals {
       ]
       # merge commits stay allowed so imported histories survive the monorepo pull request
       merge_methods = ["squash", "merge"]
+    }
+
+    # every helm chart, app and infra, each released on its own
+    "charts" = {
+      checks = [
+        "pr-title / pr-title",
+        "Validate Complete",
+      ]
     }
 
     "infra" = {
