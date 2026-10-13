@@ -24,7 +24,7 @@ A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with productio
 - **Persistent Storage** with local-path-retain StorageClass (Retain reclaim policy)
 - **Traffic Management** via Envoy Gateway (Gateway API) — one gateway for all hostnames, APIs path-routed behind `api.maxstash.io/*`
 - **Authentication** via Dex OIDC, federating Google and GitHub sign-in
-- **Data Persistence** with PostgreSQL HA cluster, NATS JetStream messaging, and a Valkey (Redis-compatible) cache
+- **Data Persistence** with PostgreSQL HA cluster, NATS messaging, and Valkey (Redis-compatible) for caches and event streams
 - **GitOps CD** with Argo CD — every workload reconciled from git, self-healing and pruning
 - **Out-of-Cluster IaC** with Terraform — the S3 backup bucket, Cloudflare DNS, and GitHub rulesets as code, with remote state in S3
 - **Secrets in Git** with Sealed Secrets — encrypted at rest in this repo, unsealed in-cluster by the controller
@@ -59,9 +59,9 @@ The stack follows a microservices architecture where each service is independent
        │              │              │              │
   ┌────▼─────┐   ┌────▼─────┐   ┌────▼─────┐   ┌────▼───┐
   │PostgreSQL│   │   NATS   │   │  Valkey  │   │  Apps  │
-  │   (DB)   │   │(JetStream│   │ (Cache)  │   │        │
-  └──────────┘   │  events) │   └──────────┘   └────────┘
-                 └──────────┘
+  │   (DB)   │   │(Messaging│   │ (Cache,  │   │        │
+  └──────────┘   │ Pub/Sub) │   │ streams) │   └────────┘
+                 └──────────┘   └──────────┘
 ```
 
 ## Deployment
