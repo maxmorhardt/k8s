@@ -6,7 +6,7 @@
 - Language: YAML (Helm values, Kubernetes manifests, Argo CD Applications), plus HCL for out-of-cluster resources and shell for bootstrap
 - Purpose: The GitOps source of truth for a self-hosted K3s cluster. Argo CD reconciles everything here into the cluster.
 - Target environments: A single on-premises K3s cluster with Tailscale on nodes, high availability at the application level.
-- Related repos: `maxstash` (the public monorepo: app source, each app's chart under `apps/<app>/chart`, and the infra charts under `charts/`; all published to `ghcr.io/maxmorhardt/charts`), `ages` (private apps), `workflows` (the shared validation workflows this repo's CI calls).
+- Related repos: `charts` (chart source for everything in `argocd/apps`, published to `ghcr.io/maxmorhardt/charts`), `maxstash` (the public app monorepo, whose releases set `image.tag`), `ages` (private apps), `workflows` (the shared validation workflows this repo's CI calls).
 
 **Editing a file and merging to `main` is the deploy.** There is no `helm upgrade` step, no per-component `deploy.sh`, and no CI workflow anywhere that holds a kubeconfig. `terraform/` deploys the same way, by `terraform apply` in CI rather than an Argo sync.
 
@@ -39,10 +39,10 @@
    - Argo CD itself is the one exception, bootstrapped by hand because it cannot deploy itself from nothing.
 4. Secrets are encrypted, never plaintext
    - Only SealedSecrets are committed. The sealing key is restored out of band.
-5. Separation of concerns with the app repos
-   - `maxstash` holds chart source. This repo holds which version of that chart runs, and where.
+5. Separation of concerns with `charts`
+   - `charts` holds chart source. This repo holds which version of that chart runs, and where.
 6. Ownership of pinned lines
-   - `image.tag` and `targetRevision` in `argocd/apps/` are written by release CI in `maxstash`. Editing them by hand works but is overwritten by the next release.
+   - `image.tag` and `targetRevision` in `argocd/apps/` are written by release CI: `image.tag` by the app's release in `maxstash`, `targetRevision` by the chart's release in `charts`. Editing them by hand works but is overwritten by the next release.
 7. Runbooks live beside config
    - Each component's `SETUP.md` is its operational runbook and stays current with its values file.
 8. Terraform is applied, not reconciled
