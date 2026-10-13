@@ -1,8 +1,8 @@
-# Valkey, the Redis-compatible fork, as one persistent instance. The squares services keep their
+# Valkey as one persistent instance. The squares services keep their
 # event streams here (one per contest, plus games and users) along with caches, rate limits,
 # idempotency keys, and token revocations. Requests keep working while it is down; events wait in
 # each service's postgres outbox and live updates pause until it is back.
-fullnameOverride: redis
+fullnameOverride: valkey
 
 # a single pod on a node-local volume; Recreate avoids two pods contending for the same data dir
 deploymentStrategy: Recreate
@@ -32,8 +32,8 @@ dataStorage:
 
 auth:
   enabled: true
-  # sealed in argocd/secrets/redis/redis-users.yaml; one key per user
-  usersExistingSecret: redis-users
+  # sealed in argocd/secrets/valkey/valkey-users.yaml; one key per user
+  usersExistingSecret: valkey-users
   aclUsers:
     default:
       permissions: "~* &* +@all"

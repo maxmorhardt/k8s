@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: redis
+  name: valkey
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -9,7 +9,7 @@ spec:
   project: default
   destination:
     server: https://kubernetes.default.svc
-    namespace: redis
+    namespace: valkey
   sources:
     - repoURL: https://valkey.io/valkey-helm/
       chart: valkey
@@ -17,7 +17,7 @@ spec:
       targetRevision: 0.12.0
       helm:
         valueFiles:
-          - $values/redis/values.yaml
+          - $values/valkey/values.yaml
     - repoURL: https://github.com/maxmorhardt/infra.git
       targetRevision: main
       ref: values

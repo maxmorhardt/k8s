@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Seals every secret the squares split needs, so they can be committed before the cutover:
-#   argocd/secrets/redis/redis-users.yaml             valkey ACL passwords (default, squares)
+#   argocd/secrets/valkey/valkey-users.yaml           valkey ACL passwords (default, squares)
 #   argocd/secrets/squares/squares-<service>-env.yaml one per service, with only the keys it reads
 #
-# Database, SMTP, captcha, and CORS settings are copied from the live squares-api-env; the redis
+# Database, SMTP, captcha, and CORS settings are copied from the live squares-api-env; the valkey
 # passwords and the internal API token are generated. Nothing is printed and no plaintext is written.
 #
 # usage, from the repository root with kubectl pointed at the cluster:
@@ -35,10 +35,10 @@ seal() {
   echo "sealed $out (${#args[@]} keys)"
 }
 
-redis_default=$(openssl rand -hex 32)
-redis_squares=$(openssl rand -hex 32)
+valkey_default=$(openssl rand -hex 32)
+valkey_squares=$(openssl rand -hex 32)
 internal_token=$(openssl rand -hex 32)
-redis_url="redis://squares:${redis_squares}@redis.redis.svc:6379/0"
+redis_url="redis://squares:${valkey_squares}@valkey.valkey.svc:6379/0"
 
 database() {
   for key in DB_HOST DB_PORT DB_USER DB_PASSWORD DB_NAME DB_SSL_MODE \
@@ -47,8 +47,8 @@ database() {
   done
 }
 
-printf '%s\n' "default=$redis_default" "squares=$redis_squares" \
-  | seal redis-users redis argocd/secrets/redis/redis-users.yaml
+printf '%s\n' "default=$valkey_default" "squares=$valkey_squares" \
+  | seal valkey-users valkey argocd/secrets/valkey/valkey-users.yaml
 
 { database; echo "REDIS_URL=$redis_url"; echo "INTERNAL_API_TOKEN=$internal_token"; echo "ALLOWED_ORIGINS=$(live ALLOWED_ORIGINS)"; } \
   | seal squares-contests-env squares argocd/secrets/squares/squares-contests-env.yaml

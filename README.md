@@ -7,7 +7,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
 ![Terraform](https://img.shields.io/badge/terraform-%23844FBA.svg?style=for-the-badge&logo=terraform&logoColor=white)
-![Valkey](https://img.shields.io/badge/valkey-6983FF?style=for-the-badge&logo=redis&logoColor=white)
+![Valkey](https://img.shields.io/badge/valkey-6983FF?style=for-the-badge)
 ![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)
 ![Alertmanager](https://img.shields.io/badge/Alertmanager-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)
 ![Grafana](https://img.shields.io/badge/grafana-%23F46800.svg?style=for-the-badge&logo=grafana&logoColor=white)
@@ -23,7 +23,7 @@ A comprehensive self-hosted Kubernetes (K3s) infrastructure stack with productio
 - **Persistent Storage** with local-path-retain StorageClass (Retain reclaim policy)
 - **Traffic Management** via Envoy Gateway (Gateway API) — one gateway for all hostnames, APIs path-routed behind `api.maxstash.io/*`
 - **Authentication** via Dex OIDC, federating Google and GitHub sign-in
-- **Data Persistence** with PostgreSQL HA cluster and Valkey (Redis-compatible) for caches and event streams
+- **Data Persistence** with PostgreSQL HA cluster and Valkey for caches and event streams
 - **GitOps CD** with Argo CD — every workload reconciled from git, self-healing and pruning
 - **Out-of-Cluster IaC** with Terraform — the S3 backup bucket, Cloudflare DNS, and GitHub rulesets as code, with remote state in S3
 - **Secrets in Git** with Sealed Secrets — encrypted at rest in this repo, unsealed in-cluster by the controller

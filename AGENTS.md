@@ -19,7 +19,7 @@
   - `secrets/<namespace>/` - SealedSecrets, encrypted at rest and safe to commit.
   - `bootstrap.sh` - installs and repairs Argo CD itself. Run by hand from a workstation with cluster access.
   - `SETUP.md` - how Argo CD is configured and bootstrapped.
-- `<component>/` - one directory per infra component (`alloy/`, `dex/`, `envoy-gateway/`, `kured/`, `loki/`, `postgres/`, `redis/`, `prometheus-stack/`, `sealed-secrets/`, `storage/`, `system-upgrade-controller/`, `k3s/`), each with its `values.yaml` or raw manifests plus a `SETUP.md`.
+- `<component>/` - one directory per infra component (`alloy/`, `dex/`, `envoy-gateway/`, `kured/`, `loki/`, `postgres/`, `valkey/`, `prometheus-stack/`, `sealed-secrets/`, `storage/`, `system-upgrade-controller/`, `k3s/`), each with its `values.yaml` or raw manifests plus a `SETUP.md`.
 - `prometheus-stack/dashboards/` - Grafana dashboard JSON plus a `kustomization.yaml` wrapping each file into a ConfigMap. Deployed by its own `grafana-dashboards` Application.
 - `cloudflare-maintenance/` - Cloudflare Worker serving a maintenance page. Deployed with wrangler, not Kubernetes.
 - `terraform/` - the resources Argo CD cannot reach: the S3 backup bucket with its IAM identity, Cloudflare DNS, and GitHub repository rulesets. Three root modules (`aws/`, `cloudflare/`, `github/`), remote state in S3, planned on PR and applied on merge by `cd-terraform.yml`. See `terraform/SETUP.md`.
@@ -101,7 +101,7 @@ Before adding a new component or upstream chart, verify:
 
 - **Ingress**: a single Envoy Gateway (Gateway API) for all traffic. UIs get a hostname each; APIs share `api.maxstash.io` split by path prefix. TLS terminates at the gateway. Charts attach via `HTTPRoute` with a `parentRef` to the `maxstash` gateway in `envoy-gateway-system`.
 - **Auth**: Dex at `login.maxstash.io` provides OIDC, federating Google and GitHub. Email is the identity.
-- **Data**: PostgreSQL HA via CloudNativePG (`postgres-operator` plus `postgres-cluster`), Valkey (`redis/`) for caches and the squares event streams.
+- **Data**: PostgreSQL HA via CloudNativePG (`postgres-operator` plus `postgres-cluster`), Valkey (`valkey/`) for caches and the squares event streams.
 - **Observability**: kube-prometheus-stack (Prometheus, Alertmanager, Grafana) plus Loki and Alloy for logs. Alertmanager routes to Discord and email with a healthchecks.io dead-man's switch.
 - **Node maintenance**: kured coordinates rolling reboots Tuesdays at 02:00, one node at a time, running `pre-reboot.sh` first. system-upgrade-controller tracks the k3s stable channel in a Wednesday 02:00 to 04:00 ET window, control plane first.
 
