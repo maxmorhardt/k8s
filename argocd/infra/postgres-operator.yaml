@@ -19,7 +19,7 @@ spec:
         releaseName: cloudnativepg
         valueFiles:
           - $values/postgres/values-operator.yaml
-    - repoURL: https://github.com/maxmorhardt/k8s.git
+    - repoURL: https://github.com/maxmorhardt/infra.git
       targetRevision: main
       ref: values
   syncPolicy:

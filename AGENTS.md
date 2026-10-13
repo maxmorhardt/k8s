@@ -2,7 +2,7 @@
 
 ## Project Context
 
-- Project: Self-Hosted Kubernetes Stack (`github.com/maxmorhardt/k8s`)
+- Project: Self-Hosted Kubernetes Stack (`github.com/maxmorhardt/infra`)
 - Language: YAML (Helm values, Kubernetes manifests, Argo CD Applications), plus HCL for out-of-cluster resources and shell for bootstrap
 - Purpose: The GitOps source of truth for a self-hosted K3s cluster. Argo CD reconciles everything here into the cluster.
 - Target environments: A single on-premises K3s cluster with Tailscale on nodes, high availability at the application level.
@@ -24,7 +24,7 @@
 - `cloudflare-maintenance/` - Cloudflare Worker serving a maintenance page. Deployed with wrangler, not Kubernetes.
 - `terraform/` - the resources Argo CD cannot reach: the S3 backup bucket with its IAM identity, Cloudflare DNS, and GitHub repository rulesets. Three root modules (`aws/`, `cloudflare/`, `github/`), remote state in S3, planned on PR and applied on merge by `cd-terraform.yml`. See `terraform/SETUP.md`.
 - `namespaces.sh` - creates namespaces on a bare cluster, before Argo CD exists.
-- `.github/workflows/ci-k8s.yml` - chart, manifest, and Terraform validation via the shared workflows, fanning into the `Validate Complete` check the rulesets require. **Never applies to the cluster.**
+- `.github/workflows/ci.yml` - chart, manifest, and Terraform validation via the shared workflows, fanning into the `Validate Complete` check the rulesets require. **Never applies to the cluster.**
 - `.github/workflows/cd-terraform.yml` - applies `terraform/` on merge, and plans it weekly with `fail_on_diff` to catch drift.
 
 ## Core Principles

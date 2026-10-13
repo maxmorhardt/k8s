@@ -31,7 +31,7 @@ locals {
       ]
     }
 
-    "k8s" = {
+    "infra" = {
       checks = [
         "pr-title / pr-title",
         "Validate Complete",
@@ -60,4 +60,10 @@ module "rulesets" {
   required_checks = each.value.checks
   strict          = try(each.value.strict, false)
   bypass_actors   = try(each.value.bypass_actors, [])
+}
+
+# the repository was renamed from k8s; keep its ruleset instead of creating a second one
+moved {
+  from = module.rulesets["k8s"]
+  to   = module.rulesets["infra"]
 }

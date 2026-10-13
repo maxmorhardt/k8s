@@ -1,4 +1,4 @@
-name: k8s CI
+name: infra CI
 
 on:
   pull_request:
