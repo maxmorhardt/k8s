@@ -16,7 +16,6 @@ config:
     - appendfsync always
     - min-replicas-to-write 1
     - min-replicas-max-lag 10
-    # sha256 of the squares password in valkey-users
     - "user squares on #d85e6a7a3d22aadd139137e12828b655cb0e9d1a71e9c62008610f59b21a1d1e ~squares:* resetchannels +@all -@dangerous"
 
 resources:
