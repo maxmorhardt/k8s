@@ -8,7 +8,7 @@ auth:
   existingSecretPasswordKey: default
 
 config:
-  maxMemory: 384mb
+  maxMemory: 160mb
   maxMemoryPolicy: volatile-ttl
   save: ""
   extraConfig:
@@ -20,11 +20,11 @@ config:
 
 resources:
   requests:
-    cpu: 100m
-    memory: 512Mi
+    cpu: 50m
+    memory: 256Mi
   limits:
     cpu: 500m
-    memory: 512Mi
+    memory: 256Mi
 
 persistence:
   storageClass: local-path-retain

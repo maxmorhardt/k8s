@@ -6,7 +6,7 @@
 - Language: YAML (Helm values, Kubernetes manifests, Argo CD Applications), plus HCL for out-of-cluster resources and shell for bootstrap
 - Purpose: The GitOps source of truth for a self-hosted K3s cluster. Argo CD reconciles everything here into the cluster.
 - Target environments: A single on-premises K3s cluster with Tailscale on nodes, high availability at the application level.
-- Related repos: `charts` (chart source for everything in `argocd/apps`, published to `ghcr.io/maxmorhardt/charts`), `maxstash` (the public app monorepo, whose releases set `image.tag`), `ages` (private apps), `workflows` (the shared validation workflows this repo's CI calls).
+- Related repos: `charts` (chart source for everything in `argocd/apps`, published to `ghcr.io/maxmorhardt/charts`), `maxstash` (the public app monorepo, whose releases set `image.tag`), `workflows` (the shared validation workflows this repo's CI calls).
 
 **Editing a file and merging to `main` is the deploy.** There is no `helm upgrade` step, no per-component `deploy.sh`, and no CI workflow anywhere that holds a kubeconfig. `terraform/` deploys the same way, by `terraform apply` in CI rather than an Argo sync.
 

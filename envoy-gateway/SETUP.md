@@ -22,7 +22,7 @@ kubectl get secret maxstash.io-tls -n <existing-ns> -o yaml \
 ## Notes
 
 - Client IP: the `ClientTrafficPolicy` walks `X-Forwarded-For` right-to-left and takes the first address outside the trusted Cloudflare CIDRs - the same trust model as the old nginx `proxy-real-ip-cidr` setup. The `cloudflare-cidr` cronjob keeps the CIDR list current.
-- Rate limits: per-route `BackendTrafficPolicy` (Local type) in each app chart replaces the nginx `limit-rps` annotations.
+- Rate limits: per-route `BackendTrafficPolicy` (Local type) in each app chart, counted per proxy replica.
 - Request body size caps moved into the apps themselves (`request_size` middleware); the gateway does not enforce one.
 - Authentication: the squares API validates OIDC tokens at the gateway. Its chart's `SecurityPolicy` checks the bearer JWT against Dex (`https://login.maxstash.io/keys`, audiences `squares` and `squares-mobile`) and copies the claims into `X-Auth-Email`, `X-Auth-Name`, `X-Auth-Email-Verified`, `X-Auth-Iat` and `X-Auth-Exp`. The JWT is optional so public routes still work; the services reject protected routes without `X-Auth-Email`. The header stripping above is what makes those headers trustworthy, so it must ship before or with any chart that relies on them.
 - Server-sent events: the squares realtime route (`/squares/events/...`) sets `timeouts.request: 0s` so long-lived streams are not cut off; the service sends a heartbeat every 25s to keep idle connections open through Cloudflare.
