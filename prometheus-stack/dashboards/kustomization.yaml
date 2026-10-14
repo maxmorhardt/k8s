@@ -28,3 +28,6 @@ configMapGenerator:
   - name: grafana-dashboard-sealed-secrets
     files:
       - sealed-secrets.json
+  - name: grafana-dashboard-valkey
+    files:
+      - valkey.json
